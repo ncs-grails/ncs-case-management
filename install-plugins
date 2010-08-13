@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Dwelling Units (Addresses) / Households / People / Relationships
+# -- storage at first, demographic changes later
+
+# Batches / Item Tracking / Instruments / Results
+# -- Create Instruments
+# -- Create Batches
+# -- Add/Remove SIDs
+# -- Receipt SIDs
+
+# Document Generation
+# -- Configure Mailings
+# -- Configure Selection Criteria
+# -- Configure Merge Materials
+# -- Re/Generate Mailings
+
+# Study Specific
+# -- Segments
+
+# Reporting
+
+# Authenitcation / Authorization - SITE SPECIFIC
+# --
+# U of MN : umn-acegi
+
+
