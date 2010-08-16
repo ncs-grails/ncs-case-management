@@ -73,9 +73,88 @@ class BootStrap {
 				coordinator:"NICHD",
 				collaborator:"TBA",
 				purpose:"improving the health of america's children",
-				exclusionary: false).save()
+				exclusionary: false)
+			if (!ncs.save()) {
+				ncs.errors.each{
+					println "${it}"
+				}
+			}
 		}
 
+		/*** Tracking Seciton ***/
+		/* Items: BatchDirection, InstrumentFormat, IsInitial, Result
+		 */
+
+		// BatchDirection
+		def outgoing = BatchDirection.findByName('outgoing')
+		if (! outgoing) {
+			outgoing = new BatchDirection(name:'outgoing').save()
+		}
+		def incoming = BatchDirection.findByName('incoming')
+		if (! incoming) {
+			incoming = new BatchDirection(name:'incoming').save()
+		}
+		def internal = BatchDirection.findByName('internal')
+		if (! internal) {
+			internal = new BatchDirection(name:'internal').save()
+		}
+
+		// InstrumentFormat
+		def firstClassMail = InstrumentFormat.findByName('first class mail')
+		if (!firstClassMail) {
+			firstClassMail = new InstrumentFormat(name:'first class mail').save
+		}
+		def inPerson = InstrumentFormat.findByName('in person')
+		if (!inPerson) {
+			inPerson = new InstrumentFormat(name:'in person').save
+		}
+		def onThePhone = InstrumentFormat.findByName('phone')
+		if (!onThePhone) {
+			onThePhone = new InstrumentFormat(name:'phone').save
+		}
+
+		// IsInitial
+		def initial = IsInitial.findByName('initial')
+		if (!initial) {
+			initial = new IsInitial(name:'initial').save
+		}
+		def reminder = IsInitial.findByName('reminder')
+		if (!reminder) {
+			reminder = new IsInitial(name:'reminder').save
+		}
+
+		// Result
+		def received = Result.findByName('received')
+		if (!received) {
+			received = new Result(name:'received').save
+		}
+
+		// Test Data
+        environments {
+			development {
+				// throw some test data into the database
+				def myAddress = new StreetAddress(address:'3323 Buchanan St NE',
+					city:'Minneapolis',
+					state:'MN', zipCode:55418, zip4:1449,
+					county:'Hennepin', country:us,
+					appCreated:'byHand').save()
+
+				def me = new Person(title:'Mr',
+					firstName:'Aaron',
+					middleName:'James',
+					lastName:'Zirbes',
+					suffix:null,
+					birthDate:new Date(79,11,21),
+					gender:male,
+					alive:true,
+					isRecruitable:false,
+					appCreated:'byHand').save()
+
+				def myUnit = new DwellingUnit(address:myAddress,
+					appCreated:'byHand').save()
+				
+			}
+		}
 
     }
     def destroy = {
