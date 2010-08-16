@@ -22,7 +22,7 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="id" title="${message(code: 'batchCreationConfig.id.label', default: 'Id')}" />
+                            <g:sortableColumn property="id" title="${message(code: 'batchCreationConfig.id.label', default: 'ID')}" />
                         
                             <g:sortableColumn property="name" title="${message(code: 'batchCreationConfig.name.label', default: 'Name')}" />
                         
@@ -40,7 +40,7 @@
                     <g:each in="${batchCreationConfigInstanceList}" status="i" var="batchCreationConfigInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${batchCreationConfigInstance.id}">${fieldValue(bean: batchCreationConfigInstance, field: "id")}</g:link></td>
+                            <td><g:link action="edit" id="${batchCreationConfigInstance.id}">${fieldValue(bean: batchCreationConfigInstance, field: "id")}</g:link></td>
                         
                             <td>${fieldValue(bean: batchCreationConfigInstance, field: "name")}</td>
                         
