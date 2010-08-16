@@ -3,3 +3,26 @@ form.ncs input {
 	border-color: #DDD;
 	border-style: solid;
 }
+
+.todo {
+	color:red;
+    font-variant: small-caps;
+}
+
+.group {
+	border-color: green;
+	border-style: solid;
+	border-width: 2px;
+}
+
+p.dataItem {
+	
+}
+
+span.name {
+	font-size: 0.9em;
+	font-variant: small-caps;
+	display: block;
+	clear:both;
+	text-decoration: underline;
+}

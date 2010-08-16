@@ -102,31 +102,31 @@ class BootStrap {
 		// InstrumentFormat
 		def firstClassMail = InstrumentFormat.findByName('first class mail')
 		if (!firstClassMail) {
-			firstClassMail = new InstrumentFormat(name:'first class mail').save
+			firstClassMail = new InstrumentFormat(name:'first class mail', groupName:'mail').save()
 		}
 		def inPerson = InstrumentFormat.findByName('in person')
 		if (!inPerson) {
-			inPerson = new InstrumentFormat(name:'in person').save
+			inPerson = new InstrumentFormat(name:'in person', groupName:'person').save()
 		}
 		def onThePhone = InstrumentFormat.findByName('phone')
 		if (!onThePhone) {
-			onThePhone = new InstrumentFormat(name:'phone').save
+			onThePhone = new InstrumentFormat(name:'phone', groupName:'phone').save()
 		}
 
 		// IsInitial
 		def initial = IsInitial.findByName('initial')
 		if (!initial) {
-			initial = new IsInitial(name:'initial').save
+			initial = new IsInitial(name:'initial').save()
 		}
 		def reminder = IsInitial.findByName('reminder')
 		if (!reminder) {
-			reminder = new IsInitial(name:'reminder').save
+			reminder = new IsInitial(name:'reminder').save()
 		}
 
 		// Result
 		def received = Result.findByName('received')
 		if (!received) {
-			received = new Result(name:'received').save
+			received = new Result(name:'received').save()
 		}
 
 		// Test Data
@@ -152,6 +152,12 @@ class BootStrap {
 
 				def myUnit = new DwellingUnit(address:myAddress,
 					appCreated:'byHand').save()
+
+				def hiQ = new Instrument(name:'High Intensity Questionnaire',
+					nickName:'HiQ', study:ncs, requiresPrimaryContact:true).save()
+				
+				def loQ = new Instrument(name:'Low Intensity Questionnaire',
+					nickName:'LoQ', study:ncs, requiresPrimaryContact:true).save()
 				
 			}
 		}
