@@ -28,7 +28,7 @@
 	  </span>
 	</div>
 
-	<fieldset class="group">
+	<fieldset class="maroonBorder">
 	  <legend>Instrument Basics</legend>
 	  <div class="prop">
 		<span class="name">
