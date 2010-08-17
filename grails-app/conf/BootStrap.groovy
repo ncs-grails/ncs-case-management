@@ -172,8 +172,6 @@ class BootStrap {
 				// Fake Mailing #1
 				// generate a batch
 
-				bccHiQ.addToBatches()
-
 				def batchHiQ = new Batch(instrument:hiQ, format:firstClassMail, 
 					direction: outgoing, instrumentDate: today, batchRunBy:'ajz',
 					batchRunByWhat: appName, trackingDocumentSent:false, 
