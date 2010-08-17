@@ -10,7 +10,7 @@ form.ncs input {
 }
 
 .group {
-	border-color: green;
+	border-color: #7A0019;
 	border-style: solid;
 	border-width: 2px;
 }
@@ -20,7 +20,7 @@ p.dataItem {
 }
 
 span.name {
-	font-size: 0.9em;
+	font-size: 1.1em;
 	font-variant: small-caps;
 	display: block;
 	clear:both;

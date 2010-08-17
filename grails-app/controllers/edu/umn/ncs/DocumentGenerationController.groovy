@@ -27,7 +27,6 @@ class DocumentGenerationController {
 						}
 					}
 				}
-				order(params.sort, params.order)
 			}
 		}
 

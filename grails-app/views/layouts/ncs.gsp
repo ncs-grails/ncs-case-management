@@ -11,25 +11,28 @@
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_template.gsp')}" />
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_print.css')}" media="print" />
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_print.gsp')}" media="print" />
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'css/pepper-grinder',file:'jquery.ui.css')}" />
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'global.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',plugin:'ncs-web-template',file:'favicon.ico')}" type="image/x-icon" />
-<g:javascript plugin="ncs-web-template" src="umn_searchfield.js" />
+	<g:javascript plugin="ncs-web-template" src="umn_searchfield.js" />
+	<g:javascript library="jquery" plugin="jquery"/>
+	<g:javascript src="jquery/jquery.ui.js" />
 
-<style type="text/css">
-#main_wrapper{width:95%; max-width:1280px; min-width:720px}
-</style>
-
-<!-- STYLE SHEETS TO FIX THE EVIL IE -->
-<!--[if IE 6]>
-<style type="text/css" media="screen">
-@import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE6.css')}");
+	<style type="text/css">
+	#main_wrapper{width:95%; max-width:1280px; min-width:720px}
 	</style>
+
+	<!-- STYLE SHEETS TO FIX THE EVIL IE -->
+	<!--[if IE 6]>
+	  <style type="text/css" media="screen">
+		@import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE6.css')}");
+	  </style>
 	<![endif]-->
 	<!--[if IE 7]>
-	<style type="text/css" media="screen">
-	@import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE7.css')}");
-	</style>
-	  <![endif]-->
+	  <style type="text/css" media="screen">
+	    @import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE7.css')}");
+	  </style>
+	<![endif]-->
 
 	  <g:layoutHead />
 	  <g:javascript library="application" />

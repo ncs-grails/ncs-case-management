@@ -34,33 +34,21 @@
 
 		<g:sortableColumn property="name" params="${[q: params?.q]}" title="${message(code: 'batchCreationConfig.name.label', default: 'Name')}" />
 
-		<g:sortableColumn property="selectionQuery" title="${message(code: 'batchCreationConfig.selectionQuery.label', default: 'Selection Query')}" />
-
-		<g:sortableColumn property="postGenerationQuery" title="${message(code: 'batchCreationConfig.postGenerationQuery.label', default: 'Post Generation Query')}" />
-
-		<g:sortableColumn property="defaultReason" title="${message(code: 'batchCreationConfig.defaultReason.label', default: 'Default Reason')}" />
-
-		<g:sortableColumn property="defaultInstructions" title="${message(code: 'batchCreationConfig.defaultInstructions.label', default: 'Default Instructions')}" />
-
 		</tr>
 		</thead>
 		<tbody>
 		<g:each in="${batchCreationConfigInstanceList}" status="i" var="batchCreationConfigInstance">
 		  <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-		  <td>${batchCreationConfigInstance?.instrument?.study?.name}</td>
+			<td>${batchCreationConfigInstance?.instrument?.study?.name}</td>
 
-		  <td>${batchCreationConfigInstance?.instrument?.name}</td>
+			<td><g:link action="show" id="${batchCreationConfigInstance.id}">
+			  ${batchCreationConfigInstance?.instrument?.name}
+			</g:link></td>
 
-		  <td><g:link action="show" id="${batchCreationConfigInstance.id}">${fieldValue(bean: batchCreationConfigInstance, field: "name")}</g:link></td>
-
-		  <td>${fieldValue(bean: batchCreationConfigInstance, field: "selectionQuery")}</td>
-
-		  <td>${fieldValue(bean: batchCreationConfigInstance, field: "postGenerationQuery")}</td>
-
-		  <td>${fieldValue(bean: batchCreationConfigInstance, field: "defaultReason")}</td>
-
-		  <td>${fieldValue(bean: batchCreationConfigInstance, field: "defaultInstructions")}</td>
+			<td><g:link action="show" id="${batchCreationConfigInstance.id}">
+			  ${fieldValue(bean: batchCreationConfigInstance, field: "name")}
+			</g:link></td>
 
 		  </tr>
 		</g:each>

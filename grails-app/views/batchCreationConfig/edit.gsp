@@ -1,5 +1,3 @@
-
-
 <%@ page import="edu.umn.ncs.BatchCreationConfig" %>
 <html>
   <head>
@@ -7,6 +5,11 @@
 	<meta name="layout" content="ncs" />
   <g:set var="entityName" value="${message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig')}" />
   <title><g:message code="default.edit.label" args="[entityName]" /></title>
+  <script type="text/javascript">
+	$(function() {
+		$("#tabs").tabs();
+	});
+  </script>
 </head>
 <body>
   <div class="nav">
