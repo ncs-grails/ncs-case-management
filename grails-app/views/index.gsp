@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Welcome to Grails</title>
+        <title>Case Management - National Children's Study</title>
         <meta name="layout" content="ncs" />
         <style type="text/css" media="screen">
 
@@ -81,11 +81,33 @@
             </div>
         </div>
         <div id="pageBody">
-            <h1>Welcome to Grails</h1>
-            <p>Congratulations, you have successfully started your first Grails application! At the moment
-            this is the default page, feel free to modify it to either redirect to a controller or display whatever
-            content you may choose. Below is a list of controllers that are currently deployed in this application,
-            click on each to execute its default action:</p>
+            <h1>Welcome to the National Children's Study</h1>
+
+			<p>This application is available for generating and tracking study
+			documents and tracking the location of study participants.</p>
+
+			<div id="pageList" class="dialog">
+			  <h2>Available Pages</h2>
+			  <dl>
+				<dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
+				<dt>
+				  Manage the instruments used to interact with study subjects.
+				  Instruments include such items as invitations, surveys, phone
+				  calls, events, etc...
+				</dt>
+				<dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
+				<dt>
+				  Configure the way that batches of instruments are generated
+				  in the system so that they can be properly tracked
+				</dt>
+				<dt><g:link controller="documentGeneration" action="list">Document Generation</g:link></dt>
+				<dt>
+				  Generate instrument batches either automatically or by hand.
+				</dt>
+				
+			  </dl>
+			</div>
+
 
             <div id="controllerList" class="dialog">
                 <h2>Available Controllers:</h2>
