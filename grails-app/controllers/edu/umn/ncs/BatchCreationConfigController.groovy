@@ -34,12 +34,16 @@ class BatchCreationConfigController {
 
     def edit = {
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+
+        def instrumentInstanceList = Instrument.list()
+        
         if (!batchCreationConfigInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
             redirect(action: "list")
         }
         else {
-            return [batchCreationConfigInstance: batchCreationConfigInstance]
+            return [batchCreationConfigInstance: batchCreationConfigInstance,
+                instrumentInstanceList:instrumentInstanceList]
         }
     }
 
@@ -60,6 +64,7 @@ class BatchCreationConfigController {
                     return
                 }
             }
+
             batchCreationConfigInstance.properties = params
 			// if the old query wasn't null, and the new query is different....
 			if (oldQuery != batchCreationConfigInstance.selectionQuery && oldQuery) {
