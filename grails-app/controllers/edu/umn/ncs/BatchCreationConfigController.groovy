@@ -35,15 +35,55 @@ class BatchCreationConfigController {
     def edit = {
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
 
+        // TEST CODE TEST CODE TEST CODE
+        // All instruments
         def instrumentInstanceList = Instrument.list()
+        def instrumentFormatInstanceList = InstrumentFormat.list()
+        def usedInstruments = []
+        def unusedInstruments = []
         
+        // TEST CODE TEST CODE TEST CODE
+
+        if (batchCreationConfigInstance) {
+            // config instrument
+            def bccInstruments = [ batchCreationConfigInstance.instrument ]
+
+            // items instruments
+            def bciInstrumentList = batchCreationConfigInstance.subItems.collect{ it.instrument }
+
+            usedInstruments = bciInstrumentList + bccInstruments
+
+            def sql = "from Instrument as i where i.id not in (:ui)"
+            unusedInstruments = Instrument.findAll(sql, [ui:usedInstruments.collect{it.id}])
+        }
+
+
+
+
+
+
+
+        // Save / Delete
+        // - All Instruments except those in items and the one in current
+        //   batchCreationConfig plus the current item
+        // - All instruments in batchCreationConfig and items except the current item
+
+        // New
+        // - All Instruments except those in items and the one in current batchCreationConfig
+        // ! only show this section if the above list is not empty
+        // - All instruments in batchCreationConfig and items
+
+
         if (!batchCreationConfigInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
             redirect(action: "list")
         }
         else {
             return [batchCreationConfigInstance: batchCreationConfigInstance,
-                instrumentInstanceList:instrumentInstanceList]
+                instrumentInstanceList:instrumentInstanceList,
+                instrumentFormatInstanceList: instrumentFormatInstanceList,
+                usedInstruments:usedInstruments,
+                unusedInstruments:unusedInstruments]
         }
     }
 

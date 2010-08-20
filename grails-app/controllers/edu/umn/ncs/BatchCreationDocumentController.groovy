@@ -49,12 +49,10 @@ class BatchCreationDocumentController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "Failed to delete document id: ${params.id}"
-                //flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'batchCreationDocument.label', default: 'BatchCreationDocument'), params.id])}"
-                redirect(controller:"batchCreationConfig", action: "edit", id:params.id)
+                redirect(controller:"batchCreationConfig", action: "edit", id:batchCreationDocumentInstance.batchCreationConfig.id)
             }
         }
         else {
-            //flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationDocument.label', default: 'BatchCreationDocument'), params.id])}"
             flash.message = "Document id: ${params.id} not found."
             redirect(controller:"batchCreationConfig", action: "list")
         }

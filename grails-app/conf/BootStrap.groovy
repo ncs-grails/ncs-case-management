@@ -186,11 +186,11 @@ class BootStrap {
 
                 // add a document
                 bccHiQ.addToDocuments(
-                        documentLocation:'n:\\merge_documents\\hiq_letter_merge.doc',
+                        documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
                         mergeSourceQuery:'SELECT * FROM something INNER JOING something ELSE WHERE (bid = 123)',
-                        mergeSourceFile:'q:\\merge_data\\hi_q_source.txt')
+                        mergeSourceFile:'q:/merge_data/hi_q_source.txt')
                     .addToDocuments(
-                        documentLocation:'n:\\merge_documents\\frequently_asked_questions.doc')
+                        documentLocation:'n:/merge_documents/frequently_asked_questions.doc')
                     .save()
 
                 // add a item

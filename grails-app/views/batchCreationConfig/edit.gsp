@@ -47,7 +47,7 @@
       <div id="doctabs">
         <ul>
           <g:each var="d" in="${batchCreationConfigInstance.documents}">
-            <li><a href="#dtabs-${d.id}">Document #${d.id}</a></li>
+            <li><a href="#dtabs-${d.id}">${new File(d.documentLocation).name}</a></li>
           </g:each>
           <li><a href="#dtabs-new">New</a></li>
         </ul>
@@ -97,32 +97,32 @@
           <g:form method="post" controller="batchCreationDocument" >
             <g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
-              <div class="prop">
-                <span class="name">
-                  <label for="documentLocation"><g:message code="batchCreationDocument.documentLocation.label" default="Document Location"/></label>
-                </span>
-                <span class="value">
-                  <g:textField size="80" name="documentLocation" value="" />
-                </span>
-              </div>
+            <div class="prop">
+              <span class="name">
+                <label for="documentLocation"><g:message code="batchCreationDocument.documentLocation.label" default="Document Location"/></label>
+              </span>
+              <span class="value">
+                <g:textField size="80" name="documentLocation" value="" />
+              </span>
+            </div>
 
-              <div class="prop">
-                <span class="name">
-                  <label for="mergeSourceFile"><g:message code="batchCreationDocument.mergeSourceFile.label" default="Merge Data Location" /></label>
-                </span>
-                <span class="value">
-                  <g:textField size="80" name="mergeSourceFile" value="" />
-                </span>
-              </div>
+            <div class="prop">
+              <span class="name">
+                <label for="mergeSourceFile"><g:message code="batchCreationDocument.mergeSourceFile.label" default="Merge Data Location" /></label>
+              </span>
+              <span class="value">
+                <g:textField size="80" name="mergeSourceFile" value="" />
+              </span>
+            </div>
 
-              <div class="prop">
-                <span class="name">
-                  <label for="mergeSourceQuery"><g:message code="batchCreationDocument.mergeSourceQuery.label" default="Merge Source Query" /></label>
-                </span>
-                <span class="value">
-                  <g:textArea name="mergeSourceQuery" rows="3" cols="80"></g:textArea>
-                </span>
-              </div>
+            <div class="prop">
+              <span class="name">
+                <label for="mergeSourceQuery"><g:message code="batchCreationDocument.mergeSourceQuery.label" default="Merge Source Query" /></label>
+              </span>
+              <span class="value">
+                <g:textArea name="mergeSourceQuery" rows="3" cols="80"></g:textArea>
+              </span>
+            </div>
 
             <g:actionSubmit controller="batchCreationDocument" action="save" value="Add" />
           </g:form>
@@ -138,7 +138,9 @@
           <g:each var="i" in="${batchCreationConfigInstance.subItems}">
             <li><a href="#itabs-${i.id}">${i.instrument?.name}</a></li>
           </g:each>
-          <li><a href="#itabs-new">New</a></li>
+          <g:if test="${unusedInstruments}">
+            <li><a href="#itabs-new">New</a></li>
+          </g:if>
         </ul>
 
         <!-- Form goes here -->
@@ -152,7 +154,7 @@
                   <label for="instrument"><g:message code="batchCreationItem.instrument.label" default="Instrument"/></label>
                 </span>
                 <span class="value">
-                  <g:select name="instrument.id" from="${instrumentInstanceList}" optionKey="id" value="${i.instrument?.id}"  />
+                  <g:select name="instrument.id" from="${unusedInstruments + [i.instrument]}" optionKey="id" value="${i.instrument?.id}"  />
                 </span>
               </div>
 
@@ -161,7 +163,7 @@
                   <label for="format"><g:message code="batchCreationItem.format.label" default="Format" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="format.id" from="${edu.umn.ncs.InstrumentFormat.list()}" optionKey="id" value="${i.format?.id}"  />
+                  <g:select name="format.id" from="${instrumentFormatInstanceList}" optionKey="id" value="${i.format?.id}"  />
                 </span>
               </div>
 
@@ -175,30 +177,30 @@
               </div>
 
               <div class="prop">
-                  <span class="name">
-                    <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="attachmentOf.id" from="${instrumentInstanceList}" optionKey="id" value="${i.attachmentOf?.id}" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="attachmentOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.attachmentOf?.id}" noSelection="['null': '']" />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                    <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="childOf.id" from="${instrumentInstanceList}" optionKey="id" value="${i.childOf?.id}" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="childOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.childOf?.id}" noSelection="['null': '']" />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                    <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="sisterOf.id" from="${instrumentInstanceList}" optionKey="id" value="${i.sisterOf?.id}" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="sisterOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.sisterOf?.id}" noSelection="['null': '']" />
+                </span>
               </div>
 
               <g:actionSubmit action="update" value="Save" />
@@ -207,68 +209,70 @@
           </div>
         </g:each>
 
-        <div id="itabs-new">
-          <g:form method="post" controller="batchCreationItem" >
-            <g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
+        <g:if test="${unusedInstruments}">
+          <div id="itabs-new">
+            <g:form method="post" controller="batchCreationItem" >
+              <g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
               <div class="prop">
-                  <span class="name">
-                    <label for="instrument"><g:message code="batchCreationItem.instrument.label" default="Instrument" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="instrument.id" from="${instrumentInstanceList}" optionKey="id" value=""  />
-                  </span>
+                <span class="name">
+                  <label for="instrument"><g:message code="batchCreationItem.instrument.label" default="Instrument" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="instrument.id" from="${unusedInstruments}" optionKey="id" value=""  />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                      <label for="format"><g:message code="batchCreationItem.format.label" default="Format" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="format.id" from="${edu.umn.ncs.InstrumentFormat.list()}" optionKey="id" value=""  />
-                  </span>
+                <span class="name">
+                  <label for="format"><g:message code="batchCreationItem.format.label" default="Format" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="format.id" from="${instrumentFormatInstanceList}" optionKey="id" value=""  />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                      <label for="direction"><g:message code="batchCreationItem.direction.label" default="Direction" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="direction.id" from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id" value=""  />
-                  </span>
+                <span class="name">
+                  <label for="direction"><g:message code="batchCreationItem.direction.label" default="Direction" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="direction.id" from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id" value=""  />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                      <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="attachmentOf.id" from="${instrumentInstanceList}" optionKey="id" value="" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="attachmentOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                      <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="childOf.id" from="${instrumentInstanceList}" optionKey="id" value="" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="childOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                </span>
               </div>
 
               <div class="prop">
-                  <span class="name">
-                      <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
-                  </span>
-                  <span class="value">
-                      <g:select name="sisterOf.id" from="${instrumentInstanceList}" optionKey="id" value="" noSelection="['null': '']" />
-                  </span>
+                <span class="name">
+                  <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
+                </span>
+                <span class="value">
+                  <g:select name="sisterOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                </span>
               </div>
 
-            <g:actionSubmit controller="batchCreationItem" action="save" value="Add" />
-          </g:form>
-        </div>
-    <!-- /Items -->
+              <g:actionSubmit controller="batchCreationItem" action="save" value="Add" />
+            </g:form>
+          </div>
+        </g:if>
+        <!-- /Items -->
 
       </div>
     </div>
