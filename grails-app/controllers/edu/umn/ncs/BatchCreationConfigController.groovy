@@ -88,6 +88,9 @@ class BatchCreationConfigController {
     }
 
     def update = {
+
+        println "PARAMS: \n ${params} \n"
+
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
 
         if (batchCreationConfigInstance) {

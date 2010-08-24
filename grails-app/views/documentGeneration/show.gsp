@@ -85,16 +85,24 @@ ${batchCreationConfigInstance?.name}
 		  <g:textField name="maxPieces" value="${batchCreationConfigInstance.maxPieces}" /> peices.
 		  </p>
 
-		  <p> <!-- Batch Date -->
-		  <g:checkBox name="autoSetMailDate" value="${batchCreationConfigInstance?.autoSetMailDate}" />
-		  <label for="autoSetMailDate">${message(code: 'batchCreationConfig.autoSetMailDate.label', default: 'Set Mail Date')}:</label>
-		  <g:datePicker name="mailDate" value="${params.mailDate}" precision="day" />
-		  </p>
-
+                  <g:if test="${batchCreationConfigInstance?.autoSetMailDate}">
+                    <p><!-- Mail Date -->
+                      <g:checkBox name="autoSetMailDate" value="${batchCreationConfigInstance?.autoSetMailDate}" />
+                      <label for="autoSetMailDate">${message(code: 'batchCreationConfig.autoSetMailDate.label', default: 'Set Mail Date')}:</label>
+                      <g:datePicker name="mailDate" value="${params.mailDate}" precision="day" />
+                    </p>
+                  </g:if>
 
 		  <!-- Go Button -->
-		  <g:actionSubmit action="autoGenerate" value="Generate New Batch Automatically" />
-		  <g:actionSubmit action="manualGenerate" value="Generate New Batch Manually" />
+                  <g:if test="${batchCreationConfigInstance?.automaticSelection}" >
+                    <g:actionSubmit action="autoGenerate" value="Generate New Batch Automatically" />
+                  </g:if>
+                  <g:if test="${batchCreationConfigInstance?.optionalSelection}" >
+                    <g:actionSubmit action="optionalGenerate" value="Generate New Batch by Selection" />
+                  </g:if>
+                  <g:if test="${batchCreationConfigInstance?.manualSelection}" >
+                    <g:actionSubmit action="manualGenerate" value="Generate New Batch Manually" />
+                  </g:if>
 		</g:form>
 
 	</fieldset>

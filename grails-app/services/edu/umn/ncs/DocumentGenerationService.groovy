@@ -1,4 +1,6 @@
 package edu.umn.ncs
+import javax.sql.DataSource
+import groovy.sql.Sql
 
 /* This class is based on the C# class written by Aaron J. Zirbes @ umn.edu
  * located here:
@@ -10,35 +12,141 @@ package edu.umn.ncs
 class DocumentGenerationService {
 
     static transactional = true
+    DataSource dataSource
 
-    def generateMailing(BatchCreationConfig config, Map params) {
+    def generateMailing(Map params) {
+
+        def validSelectionList = true
+        def emptySelectionList = false
         /*
          *
          * Params should contain...
          *	config		: BatchCreationConfig
+         *	username        : String
          *	mailDate	: Date
          *	maxPieces	: Integer
          *	manual		: Boolean
          *	reason		: String
          *	instructions    : String
          *	comments	: String
-         *	username        : String
          *
          **/
 
-        if (config && username) {
-            // TODO: Verify Selection Criteria Columns
-            // TODO: Replace SQL Variables with Data
-            // TODO: Replace SELECT TOP N or LIMIT 0, N with MaxPeices
-            //      Note: Check Oracle and Postgres TOP N code
-            // Verify result set is not empty
+        if (params.config && params.username) {
+
+            def batchCreationConfigInstance = params.config
+            def username = params.username
+
+            println "${username} is generating a new ${batchCreationConfigInstance.name} batch"
+
+            def manualSelection = false
+            def automaticSelection = false
+
+            if (batchCreationConfigInstance.manualSelection && params.manual) {
+                manualSelection = true
+                automaticSelection = false
+            } else if (batchCreationConfigInstance.automaticSelection && !params.manual) {
+                manualSelection = false
+                automaticSelection = true
+            }
+
+            if (!dataSource) {
+                println "Error: connecting to dataSource in DocumentGenerationService"
+            } else {
+                // TODO: Verify Selection Criteria Columns
+                if (manualSelection) {
+                    // We can assume all of the columns are there
+                    // because we'll put them in a table that will have
+                    // the correct columns!
+
+                    // ... we could do some null checks in the table though...
+
+                } else {
+
+                    def selectionQuery = batchCreationConfigInstance.selectionQuery
+                    def selectionParams = [:]
+                    // TODO: Replace SQL Variables with Data
+
+                    if (selectionQuery.contains(':mailDate')) {
+                        selectionParams.mailDate = mailDate
+                    }
+
+                    // TODO: Replace SELECT TOP N or LIMIT 0, N with MaxPeices
+
+                    if (selectionQuery.contains(':topN')) {
+                        selectionParams.topN = maxPieces
+                    }
+                    //      Note: Check Oracle and Postgres TOP N code
+
+                    // If it's auto selection..
+                    def sql = new Sql(dataSource)
+                    if (sql) {
+                        println "${new Date()}"
+                        def results = sql.rows(selectionQuery, selectionParams)
+                        if (results) {
+                            // validating recordset
+                            results.each{ row ->
+                                def bcq = new BatchCreationQueue()
+
+                                if (row.containsKey('person')) {
+                                    bcq.person = Person.get(row.person)
+                                }
+                                if (row.containsKey('household')) {
+                                    bcq.household = Household.get(row.household)
+                                }
+                                if (row.containsKey('dwelling_unit')) {
+                                    bcq.dwellingUnit = DwellingUnit.get(row.dwelling_unit)
+                                }
+                                bcq.username = username
+
+                                if (!bcq.validate()) {
+                                    // invalid selection list!
+                                    println "invalid selection list row: ${row}"
+                                    validSelectionList = false
+                                }
+                            }
+                        } else {
+                            println "Error: no results returned!"
+                            emptySelectionList = true
+                        }
+                    } else {
+                        println "Error: running selectionQuery!"
+                        validSelectionList = false
+                    }
+                }
+            }
+
+            def batchList = []
+            def batchChildOf = []
 
             // Create Primary Batch
+            def batchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
             //   Create Attachments of Primary Batch
-            // Create Sister and Child Batches
-            //   Create Attachments of Sister and Child Batches
-            //   Note Child's Parent Batch.id
 
+            // WARNING! Pseudo-code...
+            batchCreationConfigInstance.items.find{ attachmentOf == batchInstance.Instrument }.each{ bci ->
+                batchInstance.addToInstruments(new BatchInstrument(stuff:here))
+            }
+
+            batchList.add(batchInstance)
+            batchChildOf.add(null)
+
+            // Create Sister and Child Batches
+            batchCreationConfigInstance.items.find{ attachmentOf == null }.each{ bci ->
+                def subBatchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
+                
+                //   Create Attachments of Sister and Child Batches
+                // WARNING! Pseudo-code...
+                batchCreationConfigInstance.items.find{ attachmentOf == subBatchInstance.Instrument }.each{ bci ->
+                    subBatchInstance.addToInstruments(new BatchInstrument(stuff:here))
+                }
+
+                //   Note Child's Parent Batch.id
+                batchList.add(subBatchInstance)
+                batchChildOf.add(bci.childOf)
+
+            }
+    
             // Create TrackedItems (sid)
             //   If Primary Item
             //     ParentItem = parent_item from recordset

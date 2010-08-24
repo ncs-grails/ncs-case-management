@@ -1,6 +1,13 @@
 package edu.umn.ncs
 
 class DocumentGenerationController {
+    javax.sql.DataSource dataSource
+
+    def documentGenerationService
+
+    def username = 'ajz'
+
+        //
 	// TODO: Show BatchQueue
 	// TODO: Show/Add items per Person
 	// TODO: Show/Add items per dwelling unit
@@ -9,8 +16,6 @@ class DocumentGenerationController {
 	
     // find a mailing type
     def list = {
-
-        def username = 'ajz'
 
         def q = params.q
         // List of matching configs per search criteria
@@ -91,7 +96,30 @@ class DocumentGenerationController {
     def reGenerate = {}
 
     // generate a new mailing automatically
-    def autoGenerate = {}
+    def autoGenerate = {
+
+        def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+        def results = null
+
+        def docGenParams = [manual:false, username:username]
+
+        if (batchCreationConfigInstance) {
+            docGenParams.config = batchCreationConfigInstance
+
+            println "Generate the batch: ${batchCreationConfigInstance.name}"
+            if (params.autoSetMailDate) {
+                docGenParams.mailDate = params.mailDate
+            }
+            if (params.useMaxPieces == 'true') {
+                docGenParams.maxPieces = params.maxPieces
+            }
+
+            documentGenerationService.generateMailing(docGenParams)
+
+        }
+
+        [batchCreationConfigInstance:batchCreationConfigInstance]
+    }
 
     // manually generate a mailing
     def manualGenerate = {}
@@ -99,7 +127,7 @@ class DocumentGenerationController {
     // display a batch report
     def batchReport = {
 
-        if (params?.batch?.id) {
+        if (params.batch?.id) {
             println "Batch ID: ${params.batch.id}"
         }
 
