@@ -135,6 +135,64 @@ class BootStrap {
         // Test Data
         environments {
             development {
+
+               /*
+                * 1636 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2701 |
+                * 4 WYOMING ST E            |           |          | SAINT PAUL | MN         | 55107 | 3240 |
+                * 1372 HAZEL ST N           |           |          | SAINT PAUL | MN         | 55119 | 4507 |
+                * 180 WAYZATA ST            | APT       | 114      | SAINT PAUL | MN         | 55117 | 5351 |
+                * 2122 WOODLYNN AVE         | APT       | 4        | SAINT PAUL | MN         | 55109 | 1480 |
+                * 3744 CLEVELAND AVE N      | APT       | 104      | SAINT PAUL | MN         | 55112 | 3264 |
+                * 1255 FLANDRAU ST          |           |          | SAINT PAUL | MN         | 55106 | 2302 |
+                * 4310 OLD WHITE BEAR AVE N |           |          | SAINT PAUL | MN         | 55110 | 3874 |
+                * 1131 MARION ST            |           |          | SAINT PAUL | MN         | 55117 | 4461 |
+                * 305 EDMUND AVE            |           |          | SAINT PAUL | MN         | 55103 | 1708 |
+                * 1412 COUNTY ROAD E W      |           |          | SAINT PAUL | MN         | 55112 | 3653 |
+                * 1952 OAK KNOLL DR         |           |          | SAINT PAUL | MN         | 55110 | 4263 |
+                * 480 GERANIUM AVE E        |           |          | SAINT PAUL | MN         | 55130 | 3709 |
+                * 1140 4TH ST E             | APT       | 306      | SAINT PAUL | MN         | 55106 | 5353 |
+                * 1793 MORGAN AVE           |           |          | SAINT PAUL | MN         | 55116 | 2721 |
+                * 346 CLEVELAND AVE SW      | APT       | 14       | SAINT PAUL | MN         | 55112 | 3535 |
+                * 1575 SAINT PAUL AVE       | APT       | 9        | SAINT PAUL | MN         | 55116 | 2862 |
+                * 4041 BETHEL DR            | APT       | 27       | SAINT PAUL | MN         | 55112 | 6921 |
+                * 1265 3RD ST E             |           |          | SAINT PAUL | MN         | 55106 | 5778 |
+                * 1528 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2610 |
+                */
+
+                def myAddressList = [
+                ['1636 BREDA AVE', 'SAINT PAUL', 'MN', '55108', '2701'],
+                ['WYOMING ST E', 'SAINT PAUL', 'MN', '55107', '3240'],
+                ['1372 HAZEL ST N', 'SAINT PAUL', 'MN', '55119', '4507 '],
+                ['180 WAYZATA ST APT 114', 'SAINT PAUL', 'MN', '55117', '5351'],
+                ['2122 WOODLYNN AVE APT 4', 'SAINT PAUL', 'MN', '55109', '1480'],
+                ['3744 CLEVELAND AVE N APT 104', 'SAINT PAUL', 'MN', '55112', '3264'],
+                ['1255 FLANDRAU ST', 'SAINT PAUL', 'MN', '55106', '2302'],
+                ['4310 OLD WHITE BEAR AVE N', 'SAINT PAUL', 'MN', '55110', '3874'],
+                ['1131 MARION ST', 'SAINT PAUL', 'MN', '55117', '4461'],
+                ['305 EDMUND AVE', 'SAINT PAUL', 'MN', '55103', '1708'],
+                ['1412 COUNTY ROAD E W', 'SAINT PAUL', 'MN', '55112', '3653'],
+                ['1952 OAK KNOLL DR', 'SAINT PAUL', 'MN', '55110', '4263'],
+                ['480 GERANIUM AVE E', 'SAINT PAUL', 'MN', '55130', '3709'],
+                ['1140 4TH ST E APT 306', 'SAINT PAUL', 'MN', '55106', '5353'],
+                ['1793 MORGAN AVE', 'SAINT PAUL', 'MN', '55116', '2721'],
+                ['346 CLEVELAND AVE SW APT 14', 'SAINT PAUL', 'MN', '55112', '3535'],
+                ['1575 SAINT PAUL AVE APT 9', 'SAINT PAUL', 'MN', '55116', '2862'],
+                ['4041 BETHEL DR APT 27', 'SAINT PAUL', 'MN', '55112', '6921'],
+                ['1265 3RD ST E','SAINT PAUL', 'MN', '55106', '5778'],
+                ['1528 BREDA AVE','SAINT PAUL', 'MN', '55108', '2610']
+                ]
+
+                myAddressList.each{
+                    def sa = new StreetAddress(address:it[0],
+                        city:it[1], state:it[2], zipCode:it[3], zip4:it[4],
+                        country:us, county:'Ramsey', appCreated:'byHand').save()
+
+                    def du = new DwellingUnit(address:sa,
+                        appCreated:'byHand').save()
+
+                    println "Created Dwelling unit: ${du.id}:${sa.id}"
+                }
+
                 // throw some test data into the database
                 def myAddress = new StreetAddress(address:'3323 Buchanan St NE',
                     city:'Minneapolis',
@@ -177,7 +235,9 @@ class BootStrap {
                 def tracingLog = new Instrument(name:'Tracing Log',
                     nickName:'T-LOG', study:ncs, requiresPrimaryContact:false).save()
 
-                def sql = "SELECT id AS person_id FROM person WHERE (alive = 1)";
+                def sql = """SELECT du.id AS dwelling_unit
+FROM dwelling_unit du INNER JOIN
+  street_address sa ON du.address_id = sa.id""";
 
                 def bccHiQ = new BatchCreationConfig(name:'HiQ Initial',
                     instrument:hiQ, format:firstClassMail, direction: outgoing,
@@ -187,9 +247,7 @@ class BootStrap {
                 // add a document
                 bccHiQ.addToDocuments(
                         documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
-                        mergeSourceQuery:"""SELECT du.id AS dwelling_unit
-FROM dwelling_unit du INNER JOIN
-  street_address sa ON du.address_id = sa.id""",
+                        mergeSourceQuery:"qDefault()",
                         mergeSourceFile:'q:/merge_data/hi_q_source.txt')
                     .addToDocuments(
                         documentLocation:'n:/merge_documents/frequently_asked_questions.doc')

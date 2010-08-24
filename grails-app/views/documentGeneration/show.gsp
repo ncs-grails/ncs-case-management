@@ -13,17 +13,17 @@
 	<span class="menuButton"><g:link class="list" action="list">Choose a Different Mailing Type</g:link></span>
   </div>
   <div class="body">
-	<h1>
+        <h1>
 ${batchCreationConfigInstance?.instrument?.study?.name}
 ${batchCreationConfigInstance?.instrument?.name}
-	</h1>
-	<h3>
+        </h1>
+        <h3>
 ${batchCreationConfigInstance?.direction?.name.capitalize()}
 ${batchCreationConfigInstance?.isInitial?.name.capitalize()}
 ${batchCreationConfigInstance?.format?.name.capitalize()}
-	  <br/>
+          <br/>
 ${batchCreationConfigInstance?.name}
-	</h3>
+        </h3>
 	<g:if test="${flash.message}">
 	  <div class="message">${flash.message}</div>
 	</g:if>
@@ -32,7 +32,8 @@ ${batchCreationConfigInstance?.name}
 	  <legend style="margin-left: 0.5em;">Recently Generated Batches</legend>
 	  <div class="list">
 
-		<g:form id="${batchCreationConfigInstance?.id}">
+		<g:form method="post" controller="documentGeneration" >
+                  <g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
 		  <table>
 			<thead>
@@ -57,6 +58,10 @@ ${batchCreationConfigInstance?.name}
 			</g:each>
 			</tbody>
 		  </table>
+
+
+
+
 		  <!-- Reprint Button -->
 		  <g:actionSubmit action="reGenerate" value="Reprint Document(s)" />
 		  <!-- Batch Report Button -->

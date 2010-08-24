@@ -55,3 +55,27 @@ span.name {
 	clear:both;
 	text-decoration: underline;
 }
+
+.itemMaroon {
+    color: #7A0019;
+    height: auto;
+    width:auto;
+    margin:1em 0 0 1%;
+    padding: 1% 0 3% 0;
+    clear: both;
+}
+
+.item {
+    height: auto;
+    width:auto;
+    margin:1em 0 0 1%;
+    padding:1% 0 1% 0;
+    clear: both;
+}
+.datapoint {
+    display:inline;
+    float:left;
+    font-size:95%;
+}
+
+

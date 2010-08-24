@@ -81,6 +81,7 @@ class BatchCreationDocumentController {
     }
 
     def update = {
+        println "${params}"
         def batchCreationDocumentInstance = BatchCreationDocument.get(params.id)
         if (batchCreationDocumentInstance) {
             if (params.version) {
