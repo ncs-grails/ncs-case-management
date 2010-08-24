@@ -187,7 +187,9 @@ class BootStrap {
                 // add a document
                 bccHiQ.addToDocuments(
                         documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
-                        mergeSourceQuery:'SELECT * FROM something INNER JOING something ELSE WHERE (bid = 123)',
+                        mergeSourceQuery:"""SELECT du.id AS dwelling_unit
+FROM dwelling_unit du INNER JOIN
+  street_address sa ON du.address_id = sa.id""",
                         mergeSourceFile:'q:/merge_data/hi_q_source.txt')
                     .addToDocuments(
                         documentLocation:'n:/merge_documents/frequently_asked_questions.doc')

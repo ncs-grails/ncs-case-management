@@ -1,6 +1,9 @@
 package edu.umn.ncs
 
 class DocumentGenerationController {
+	// TODO: Show BatchQueue
+	// TODO: Show/Add items per Person
+	// TODO: Show/Add items per dwelling unit
 
     def index = { redirect(action:'list', params:params) }
 	
