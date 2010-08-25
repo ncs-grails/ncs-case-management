@@ -1,4 +1,3 @@
-
 <%@ page import="edu.umn.ncs.BatchCreationConfig" %>
 <html>
   <head>

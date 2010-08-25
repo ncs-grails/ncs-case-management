@@ -127,11 +127,12 @@ class DocumentGenerationController {
     // display a batch report
     def batchReport = {
 
-        if (params.batch?.id) {
-            println "Batch ID: ${params.batch.id}"
-        }
+		def batchInstance = Batch.get(params.batch?.id)
 
-        redirect(controller:'batch',action:'show',params:params)
+        if (batchInstance) {
+            println "Batch ID: ${batchInstance.id}"
+        }
+		[batchInstance:batchInstance]
     }
 
 }
