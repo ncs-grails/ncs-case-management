@@ -14,10 +14,14 @@ class DocumentGenerationService {
     static transactional = true
     DataSource dataSource
 
+    def grailsApplication
+
     def generateMailing(Map params) {
 
         def validSelectionList = true
         def emptySelectionList = false
+        def appName = grailsApplication?.config?.appName
+        Batch primaryBatch = null
         /*
          *
          * Params should contain...
@@ -32,12 +36,19 @@ class DocumentGenerationService {
          *
          **/
 
+        //println "${params}"
+
+
         if (params.config && params.username) {
 
             def batchCreationConfigInstance = params.config
             def username = params.username
 
             println "${username} is generating a new ${batchCreationConfigInstance.name} batch"
+            println "BatchCreationConfig instrument:  ${batchCreationConfigInstance.instrument.name} "
+
+            println "params in service: ${params}"
+
 
             def manualSelection = false
             def automaticSelection = false
@@ -82,7 +93,12 @@ class DocumentGenerationService {
                     def sql = new Sql(dataSource)
                     if (sql) {
                         println "${new Date()}"
-                        def results = sql.rows(selectionQuery, selectionParams)
+                        def results
+                        if (selectionParams) {
+                            results = sql.rows(selectionQuery, selectionParams)
+                        } else {
+                            results = sql.rows(selectionQuery)
+                        }
                         if (results) {
                             // validating recordset
                             results.each{ row ->
@@ -120,7 +136,50 @@ class DocumentGenerationService {
             def batchChildOf = []
 
             // Create Primary Batch
-            def batchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
+            //def batchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
+
+            def batchInstance = new Batch(batchRunBy:username,
+                format:batchCreationConfigInstance.format,
+                direction:batchCreationConfigInstance.direction,
+                instrumentDate:new Date(),
+                instrument:batchCreationConfigInstance.instrument,
+                batchRunByWhat: 'ncs-case-management',
+                trackingDocumentSent:false,
+                creationConfig:batchCreationConfigInstance)
+
+            batchInstance.addToInstruments(isPrimary: true,
+                isResend: batchCreationConfigInstance.isResend,
+                instrument:batchCreationConfigInstance.instrument,
+                isInitial:batchCreationConfigInstance.isInitial)
+
+            // Find attachments, and add them to the batch
+            // batchCreationConfigInstance.subItems.find{ it.attachmentOf.id == batchCreationConfigInstance.instrument.id }
+            batchCreationConfigInstance.subItems
+                    .find{ it.attachmentOf == batchCreationConfigInstance.instrument }
+                    .each{ attachment ->
+
+                batchInstance.addToInstruments(isPrimary: false,
+                    instrument:attachment.instrument,
+                    isResend: batchCreationConfigInstance.isResend,
+                    isInitial:batchCreationConfigInstance.isInitial)
+
+            }
+
+            batchCreationConfigInstance.addToBatches(batchInstance)
+
+            if (! batchCreationConfigInstance.save()) {
+                println "ERRORS:"
+                batchCreationConfigInstance.errors.each{ err ->
+                    println "ERROR>> ${err}"
+                }
+            } else {
+                println "batchCreationConfigInstance and batchInstance saved!"
+            }
+
+            primaryBatch = batchInstance
+
+/*
+
             //   Create Attachments of Primary Batch
 
             // WARNING! Pseudo-code...
@@ -146,6 +205,12 @@ class DocumentGenerationService {
                 batchChildOf.add(bci.childOf)
 
             }
+
+*/
+
+
+
+
     
             // Create TrackedItems (sid)
             //   If Primary Item
@@ -163,6 +228,7 @@ class DocumentGenerationService {
             //   Display link to merge documents
 
         }
+        return primaryBatch
     }
 
     def generateMergeData() {

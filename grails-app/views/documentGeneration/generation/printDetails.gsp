@@ -12,16 +12,20 @@
     <meta name="layout" content="ncs" />
   </head>
   <body>
-    <h1>Auto Document Generation</h1>
+  <div class="nav">
+	<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
+	<span class="menuButton"><g:link class="show" action="show" id="${batchCreationConfigInstance?.id}">Back to Document Generation</g:link></span>
+  </div>
+  <div class="body">
+
+    <h1>Batch Details</h1>
 
     <h2>${batchCreationConfigInstance?.name}</h2>
 
-    <p>Query:
-      <!-- margin: top right bottom left -->
-      <pre style="margin: 0.5em 0em 0.5em 2em;">${batchCreationConfigInstance?.selectionQuery}</pre>
-    </p>
+    <h3>Data Sources To Save...</h3>
 
+    <h3>Documents to open...</h3>
 
-    <p>The end.</p>
+  </div>
   </body>
 </html>

@@ -78,4 +78,7 @@ span.name {
     font-size:95%;
 }
 
-
+table.batchList tbody {
+    max-height: 10em;
+    overflow-y: auto;
+}

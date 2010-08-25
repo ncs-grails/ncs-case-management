@@ -22,7 +22,7 @@
 	<hr/>
 
 	<div id="studyName">${batchInstance?.primaryInstrument?.study?.name}</div>
-	<div id="peices">${batchInstance.items.size}</div>
+	<div id="peices">${batchInstance?.items?.size}</div>
 
   </body>
 </html>

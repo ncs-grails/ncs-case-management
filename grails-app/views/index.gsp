@@ -100,7 +100,7 @@
 				  Configure the way that batches of instruments are generated
 				  in the system so that they can be properly tracked
 				</dt>
-				<dt><g:link controller="documentGeneration" action="list">Document Generation</g:link></dt>
+				<dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
 				<dt>
 				  Generate instrument batches either automatically or by hand.
 				</dt>
