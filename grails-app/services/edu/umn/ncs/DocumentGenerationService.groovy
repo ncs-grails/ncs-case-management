@@ -172,6 +172,17 @@ class DocumentGenerationService {
 
             }
 
+			// save batches
+			if (! masterBatch.save()) {
+				println "ERRORS:"
+				masterBatch.errors.each{ err ->
+					println "ERROR>> ${err}"
+				}
+			} else {
+				println "subBatch saved!"
+			}
+
+
             batchCreationConfigInstance.addToBatches(masterBatch)
 
 			batchList.add(masterBatch)
@@ -207,8 +218,18 @@ class DocumentGenerationService {
 						isInitial:batchCreationConfigInstance.isInitial)
 
 				}
-				batchCreationConfigInstance.addToBatches(subBatch)
 
+				//batchCreationConfigInstance.addToBatches(subBatch)
+
+				// save batches
+				if (! subBatch.save()) {
+					println "ERRORS:"
+					subBatch.errors.each{ err ->
+						println "ERROR>> ${err}"
+					}
+				} else {
+					println "subBatch saved!"
+				}
 
 				// add batch to list
 				batchList.add(subBatch)
@@ -226,6 +247,7 @@ class DocumentGenerationService {
 
 			// loop through created batches and mark the childOf batches
 			batchList.each{
+				it.refresh()
 				println "created batch # ${it.id}"
 			}
 

@@ -39,6 +39,20 @@ class DocumentGenerationController {
         [batchInstance:batchInstance]
     }
 
+	def testGenerate = {
+
+		def batchCreationConfigInstance = BatchCreationConfig.get(1)
+		def docGenParams = [manual:false,
+			username:username,
+			config:batchCreationConfigInstance]
+
+		def batchInstance = documentGenerationService.generateMailing(docGenParams)
+		
+		[batchCreationConfigInstance:batchCreationConfigInstance,
+                    batchInstance:batchInstance]
+
+	}
+
 	// here is the batch generation FSM
     def generationFlow = {
         // WARNING:  Any thing get gets passed as part of the model
