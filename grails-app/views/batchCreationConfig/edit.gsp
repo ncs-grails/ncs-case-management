@@ -181,7 +181,7 @@
                   <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="attachmentOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.attachmentOf?.id}" noSelection="['null': '']" />
+                  <g:select name="attachmentOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.attachmentOf?.id}" noSelection="['null': '']" />
                 </span>
               </div>
 
@@ -190,7 +190,7 @@
                   <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="childOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.childOf?.id}" noSelection="['null': '']" />
+                  <g:select name="childOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.childOf?.id}" noSelection="['null': '']" />
                 </span>
               </div>
 
@@ -199,7 +199,7 @@
                   <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="sisterOf.id" from="${usedInstruments - [i.instrument]}" optionKey="id" value="${i.sisterOf?.id}" noSelection="['null': '']" />
+                  <g:select name="sisterOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.sisterOf?.id}" noSelection="['null': '']" />
                 </span>
               </div>
 
@@ -246,7 +246,7 @@
                   <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="attachmentOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                  <g:select name="attachmentOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
                 </span>
               </div>
 
@@ -255,7 +255,7 @@
                   <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="childOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                  <g:select name="childOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
                 </span>
               </div>
 
@@ -264,7 +264,7 @@
                   <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="sisterOf.id" from="${usedInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                  <g:select name="sisterOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
                 </span>
               </div>
 

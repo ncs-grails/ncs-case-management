@@ -18,16 +18,28 @@ class DocumentGenerationController {
     def batchReport = {
 
         def batchInstance = Batch.get(params.id)
+		def batchInstanceList = []
+		
         if (!batchInstance) {
               batchInstance = Batch.get(params.batch?.id)
         }
 
         if (batchInstance) {
+			def batchCreationConfigInstance = batchInstance.creationConfig
+
+			if (batchCreationConfigInstance.instrument != batchInstance.primaryInstrument) {
+				// This batch is not the primary batch of the run... let's find it.
+				println "This is not the primary batch!"
+			}
+
+			// Now we need to find all of the sister / child batches
+
             println "Batch ID: ${batchInstance.id}"
         }
         [batchInstance:batchInstance]
     }
 
+	// here is the batch generation FSM
     def generationFlow = {
         // WARNING:  Any thing get gets passed as part of the model
         // needs to implement Serializable.  Otherwise everything comes

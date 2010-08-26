@@ -41,6 +41,7 @@ class BatchCreationConfigController {
         def instrumentFormatInstanceList = InstrumentFormat.list()
         def usedInstruments = []
         def unusedInstruments = []
+		def attachableInstruments = []
         
         // TEST CODE TEST CODE TEST CODE
 
@@ -50,18 +51,15 @@ class BatchCreationConfigController {
 
             // items instruments
             def bciInstrumentList = batchCreationConfigInstance.subItems.collect{ it.instrument }
+			// sister/child instruments
+            def subInstrumentList = batchCreationConfigInstance.subItems.find{it.attachmentOf == null}.collect{ it.instrument }
 
             usedInstruments = bciInstrumentList + bccInstruments
+			attachableInstruments = subInstrumentList + bccInstruments
 
-            def sql = "from Instrument as i where i.id not in (:ui)"
+            def sql = "from Instrument as i where (i.id not in (:ui))"
             unusedInstruments = Instrument.findAll(sql, [ui:usedInstruments.collect{it.id}])
         }
-
-
-
-
-
-
 
         // Save / Delete
         // - All Instruments except those in items and the one in current
@@ -83,7 +81,8 @@ class BatchCreationConfigController {
                 instrumentInstanceList:instrumentInstanceList,
                 instrumentFormatInstanceList: instrumentFormatInstanceList,
                 usedInstruments:usedInstruments,
-                unusedInstruments:unusedInstruments]
+                unusedInstruments:unusedInstruments,
+				attachableInstruments:attachableInstruments]
         }
     }
 

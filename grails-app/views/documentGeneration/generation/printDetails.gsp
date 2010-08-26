@@ -14,7 +14,7 @@
   <body>
   <div class="nav">
 	<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-	<span class="menuButton"><g:link class="show" action="show" id="${batchCreationConfigInstance?.id}">Back to Document Generation</g:link></span>
+	<span class="menuButton"><g:link class="show" action="generation" event="return">Back to Document Generation</g:link></span>
   </div>
   <div class="body">
 
@@ -26,6 +26,9 @@
 
     <h3>Documents to open...</h3>
 
+	<g:link action="batchReport" id="${batchInstance?.id}">
+	  Open the batch report...
+	</g:link>
   </div>
   </body>
 </html>

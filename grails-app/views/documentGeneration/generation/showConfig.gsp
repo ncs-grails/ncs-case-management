@@ -44,7 +44,7 @@ ${batchCreationConfigInstance?.name}
               </tr>
             </thead>
             <tbody>
-            <g:each in="${batchCreationConfigInstance?.batches}" status="i" var="batchInstance">
+            <g:each in="${batchCreationConfigInstance?.batches.find{it.master == null}}" status="i" var="batchInstance">
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                 <td><g:radio id="batch.id-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
 

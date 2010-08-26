@@ -21,7 +21,9 @@ class DocumentGenerationService {
         def validSelectionList = true
         def emptySelectionList = false
         def appName = grailsApplication?.config?.appName
-        Batch primaryBatch = null
+		def now = new Date()
+		// the master batch for the run
+        Batch masterBatch = null
         /*
          *
          * Params should contain...
@@ -43,6 +45,8 @@ class DocumentGenerationService {
 
             def batchCreationConfigInstance = params.config
             def username = params.username
+			// selection results
+			def results
 
             println "${username} is generating a new ${batchCreationConfigInstance.name} batch"
             println "BatchCreationConfig instrument:  ${batchCreationConfigInstance.instrument.name} "
@@ -93,7 +97,6 @@ class DocumentGenerationService {
                     def sql = new Sql(dataSource)
                     if (sql) {
                         println "${new Date()}"
-                        def results
                         if (selectionParams) {
                             results = sql.rows(selectionQuery, selectionParams)
                         } else {
@@ -138,16 +141,18 @@ class DocumentGenerationService {
             // Create Primary Batch
             //def batchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
 
-            def batchInstance = new Batch(batchRunBy:username,
+			println "creating batch of ${batchCreationConfigInstance.instrument.name}..."
+
+            masterBatch = new Batch(batchRunBy:username,
                 format:batchCreationConfigInstance.format,
                 direction:batchCreationConfigInstance.direction,
-                instrumentDate:new Date(),
+                instrumentDate:now,
                 instrument:batchCreationConfigInstance.instrument,
                 batchRunByWhat: 'ncs-case-management',
-                trackingDocumentSent:false,
+                trackingDocumentSent:batchCreationConfigInstance.generateTrackingDocument,
                 creationConfig:batchCreationConfigInstance)
 
-            batchInstance.addToInstruments(isPrimary: true,
+            masterBatch.addToInstruments(isPrimary: true,
                 isResend: batchCreationConfigInstance.isResend,
                 instrument:batchCreationConfigInstance.instrument,
                 isInitial:batchCreationConfigInstance.isInitial)
@@ -155,63 +160,111 @@ class DocumentGenerationService {
             // Find attachments, and add them to the batch
             // batchCreationConfigInstance.subItems.find{ it.attachmentOf.id == batchCreationConfigInstance.instrument.id }
             batchCreationConfigInstance.subItems
-                    .find{ it.attachmentOf == batchCreationConfigInstance.instrument }
-                    .each{ attachment ->
+			.find{ it.attachmentOf == batchCreationConfigInstance.instrument }
+			.each{ attachment ->
 
-                batchInstance.addToInstruments(isPrimary: false,
+				println "adding attachment ${attachment.instrument.name}..."
+
+                masterBatch.addToInstruments(isPrimary: false,
                     instrument:attachment.instrument,
                     isResend: batchCreationConfigInstance.isResend,
                     isInitial:batchCreationConfigInstance.isInitial)
 
             }
 
-            batchCreationConfigInstance.addToBatches(batchInstance)
+            batchCreationConfigInstance.addToBatches(masterBatch)
 
+			batchList.add(masterBatch)
+
+            //   Create Child and Sister items of Primary Batch
+            batchCreationConfigInstance.subItems
+			.find{ it.childOf != null || it.sisterOf != null }
+			.each{ inst ->
+
+				println "creating sub-batch ${inst.instrument.name}..."
+
+				// Create Batch, assigning master
+				def subBatch = new Batch(batchRunBy:username,
+					master: masterBatch,
+					format:inst.format,
+					direction:inst.direction,
+					instrumentDate:now,
+					instrument:inst.instrument,
+					batchRunByWhat: 'ncs-case-management',
+					trackingDocumentSent:batchCreationConfigInstance.generateTrackingDocument,
+					creationConfig:batchCreationConfigInstance)
+
+				// Add attachments to batch
+				batchCreationConfigInstance.subItems
+				.find{ it.attachmentOf == inst.instrument }
+				.each{ attachment ->
+
+					println "adding attachment ${attachment.instrument.name}..."
+
+					subBatch.addToInstruments(isPrimary: false,
+						instrument:attachment.instrument,
+						isResend: batchCreationConfigInstance.isResend,
+						isInitial:batchCreationConfigInstance.isInitial)
+
+				}
+				batchCreationConfigInstance.addToBatches(subBatch)
+
+
+				// add batch to list
+				batchList.add(subBatch)
+            }
+
+			// save batches
             if (! batchCreationConfigInstance.save()) {
                 println "ERRORS:"
                 batchCreationConfigInstance.errors.each{ err ->
                     println "ERROR>> ${err}"
                 }
             } else {
-                println "batchCreationConfigInstance and batchInstance saved!"
+                println "batchCreationConfigInstance and batches saved!"
             }
 
-            primaryBatch = batchInstance
-
-/*
-
-            //   Create Attachments of Primary Batch
-
-            // WARNING! Pseudo-code...
-            batchCreationConfigInstance.items.find{ attachmentOf == batchInstance.Instrument }.each{ bci ->
-                batchInstance.addToInstruments(new BatchInstrument(stuff:here))
-            }
-
-            batchList.add(batchInstance)
-            batchChildOf.add(null)
-
-            // Create Sister and Child Batches
-            batchCreationConfigInstance.items.find{ attachmentOf == null }.each{ bci ->
-                def subBatchInstance = new Batch(all:the, batch:parameters, that:we, need:'.')
-                
-                //   Create Attachments of Sister and Child Batches
-                // WARNING! Pseudo-code...
-                batchCreationConfigInstance.items.find{ attachmentOf == subBatchInstance.Instrument }.each{ bci ->
-                    subBatchInstance.addToInstruments(new BatchInstrument(stuff:here))
-                }
-
-                //   Note Child's Parent Batch.id
-                batchList.add(subBatchInstance)
-                batchChildOf.add(bci.childOf)
-
-            }
-
-*/
+			// loop through created batches and mark the childOf batches
+			batchList.each{
+				println "created batch # ${it.id}"
+			}
 
 
+			if (results) {
+				// validating recordset
+				results.each{ row ->
+					def bcq = new BatchCreationQueue()
 
+					if (row.containsKey('person')) {
+						bcq.person = Person.get(row.person)
+					}
+					if (row.containsKey('household')) {
+						bcq.household = Household.get(row.household)
+					}
+					if (row.containsKey('dwelling_unit')) {
+						bcq.dwellingUnit = DwellingUnit.get(row.dwelling_unit)
+					}
+					bcq.username = username
 
-    
+					if (bcq.validate()) {
+						batchList.each{ b ->
+							def trackedItem = new TrackedItem(person:bcq.person,
+								household:bcq.household,
+								dwellingUnit:bcq.dwellingUnit)
+
+							// TODO: Add StudyYear
+							//       Add Expiration
+							//		 Add Parent
+
+							b.addToItems(trackedItem)
+						}
+					}
+				}
+			} else {
+				println "Error: no results returned!"
+				emptySelectionList = true
+			}
+
             // Create TrackedItems (sid)
             //   If Primary Item
             //     ParentItem = parent_item from recordset
@@ -228,7 +281,7 @@ class DocumentGenerationService {
             //   Display link to merge documents
 
         }
-        return primaryBatch
+        return masterBatch
     }
 
     def generateMergeData() {
