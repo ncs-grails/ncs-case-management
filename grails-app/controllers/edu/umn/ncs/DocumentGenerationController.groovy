@@ -39,7 +39,7 @@ class DocumentGenerationController {
         [batchInstance:batchInstance]
     }
 
-	def testGenerate = {
+	/* def testGenerate = {
 
 		def batchCreationConfigInstance = BatchCreationConfig.get(1)
 		def docGenParams = [manual:false,
@@ -50,8 +50,18 @@ class DocumentGenerationController {
 		
 		[batchCreationConfigInstance:batchCreationConfigInstance,
                     batchInstance:batchInstance]
+	} */
 
-	}
+    def testGenerate = {
+        def batchCreationConfigInstance = BatchCreationConfig.get(1)
+        def docGenParams = [manual: false,
+            username:username,
+            config:batchCreationConfigInstance]
+
+        def batchInstance = documentGenerationService.generateMailing(docGenParams)
+        [batchCreationConfigInstance:batchCreationConfigInstance,
+            batchInstance:batchInstance]
+    }
 
 	// here is the batch generation FSM
     def generationFlow = {
@@ -176,6 +186,11 @@ class DocumentGenerationController {
         }
         errorGeneratingBatch()
         printDetails{
+            // TODO:
+            //   Open Batch Report if set to true
+            //   Display link to D/L merge data, and show where to save it
+            //   Display link to merge documents
+
             on("report").to "batchReport"
             on("return").to "showConfig"
         }

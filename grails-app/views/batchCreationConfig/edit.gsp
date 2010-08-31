@@ -178,28 +178,15 @@
 
               <div class="prop">
                 <span class="name">
-                  <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
+                  <label for="relation.id"><g:message code="BatchCreationItemRelation.label" default="Relation:" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="attachmentOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.attachmentOf?.id}" noSelection="['null': '']" />
+                  <g:select name="relation.id" from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id" value="${i.relation?.id}" />
                 </span>
-              </div>
 
-              <div class="prop">
-                <span class="name">
-                  <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
-                </span>
+                <label for="parentInstrument"><g:message code="batchCreationItem.childOf.label" default="of" /></label>
                 <span class="value">
-                  <g:select name="childOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.childOf?.id}" noSelection="['null': '']" />
-                </span>
-              </div>
-
-              <div class="prop">
-                <span class="name">
-                  <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
-                </span>
-                <span class="value">
-                  <g:select name="sisterOf.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.sisterOf?.id}" noSelection="['null': '']" />
+                  <g:select name="parentInstrument.id" from="${attachableInstruments - [i.instrument]}" optionKey="id" value="${i.parentInstrument?.id}" />
                 </span>
               </div>
 
@@ -241,30 +228,18 @@
                 </span>
               </div>
 
-              <div class="prop">
-                <span class="name">
-                  <label for="attachmentOf"><g:message code="batchCreationItem.attachmentOf.label" default="Attachment Of" /></label>
-                </span>
-                <span class="value">
-                  <g:select name="attachmentOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
-                </span>
-              </div>
 
               <div class="prop">
                 <span class="name">
-                  <label for="childOf"><g:message code="batchCreationItem.childOf.label" default="Child Of" /></label>
+                  <label for="relation.id"><g:message code="BatchCreationItemRelation.label" default="Relation:" /></label>
                 </span>
                 <span class="value">
-                  <g:select name="childOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                  <g:select name="relation.id" from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id" />
                 </span>
-              </div>
 
-              <div class="prop">
-                <span class="name">
-                  <label for="sisterOf"><g:message code="batchCreationItem.sisterOf.label" default="Sister Of" /></label>
-                </span>
+                <label for="parentInstrument"><g:message code="batchCreationItem.childOf.label" default="of" /></label>
                 <span class="value">
-                  <g:select name="sisterOf.id" from="${attachableInstruments}" optionKey="id" value="" noSelection="['null': '']" />
+                  <g:select name="parentInstrument.id" from="${attachableInstruments}" optionKey="id" />
                 </span>
               </div>
 

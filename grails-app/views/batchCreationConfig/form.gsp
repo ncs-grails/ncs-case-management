@@ -215,6 +215,14 @@
 	  </span>
 	</div>
 
+	<div class="prop">
+	  <span class="name">
+		<label for="useExpiration"><g:message code="batchCreationConfig.useExpiration.label" default="Item Expires?" /></label>
+	  </span>
+	  <span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useExpiration', 'errors')}">
+		<g:checkBox name="useExpiration" value="${batchCreationConfigInstance?.useExpiration}" />
+	  </span>
+	</div>
   </div>
   <div id="tabs-comments">
 	<div class="prop">

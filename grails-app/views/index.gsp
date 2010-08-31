@@ -104,6 +104,12 @@
 				<dt>
 				  Generate instrument batches either automatically or by hand.
 				</dt>
+
+				<dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>
+				<dt>
+				  Use this to test Doc Gen
+				</dt>
+
 				
 			  </dl>
 			</div>

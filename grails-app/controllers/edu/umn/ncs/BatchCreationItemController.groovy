@@ -23,6 +23,8 @@ class BatchCreationItemController {
 
         def batchCreationConfig = BatchCreationConfig.get(params.batchCreationConfig.id)
 
+        println "ngp debug; Save New BCC Item. params: ${params}"
+
         if (batchCreationConfig){
             def batchCreationItemInstance = new BatchCreationItem(params)
             if (batchCreationItemInstance.save(flush: true)) {

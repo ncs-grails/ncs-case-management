@@ -132,54 +132,71 @@ class BootStrap {
             received = new Result(name:'received').save()
         }
 
+        // Relationship between sub batches
+        // id = 1
+        def attachmentOf = BatchCreationItemRelation.findByName('attachment')
+        if (!attachmentOf) {
+            attachmentOf = new BatchCreationItemRelation(name:'attachment').save()
+        }
+        // id = 2
+        def childOf = BatchCreationItemRelation.findByName('child')
+        if (!childOf) {
+            childOf = new BatchCreationItemRelation(name:'child').save()
+        }
+        // id = 3
+        def sisterOf = BatchCreationItemRelation.findByName('sister')
+        if (!sisterOf) {
+            sisterOf = new BatchCreationItemRelation(name:'sister').save()
+        }
+
         // Test Data
         environments {
             development {
 
-               /*
-                * 1636 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2701 |
-                * 4 WYOMING ST E            |           |          | SAINT PAUL | MN         | 55107 | 3240 |
-                * 1372 HAZEL ST N           |           |          | SAINT PAUL | MN         | 55119 | 4507 |
-                * 180 WAYZATA ST            | APT       | 114      | SAINT PAUL | MN         | 55117 | 5351 |
-                * 2122 WOODLYNN AVE         | APT       | 4        | SAINT PAUL | MN         | 55109 | 1480 |
-                * 3744 CLEVELAND AVE N      | APT       | 104      | SAINT PAUL | MN         | 55112 | 3264 |
-                * 1255 FLANDRAU ST          |           |          | SAINT PAUL | MN         | 55106 | 2302 |
-                * 4310 OLD WHITE BEAR AVE N |           |          | SAINT PAUL | MN         | 55110 | 3874 |
-                * 1131 MARION ST            |           |          | SAINT PAUL | MN         | 55117 | 4461 |
-                * 305 EDMUND AVE            |           |          | SAINT PAUL | MN         | 55103 | 1708 |
-                * 1412 COUNTY ROAD E W      |           |          | SAINT PAUL | MN         | 55112 | 3653 |
-                * 1952 OAK KNOLL DR         |           |          | SAINT PAUL | MN         | 55110 | 4263 |
-                * 480 GERANIUM AVE E        |           |          | SAINT PAUL | MN         | 55130 | 3709 |
-                * 1140 4TH ST E             | APT       | 306      | SAINT PAUL | MN         | 55106 | 5353 |
-                * 1793 MORGAN AVE           |           |          | SAINT PAUL | MN         | 55116 | 2721 |
-                * 346 CLEVELAND AVE SW      | APT       | 14       | SAINT PAUL | MN         | 55112 | 3535 |
-                * 1575 SAINT PAUL AVE       | APT       | 9        | SAINT PAUL | MN         | 55116 | 2862 |
-                * 4041 BETHEL DR            | APT       | 27       | SAINT PAUL | MN         | 55112 | 6921 |
-                * 1265 3RD ST E             |           |          | SAINT PAUL | MN         | 55106 | 5778 |
-                * 1528 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2610 |
-                */
+                /*
+                 * 1636 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2701 |
+                 * 4 WYOMING ST E            |           |          | SAINT PAUL | MN         | 55107 | 3240 |
+                 * 1372 HAZEL ST N           |           |          | SAINT PAUL | MN         | 55119 | 4507 |
+                 * 180 WAYZATA ST            | APT       | 114      | SAINT PAUL | MN         | 55117 | 5351 |
+                 * 2122 WOODLYNN AVE         | APT       | 4        | SAINT PAUL | MN         | 55109 | 1480 |
+                 * 3744 CLEVELAND AVE N      | APT       | 104      | SAINT PAUL | MN         | 55112 | 3264 |
+                 * 1255 FLANDRAU ST          |           |          | SAINT PAUL | MN         | 55106 | 2302 |
+                 * 4310 OLD WHITE BEAR AVE N |           |          | SAINT PAUL | MN         | 55110 | 3874 |
+                 * 1131 MARION ST            |           |          | SAINT PAUL | MN         | 55117 | 4461 |
+                 * 305 EDMUND AVE            |           |          | SAINT PAUL | MN         | 55103 | 1708 |
+                 * 1412 COUNTY ROAD E W      |           |          | SAINT PAUL | MN         | 55112 | 3653 |
+                 * 1952 OAK KNOLL DR         |           |          | SAINT PAUL | MN         | 55110 | 4263 |
+                 * 480 GERANIUM AVE E        |           |          | SAINT PAUL | MN         | 55130 | 3709 |
+                 * 1140 4TH ST E             | APT       | 306      | SAINT PAUL | MN         | 55106 | 5353 |
+                 * 1793 MORGAN AVE           |           |          | SAINT PAUL | MN         | 55116 | 2721 |
+                 * 346 CLEVELAND AVE SW      | APT       | 14       | SAINT PAUL | MN         | 55112 | 3535 |
+                 * 1575 SAINT PAUL AVE       | APT       | 9        | SAINT PAUL | MN         | 55116 | 2862 |
+                 * 4041 BETHEL DR            | APT       | 27       | SAINT PAUL | MN         | 55112 | 6921 |
+                 * 1265 3RD ST E             |           |          | SAINT PAUL | MN         | 55106 | 5778 |
+                 * 1528 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2610 |
+                 */
 
                 def myAddressList = [
-                ['1636 BREDA AVE', 'SAINT PAUL', 'MN', '55108', '2701'],
-                ['WYOMING ST E', 'SAINT PAUL', 'MN', '55107', '3240'],
-                ['1372 HAZEL ST N', 'SAINT PAUL', 'MN', '55119', '4507 '],
-                ['180 WAYZATA ST APT 114', 'SAINT PAUL', 'MN', '55117', '5351'],
-                ['2122 WOODLYNN AVE APT 4', 'SAINT PAUL', 'MN', '55109', '1480'],
-                ['3744 CLEVELAND AVE N APT 104', 'SAINT PAUL', 'MN', '55112', '3264'],
-                ['1255 FLANDRAU ST', 'SAINT PAUL', 'MN', '55106', '2302'],
-                ['4310 OLD WHITE BEAR AVE N', 'SAINT PAUL', 'MN', '55110', '3874'],
-                ['1131 MARION ST', 'SAINT PAUL', 'MN', '55117', '4461'],
-                ['305 EDMUND AVE', 'SAINT PAUL', 'MN', '55103', '1708'],
-                ['1412 COUNTY ROAD E W', 'SAINT PAUL', 'MN', '55112', '3653'],
-                ['1952 OAK KNOLL DR', 'SAINT PAUL', 'MN', '55110', '4263'],
-                ['480 GERANIUM AVE E', 'SAINT PAUL', 'MN', '55130', '3709'],
-                ['1140 4TH ST E APT 306', 'SAINT PAUL', 'MN', '55106', '5353'],
-                ['1793 MORGAN AVE', 'SAINT PAUL', 'MN', '55116', '2721'],
-                ['346 CLEVELAND AVE SW APT 14', 'SAINT PAUL', 'MN', '55112', '3535'],
-                ['1575 SAINT PAUL AVE APT 9', 'SAINT PAUL', 'MN', '55116', '2862'],
-                ['4041 BETHEL DR APT 27', 'SAINT PAUL', 'MN', '55112', '6921'],
-                ['1265 3RD ST E','SAINT PAUL', 'MN', '55106', '5778'],
-                ['1528 BREDA AVE','SAINT PAUL', 'MN', '55108', '2610']
+                    ['1636 BREDA AVE', 'SAINT PAUL', 'MN', '55108', '2701'],
+                    ['WYOMING ST E', 'SAINT PAUL', 'MN', '55107', '3240'],
+                    ['1372 HAZEL ST N', 'SAINT PAUL', 'MN', '55119', '4507 '],
+                    ['180 WAYZATA ST APT 114', 'SAINT PAUL', 'MN', '55117', '5351'],
+                    ['2122 WOODLYNN AVE APT 4', 'SAINT PAUL', 'MN', '55109', '1480'],
+                    ['3744 CLEVELAND AVE N APT 104', 'SAINT PAUL', 'MN', '55112', '3264'],
+                    ['1255 FLANDRAU ST', 'SAINT PAUL', 'MN', '55106', '2302'],
+                    ['4310 OLD WHITE BEAR AVE N', 'SAINT PAUL', 'MN', '55110', '3874'],
+                    ['1131 MARION ST', 'SAINT PAUL', 'MN', '55117', '4461'],
+                    ['305 EDMUND AVE', 'SAINT PAUL', 'MN', '55103', '1708'],
+                    ['1412 COUNTY ROAD E W', 'SAINT PAUL', 'MN', '55112', '3653'],
+                    ['1952 OAK KNOLL DR', 'SAINT PAUL', 'MN', '55110', '4263'],
+                    ['480 GERANIUM AVE E', 'SAINT PAUL', 'MN', '55130', '3709'],
+                    ['1140 4TH ST E APT 306', 'SAINT PAUL', 'MN', '55106', '5353'],
+                    ['1793 MORGAN AVE', 'SAINT PAUL', 'MN', '55116', '2721'],
+                    ['346 CLEVELAND AVE SW APT 14', 'SAINT PAUL', 'MN', '55112', '3535'],
+                    ['1575 SAINT PAUL AVE APT 9', 'SAINT PAUL', 'MN', '55116', '2862'],
+                    ['4041 BETHEL DR APT 27', 'SAINT PAUL', 'MN', '55112', '6921'],
+                    ['1265 3RD ST E','SAINT PAUL', 'MN', '55106', '5778'],
+                    ['1528 BREDA AVE','SAINT PAUL', 'MN', '55108', '2610']
                 ]
 
                 myAddressList.each{
@@ -246,18 +263,26 @@ FROM dwelling_unit du INNER JOIN
 
                 // add a document
                 bccHiQ.addToDocuments(
-                        documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
-                        mergeSourceQuery:"qDefault()",
-                        mergeSourceFile:'q:/merge_data/hi_q_source.txt')
-                    .addToDocuments(
-                        documentLocation:'n:/merge_documents/frequently_asked_questions.doc')
-                    .save()
+                    documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
+                    mergeSourceQuery:"qDefault()",
+                    mergeSourceFile:'q:/merge_data/hi_q_source.txt')
+                .addToDocuments(
+                    documentLocation:'n:/merge_documents/frequently_asked_questions.doc')
+                .save()
+
+                // for test adding dependent before parent subitem added
+                bccHiQ.addToSubItems(instrument:asu,
+                    direction:outgoing,
+                    format:firstClassMail,
+                    relation:childOf,
+                    parentInstrument:faq).save()
 
                 // add a item
                 bccHiQ.addToSubItems(instrument:faq,
                     direction:outgoing,
                     format:firstClassMail,
-                    childOf:hiQ).save()
+                    relation:childOf,
+                    parentInstrument:hiQ).save()
 
                 // Fake Mailing #1
                 // generate a batch

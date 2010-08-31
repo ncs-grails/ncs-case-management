@@ -106,4 +106,11 @@ class BatchCreationDocumentController {
             redirect(controller:"batchCreationConfig", action: "list")
         }
     }
+
+    def getData = {
+        // return the data from a BatchCreationConfigDocument type based on items
+        // in the user's queue
+
+    }
+
 }
