@@ -149,6 +149,25 @@ class BootStrap {
             sisterOf = new BatchCreationItemRelation(name:'sister').save()
         }
 
+        // Source of the Batch
+        // id = 1
+        def personSource = BatchCreationQueueSource.findByName("person")
+        if (!personSource) {
+            personSource = new BatchCreationQueueSource(name:'person').save()
+        }
+
+        // id = 2
+        def householdSource = BatchCreationQueueSource.findByName("household")
+        if (!householdSource) {
+            householdSource = new BatchCreationQueueSource(name:'household').save()
+        }
+
+        // id = 3
+        def dwellingUnitSource = BatchCreationQueueSource.findByName("dwellingUnit")
+        if (!dwellingUnitSource) {
+            dwellingUnitSource = new BatchCreationQueueSource(name:'dwellingUnit').save()
+        }
+
         // Test Data
         environments {
             development {
@@ -258,7 +277,7 @@ FROM dwelling_unit du INNER JOIN
 
                 def bccHiQ = new BatchCreationConfig(name:'HiQ Initial',
                     instrument:hiQ, format:firstClassMail, direction: outgoing,
-                    isInitial:initial, selectionQuery:sql, active:true,
+                    isInitial:initial, selectionQuery:sql, active:true, manualSelection:true,
                     oneBatchEventPerson:true).save()
 
                 // add a document

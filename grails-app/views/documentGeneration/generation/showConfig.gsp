@@ -97,7 +97,7 @@ ${batchCreationConfigInstance?.name}
           <g:submitButton name="optionalGenerate" value="Generate New Batch by Selection" />
         </g:if>
         <g:if test="${batchCreationConfigInstance?.manualSelection}" >
-          <g:submitButton name="manualGenerate" value="Generate New Batch Manually" />
+          <g:submitButton name="manualGenerateAction" value="Generate New Batch Manually" />
         </g:if>
       </g:form>
 

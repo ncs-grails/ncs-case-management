@@ -25,12 +25,17 @@
     <h3>Data Sources To Save...</h3>
 
     <ul>
-      <g:each var="doc" in="${batchCreationConfigInstance?.documents}">
-        <li><g:link ${doc.mergeSourceFile}</li>
+      <g:each var="msf" in="${batchCreationConfigInstance?.documents}">
+        <li><a href=""#">${msf.mergeSourceFile}</a></li>
       </g:each>
     </ul>
 
     <h3>Documents to open...</h3>
+    <ul>
+      <g:each var="doc" in="${batchCreationConfigInstance?.documents}">
+        <li><a href="#">${doc.documentLocation}</a></li>
+      </g:each>
+    </ul>
 
 	<g:link action="batchReport" id="${batchInstance?.id}">
 	  Open the batch report...

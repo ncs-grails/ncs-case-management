@@ -2,9 +2,7 @@ package edu.umn.ncs
 
 class DocumentGenerationController {
     javax.sql.DataSource dataSource
-
     def documentGenerationService
-
     def username = 'ajz'
 
     //
@@ -12,7 +10,51 @@ class DocumentGenerationController {
     // TODO: Show/Add items per Person
     // TODO: Show/Add items per dwelling unit
 
-    def index = { redirect(action:'generation', params:params) }
+    def find = {
+        flash.message = null
+        def batchCreationQueue = null
+
+        def person = null
+        def household = null
+        def dwellingUnit = null
+
+        if (params.sourceId && params.sourceValue) {
+
+            def source = BatchCreationQueueSource.get(params.sourceId)
+
+            if (source.name == 'person' ) {
+                person = Person.get(params.sourceValue)
+                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, person:person)
+            } else if (source.name == 'household' ) {
+                household = Household.get(params.sourceValue)
+                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, household:household)
+            } else if (source.name == 'dwellingUnit' ) {
+                dwellingUnit = DwellingUnit.get(params.sourceValue)
+                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, dwellingUnit:dwellingUnit)
+            }
+
+            if (person || household || dwellingUnit) {
+                if (!batchCreationQueue) {
+                    batchCreationQueue = new BatchCreationQueue(username:username, source:source, person:person, household:household, dwellingUnit:dwellingUnit)
+                    batchCreationQueue.save(flush:true)
+                }
+            } else {
+                flash.message = "Source and ID required."
+            }
+        }
+
+        def batchCreationQueueList = null
+        def nBatchCreationQueue = BatchCreationQueue.count()
+        println "nBatchCreationQueue -> ${nBatchCreationQueue}"
+        if (nBatchCreationQueue > 0 ) {
+            batchCreationQueueList = BatchCreationQueue.list()
+        }
+        [batchCreationQueueList:batchCreationQueueList]
+    }
+
+    def index = { 
+        redirect(action:'generation', params:params)
+    }
 	
     // display a batch report
     def batchReport = {
@@ -39,19 +81,6 @@ class DocumentGenerationController {
         [batchInstance:batchInstance]
     }
 
-	/* def testGenerate = {
-
-		def batchCreationConfigInstance = BatchCreationConfig.get(1)
-		def docGenParams = [manual:false,
-			username:username,
-			config:batchCreationConfigInstance]
-
-		def batchInstance = documentGenerationService.generateMailing(docGenParams)
-		
-		[batchCreationConfigInstance:batchCreationConfigInstance,
-                    batchInstance:batchInstance]
-	} */
-
     def testGenerate = {
         def batchCreationConfigInstance = BatchCreationConfig.get(1)
         def docGenParams = [manual: false,
@@ -70,6 +99,8 @@ class DocumentGenerationController {
         // crumblig down.
         loadRecentBatches {
             action {
+
+            println "loadRecentBatches params: ${params}"
 
             def q = params.q
             println "${q}"
@@ -148,14 +179,28 @@ class DocumentGenerationController {
         }
         showConfig {
             on("return").to "loadRecentBatches"
-            on("manualGenerate").to "manualGenerate"
+            on("manualGenerateAction").to "manualGenerateAction"
             on("autoGenerate").to "autoGenerate"
             on("optionalGenerate").to "optionalGenerate"
             on("reGenerate").to "printDetails"
             on("batchReport").to "showBatchReport"
         }
-        manualGenerate{
+        manualGenerateAction{
+            action {
+                def nBatchCreationQueue = BatchCreationQueue.count()
+                if (nBatchCreationQueue > 0) {
+                    BatchCreationQueue.executeUpdate("delete BatchCreationQueue")
+                }
+            }
+            on("success").to "manualGenerate"
             on("return").to "showConfig"
+        }
+
+        manualGenerate {
+            println "params in manualGenerate --> ${params}"
+            
+            on("return").to "showConfig"
+            on("error").to "errorGeneratingBatch"
         }
         optionalGenerate{
             on("return").to "showConfig"
