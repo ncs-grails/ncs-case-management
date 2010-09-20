@@ -1,7 +1,3 @@
-<!--
-  To change this template, choose Tools | Templates
-  and open the template in the editor.
--->
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
@@ -22,13 +18,29 @@
 
     <h2>${batchCreationConfigInstance?.name}</h2>
 
-    <h3>Data Sources To Save...</h3>
+    <fieldset class="maroonBorder">
+      <legend style="margin-left: 0.5em;">Data Sources To Save...</legend>
+        <ul>
+          <g:each var="ds" in="${batchCreationConfigInstance?.documents}">
+            <li><a href=""#">${ds.mergeSourceFile}</a></li>
+          </g:each>
+        </ul>      
+    </fieldset>
 
-    <h3>Documents to open...</h3>
 
-	<g:link action="batchReport" id="${batchInstance?.id}">
-	  Open the batch report...
-	</g:link>
+    <fieldset class="maroonBorder">
+      <legend style="margin-left: 0.5em;">Documents to open...</legend>
+        <ul>
+          <g:each var="doc" in="${batchCreationConfigInstance?.documents}">
+            <li><a href="#">${doc.documentLocation}</a></li>
+          </g:each>
+        </ul>
+    </fieldset>
+
+
+        <div class="buttons">
+          <span class="button"><g:link action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link></span>
+        </div>
   </div>
   </body>
 </html>

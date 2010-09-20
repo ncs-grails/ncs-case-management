@@ -78,6 +78,7 @@ class DocumentGenerationService {
         def childOf = BatchCreationItemRelation.findByName('child')
         def sisterOf = BatchCreationItemRelation.findByName('sister')
 
+        println "generateMailing params --> ${params}"
 
         if (params.config && params.username) {
 
@@ -129,6 +130,12 @@ class DocumentGenerationService {
                                             WHERE (username = ?)"""
                         results = sql.rows(selectionQuery, [params.username])
 
+                        if (results) {
+                            println "results are not NULL!!!!"
+                        } else {
+                            println "selectionQuery returned nothing"
+                        }
+
                         // TODO:
                         // We can assume all of the columns are there
                         // because we'll put them in a table that will have
@@ -138,6 +145,16 @@ class DocumentGenerationService {
                         // The class is: BatchCreationQueue (table = batch_creation_queue)
 
                         // BatchCreationQueue needs to go into (results)
+
+
+                        // ngp: do I have to do anything with the maildate in manual batch generation? (ask ajz) Refering to:
+                        /*
+                                             if (selectionQuery.contains(':mailDate')) {
+                                                   selectionParams.mailDate = params.mailDate
+                                               }
+                            */
+
+
                     }
                 } else {
 
@@ -181,7 +198,7 @@ class DocumentGenerationService {
 
                                 if (!bcq.validate()) {
                                     // invalid selection list!
-                                    println "invalid selection list row: ${row}"
+                                    println "invalid selection list row: ${bcq?.dwellingUnit?.address?.address}"
                                     validSelectionList = false
                                 }
                             }
@@ -222,7 +239,6 @@ class DocumentGenerationService {
 
                     // Find attachments, and add them to the batch
                     batchCreationConfigInstance.subItems
-
                     .findAll{ it.attachmentOf == batchCreationConfigInstance.instrument }
                     .each{ attachment ->
 
@@ -280,13 +296,10 @@ class DocumentGenerationService {
                             isResend: batchCreationConfigInstance.isResend,
                             isInitial:batchCreationConfigInstance.isInitial)
 
-
                         // Add attachments to sub-batch
                         batchCreationConfigInstance.subItems
-                        .findAll{ it.attachmentOf == bci.instrument }
+                        .findAll{ it?.attachmentOf?.id == bci?.instrument?.id }
                         .each{ attachment ->
-
-                            println "adding attachment ${attachment.instrument.name}..."
 
                             subBatch.addToInstruments(isPrimary: false,
                                 instrument:attachment.instrument,
@@ -304,8 +317,6 @@ class DocumentGenerationService {
                             subBatch.errors.each{ err ->
                                 println "ERROR>> ${err}"
                             }
-                        } else {
-                            println "subBatch saved!"
                         }
 
                         batchInfoList.add([batch:subBatch,
@@ -322,9 +333,7 @@ class DocumentGenerationService {
                         batchCreationConfigInstance.errors.each{ err ->
                             println "ERROR>> ${err}"
                         }
-                    } else {
-                        println "batchCreationConfigInstance and batches saved!"
-                    }
+                    } 
 
                     // fill the batchInfoList.childOfBatch fields
                     // set the ordering based on parent-child relationships
@@ -379,7 +388,8 @@ class DocumentGenerationService {
                         // validating recordset
                         results.each{ row ->
 
-                        def bcq = new BatchCreationQueue()
+
+                            def bcq = new BatchCreationQueue()
 
                             if (row.containsKey('person')) {
                                 bcq.person = Person.get(row.person)

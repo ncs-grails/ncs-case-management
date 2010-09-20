@@ -192,15 +192,42 @@ class DocumentGenerationController {
                     BatchCreationQueue.executeUpdate("delete BatchCreationQueue")
                 }
             }
-            on("success").to "manualGenerate"
+            on("success"){
+                [batchCreationConfigId:params?.id]
+            }.to "manualGenerate"
             on("return").to "showConfig"
         }
 
         manualGenerate {
-            println "params in manualGenerate --> ${params}"
-            
+            on("generateDocuments").to "generateDocuments"
             on("return").to "showConfig"
             on("error").to "errorGeneratingBatch"
+        }
+        generateDocuments {
+            action {
+                def batchInstance = null
+                def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
+                def docGenParams = [manual:true, username:username]
+
+                if (batchCreationConfigInstance) {
+                    docGenParams.config = batchCreationConfigInstance
+
+                    if (params.autoSetMailDate) {
+                        docGenParams.mailDate = params.mailDate
+                    }
+                    if (params.useMaxPieces == 'true') {
+                        docGenParams.maxPieces = params.maxPieces
+                    }
+                    batchInstance = documentGenerationService.generateMailing(docGenParams)
+                }
+
+                [batchCreationConfigInstance:batchCreationConfigInstance,
+                    batchInstance:batchInstance]
+            }
+            on("success").to "printDetails"
+            on("return").to "showConfig"
+            on("error").to "errorGeneratingBatch"
+            
         }
         optionalGenerate{
             on("return").to "showConfig"
