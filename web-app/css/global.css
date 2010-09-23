@@ -150,6 +150,14 @@ h1.batchReport {
     font-weight:bold;
 }
 
+.p1 {
+    padding-left: 0.5em;
+}
+
+m1 {
+    margin-left: 0.5em;
+}
+
 #primaryInstrument {
     font-style:italic;
     font-weight:bold;

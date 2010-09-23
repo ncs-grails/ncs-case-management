@@ -19,12 +19,28 @@
     <h2>${batchCreationConfigInstance?.name}</h2>
 
     <fieldset class="maroonBorder">
-      <legend style="margin-left: 0.5em;">Data Sources To Save...</legend>
-        <ul>
+      <legend class="m1">Data Sources To Save...</legend>
           <g:each var="ds" in="${batchCreationConfigInstance?.documents}">
-            <li><a href=""#">${ds.mergeSourceFile}</a></li>
+            <g:if test="${ds.mergeSourceFile != null}">
+              <a href="#">${ds.mergeSourceFile}</a>
+              <div class="dataitem">
+                <div class="datavalue">
+                <label for="usePerson">
+                  <g:message code="batchCreationDocument.usePerson.label" default="Use Person Datset" />
+                </label>
+                <span class="p1"><g:checkBox name="usePerson" value="${ds.usePerson}" /></span>
+                </div>
+              </div>
+              <div class="dataitem">
+                <div class="datavalue">
+                  <label for="useDwelling">
+                    <g:message code="batchCreationDocument.useDwelling.label" default="Use Dwelling Unit Datset" />
+                  </label>
+                  <span class="p1"></span><g:checkBox name="useDwelling" value="${ds.useDwelling}" />
+                </div>
+              </div>
+            </g:if>
           </g:each>
-        </ul>      
     </fieldset>
 
 

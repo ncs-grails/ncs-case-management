@@ -29,6 +29,7 @@ class DocumentGenerationController {
                 household = Household.get(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, household:household)
             } else if (source.name == 'dwellingUnit' ) {
+                 println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
                 dwellingUnit = DwellingUnit.get(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, dwellingUnit:dwellingUnit)
             }
@@ -37,6 +38,7 @@ class DocumentGenerationController {
                 if (!batchCreationQueue) {
                     batchCreationQueue = new BatchCreationQueue(username:username, source:source, person:person, household:household, dwellingUnit:dwellingUnit)
                     batchCreationQueue.save(flush:true)
+                    
                 }
             } else {
                 flash.message = "Source and ID required."
@@ -59,26 +61,27 @@ class DocumentGenerationController {
     // display a batch report
     def batchReport = {
 
+        // primary batch
         def batchInstance = Batch.get(params.id)
-		def batchInstanceList = []
-		
+        // child batches
+        def batchInstanceList = []
+
+        // If we didn't find the batch, see if the param is batch.id instead of id
         if (!batchInstance) {
-              batchInstance = Batch.get(params.batch?.id)
+            batchInstance = Batch.get(params.batch?.id)
         }
 
+        // Hopefully we found one by now.  If so, let's fill the batch report
+        // batch list.  Master first.
         if (batchInstance) {
-			def batchCreationConfigInstance = batchInstance.creationConfig
-
-			if (batchCreationConfigInstance.instrument != batchInstance.primaryInstrument) {
-				// This batch is not the primary batch of the run... let's find it.
-				println "This is not the primary batch!"
-			}
-
-			// Now we need to find all of the sister / child batches
-
-            println "Batch ID: ${batchInstance.id}"
+            // Add master batch to the list
+            batchInstanceList.add(batchInstance)
+            // add all the batches that belong to the master
+            batchInstanceList.addAll(Batch.findAllByMaster(batchInstance))
         }
-        [batchInstance:batchInstance]
+
+        // Pack it up and ship it off to the view...
+        [batchInstance:batchInstance, batchInstanceList:batchInstanceList]
     }
 
     def testGenerate = {
@@ -92,7 +95,7 @@ class DocumentGenerationController {
             batchInstance:batchInstance]
     }
 
-	// here is the batch generation FSM
+    // here is the batch generation FSM
     def generationFlow = {
         // WARNING:  Any thing get gets passed as part of the model
         // needs to implement Serializable.  Otherwise everything comes
@@ -100,57 +103,57 @@ class DocumentGenerationController {
         loadRecentBatches {
             action {
 
-            println "loadRecentBatches params: ${params}"
+                println "loadRecentBatches params: ${params}"
 
-            def q = params.q
-            println "${q}"
+                def q = params.q
+                println "${q}"
 
-            // List of matching configs per search criteria
-            def batchCreationConfigInstanceList = []
-            // list of recently generated mailing types
-            def batchCreationConfigRecentList = []
+                // List of matching configs per search criteria
+                def batchCreationConfigInstanceList = []
+                // list of recently generated mailing types
+                def batchCreationConfigRecentList = []
 
-            def aboutSixMonthsAgo = (new Date()) - 180
+                def aboutSixMonthsAgo = (new Date()) - 180
 
-            // find recently generated batch config types
-            def criteria = BatchCreationConfig.createCriteria()
+                // find recently generated batch config types
+                def criteria = BatchCreationConfig.createCriteria()
 
-            batchCreationConfigRecentList = criteria.listDistinct{
-                batches {
-                    eq('batchRunBy', username)
-                    gt('dateCreated', aboutSixMonthsAgo)
+                batchCreationConfigRecentList = criteria.listDistinct{
+                    batches {
+                        eq('batchRunBy', username)
+                        gt('dateCreated', aboutSixMonthsAgo)
+                    }
                 }
-            }
 
-            //		order('dateCreated', 'desc')
-
+                //		order('dateCreated', 'desc')
 
 
-            // if a query was passed, we'll run it
-            if (q) {
-                criteria = BatchCreationConfig.createCriteria()
 
-                batchCreationConfigInstanceList = criteria.listDistinct{
-                    or {
-                        ilike('name', "%${q}%")
-                        instrument {
-                            or {
-                                study {
-                                    or {
-                                        ilike('name', "%${q}%")
-                                        ilike('fullName', "%${q}%")
+                // if a query was passed, we'll run it
+                if (q) {
+                    criteria = BatchCreationConfig.createCriteria()
+
+                    batchCreationConfigInstanceList = criteria.listDistinct{
+                        or {
+                            ilike('name', "%${q}%")
+                            instrument {
+                                or {
+                                    study {
+                                        or {
+                                            ilike('name', "%${q}%")
+                                            ilike('fullName', "%${q}%")
+                                        }
                                     }
+                                    ilike('name', "%${q}%")
+                                    ilike('nickName', "%${q}%")
                                 }
-                                ilike('name', "%${q}%")
-                                ilike('nickName', "%${q}%")
                             }
                         }
                     }
                 }
-            }
 
-            [batchCreationConfigInstanceList:batchCreationConfigInstanceList,
-                batchCreationConfigRecentList:batchCreationConfigRecentList]
+                [batchCreationConfigInstanceList:batchCreationConfigInstanceList,
+                    batchCreationConfigRecentList:batchCreationConfigRecentList]
             }
             on("success").to("listConfig")
         }
@@ -219,6 +222,7 @@ class DocumentGenerationController {
                         docGenParams.maxPieces = params.maxPieces
                     }
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
+
                 }
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,

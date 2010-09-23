@@ -77,6 +77,10 @@ class DocumentGenerationService {
         def attachmentOf = BatchCreationItemRelation.findByName('attachment')
         def childOf = BatchCreationItemRelation.findByName('child')
         def sisterOf = BatchCreationItemRelation.findByName('sister')
+        
+        def reason = null
+        def instructions = null
+        def comments = null       
 
         println "generateMailing params --> ${params}"
 
@@ -158,6 +162,17 @@ class DocumentGenerationService {
                     }
                 } else {
 
+                    if (!params.reason)  {
+                        reason = batchCreationConfigInstance.defaultReason
+                    }
+                    if (!params.instructions)  {
+                        instructions = batchCreationConfigInstance.defaultInstructions
+                    }
+                    if (!params.comments)  {
+                        comments = batchCreationConfigInstance.defaultComments
+                    }
+                    
+                    
                     def selectionQuery = batchCreationConfigInstance.selectionQuery
                     def selectionParams = [:]
                     // Replace :mailDate with actual mail date
@@ -419,6 +434,18 @@ class DocumentGenerationService {
                                         household:bcq.household,
                                         dwellingUnit:bcq.dwellingUnit)
 
+                                    if (b.master) {
+                                        if (instructions) {
+                                            trackedItem.addToComments(subject: 'instructions', text: instructions, userCreated: username, appCreated: appName)
+                                        }
+                                        if (comments) {
+                                            trackedItem.addToComments(text: comments, userCreated: username, appCreated: appName)
+                                        }
+                                        if (reason) {
+                                            trackedItem.addToComments(subject: 'reason', text: reason, userCreated: username, appCreated: appName)
+                                        }                                        
+                                    }
+
                                     // add sister batches as well as master batches,
                                     // because they both become child of parent items
                                     // if doc gen is configured as such...
@@ -507,24 +534,73 @@ class DocumentGenerationService {
         return masterBatch
     }
 
-    def generateMergeData(BatchCreationDocument batchCreationDocumentInstance) {
-        // This needs to generate the data source based on the merge_source_query
-        // in the BatchCreationConfig.document object
-        if (batchCreationDocumentInstance.mergeSourceQuery) {
-            // run the query, save the data to the "merge data location" if possible?
+    def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
 
-            // print out a list of?
+        // the stuff to write to the file
+        def mergeSourceContents = ""
+        // the file name... we should trim off the file name from the end of
+        // the path.  (q:\stuff\data.csv --> data.csv)
+        def mergeSourceFile = new File(batchCreationDocumentInstance.mergeSourceFile).name
 
+        // the output recordset (list of maps)
+        def outputData = mergeDataBuilderService.getBaseData(batchInstance)
+
+        if (batchCreationDocumentInstance.useDwelling) {
+            outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
+        } else if (batchCreationDocumentInstance.usePerson) {
+            outputData = mergeDataBuilderService.addPersonData(outputData)
         }
+
+        // Make sure the dataset is not empty!
+
+        if (outputData) {
+            // assume this doesn't work
+            // Render outputData as CSV
+
+            // get a field list
+            def firstRow = outputData[0]
+            def columnNames = firstRow.collect{ it.key }
+
+            // write the header column
+            //  "ID","FirstName","MiddleName","LastName","Suffix"
+            columnNames.eachWithIndex{ col, i ->
+                if (i > 0) {
+                    mergeSourceContents << ","
+                }
+                mergeSourceContents << ("\"" + col.replace("\"", "\"\"") + "\"")
+            }
+            mergeSourceContents << "\n"
+
+            // write the data
+            outputData.each{ row ->
+                columnNames.eachWithIndex{ col, i ->
+                    if (i > 0) {
+                        mergeSourceContents << ","
+                    }
+                    mergeSourceContents << ("\"" + row[col].replace("\"", "\"\"") + "\"")
+                }
+                mergeSourceContents << "\n"
+            }
+        }
+        
+        return mergeSourceContents
+        
+        // do this in the controller:
+        // response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
+        // render(contentType: "text/csv", text: mergeSourceContents);
     }
 	
-    def getDocumentLocation(BatchCreationConfig batchCreationConfigInstance) {
+    def getDocumentLocation(BatchCreationDocument batchCreationDocumentInstance) {
         // Some time in the future, this could return a URL reference
         // to something like a controller or the like that will create
         // and merge the documents into their final form automatically
         // for the user.
 
         return batchCreationConfigInstance.documents.collect{ it.documentLocation }
+
+
+        // render an a href to \\files.ncs.umn.edu\ncs\documents\production\some_survey.docx
+        // <a href="file://files.ncs.umn.edu/ncs/NCS%20Articles/09-05%20FY10%20Childrens%20Study%20Group%20Letter.doc">
     }
 
 }

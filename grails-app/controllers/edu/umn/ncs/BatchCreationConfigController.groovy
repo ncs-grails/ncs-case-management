@@ -111,7 +111,9 @@ class BatchCreationConfigController {
                 def version = params.version.toLong()
                 if (batchCreationConfigInstance.version > version) {
                     
-                    batchCreationConfigInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig')] as Object[], "Another user has updated this BatchCreationConfig while you were editing")
+                    batchCreationConfigInstance.errors.rejectValue("version", "default.optimistic.locking.failure", 
+                        [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig')] as Object[],
+                        "Another user has updated this BatchCreationConfig while you were editing")
                     render(view: "edit", model: [batchCreationConfigInstance: batchCreationConfigInstance])
                     return
                 }

@@ -226,7 +226,7 @@ class BootStrap {
                     def du = new DwellingUnit(address:sa,
                         appCreated:'byHand').save()
 
-                    // println "Created Dwelling unit: ${du.id}:${sa.id}"
+                     //println "Created Dwelling unit: ${du?.id}:${sa?.id}"
                 }
 
                 // throw some test data into the database

@@ -30,6 +30,34 @@
 
       <g:form method="post" controller="documentGeneration" action="generation">
           <g:hiddenField name="batchCreationConfigInstance.id" value="${batchCreationConfigId}" />
+
+	<div class="prop">
+	  <span class="name">
+		<label for="reason"><g:message code="batchCreationConfig.defaultReason.label" default="Reason" /></label>
+	  </span>
+	  <span class="value">
+		<g:textField name="reason" size="40" value="${batchCreationConfigInstance?.defaultReason}" />
+	  </span>
+	</div>
+
+	<div class="prop">
+	  <span class="name">
+		<label for="instructions"><g:message code="batchCreationConfig.defaultInstructions.label" default="Instructions" /></label>
+	  </span>
+	  <span class="value">
+		<g:textField name="instructions" size="40" value="${batchCreationConfigInstance?.defaultInstructions}" />
+	  </span>
+	</div>
+
+	<div class="prop">
+	  <span class="name">
+		<label for="comments"><g:message code="batchCreationConfig.defaultComments.label" default="Comments" /></label>
+	  </span>
+	  <span class="value">
+		<g:textField name="comments" size="40" value="${batchCreationConfigInstance?.defaultComments}" />
+	  </span>
+	</div>
+
           <div class="prop">
             <span class="name">
               <label for="sourceId"><g:message code="BatchCreationQueueSource.label" default="Source:" /></label>
