@@ -31,7 +31,7 @@ ${batchCreationConfigInstance?.name}
       <legend style="margin-left: 0.5em;">Recently Generated Batches</legend>
       <div class="list">
 
-        <g:form method="post" controller="documentGeneration" action="generation" >
+        <g:form method="post" controller="documentGeneration" >
           <g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
           <table class="batchList">
@@ -46,22 +46,22 @@ ${batchCreationConfigInstance?.name}
             <tbody>
             <g:each in="${batchCreationConfigInstance?.batches.find{it.master == null}}" status="i" var="batchInstance">
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                <td><g:radio id="batch.id-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
+                <td><g:radio id="batchId-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
 
-              <td><label for="batch.id-${batchInstance.id}">${batchInstance?.primaryInstrument?.study?.name}</label></td>
+              <td><label for="batchId-${batchInstance.id}">${batchInstance?.primaryInstrument?.study?.name}</label></td>
 
-              <td><label for="batch.id-${batchInstance.id}">${batchInstance?.primaryInstrument?.name}</label></td>
+              <td><label for="batchId-${batchInstance.id}">${batchInstance?.primaryInstrument?.name}</label></td>
 
-              <td><label for="batch.id-${batchInstance.id}">${batchInstance?.pieces}</label></td>
+              <td><label for="batchId-${batchInstance.id}">${batchInstance?.pieces}</label></td>
               </tr>
             </g:each>
             </tbody>
           </table>
 
           <!-- Reprint Button -->
-          <g:submitButton name="reGenerate" value="Reprint Document(s)" />
+          <g:actionSubmit action="printDetails" value="Reprint Document(s)" />
           <!-- Batch Report Button -->
-          <g:submitButton name="batchReport" value="View Batch Report" />
+          <g:actionSubmit action="batchReport" value="View Batch Report" />
         </g:form>
       </div>
     </fieldset>

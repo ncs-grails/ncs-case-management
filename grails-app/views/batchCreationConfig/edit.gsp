@@ -1,4 +1,5 @@
 <%@ page import="edu.umn.ncs.BatchCreationConfig" %>
+<%@ page import="edu.umn.ncs.DataSetType" %>
 <%@ page import="edu.umn.ncs.Instrument" %>
 <html>
   <head>
@@ -80,10 +81,21 @@
 
               <div class="prop">
                 <span class="name">
-                  <label for="mergeSourceQuery"><g:message code="batchCreationDocument.mergeSourceQuery.label" default="Merge Source Query" /></label>
+                  <label for="mergeSourceQuery"><g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" /></label>
                 </span>
                 <span class="value">
-                  <g:textArea name="mergeSourceQuery" rows="3" cols="80">${d.mergeSourceQuery}</g:textArea>
+
+                  <g:each var="msg" in="${DataSetType.list()}">
+                    
+                    <g:if test="${d.dataSets.find{ it.id == msg.id}}" >
+                      <input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" checked="checked" />
+                    </g:if>
+                    <g:else>
+                      <input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" />
+                    </g:else>
+
+                    <label for="dataSet-${msg.id}">${msg.name}</label>
+                  </g:each>
                 </span>
               </div>
 

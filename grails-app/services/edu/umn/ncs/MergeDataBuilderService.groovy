@@ -48,7 +48,7 @@ class MergeDataBuilderService {
                 instrumentId: batchInstance?.primaryInstrument?.id,
                 instrumentName: batchInstance?.primaryInstrument?.name,
                 studyName: batchInstance?.primaryInstrument?.study?.name,
-                documentTitle: "T" + item?.studyYear + ' ' + batchInstance?.primaryInstrument?.study?.name + ' ' + batchInstance?.primaryInstrument?.name,
+                documentTitle: ((item?.studyYear != null) ? "T" + item?.studyYear + ' ' : '') + batchInstance?.primaryInstrument?.study?.name + ' ' + batchInstance?.primaryInstrument?.name,
                 fullStudyName: batchInstance?.primaryInstrument?.study?.fullName,
                 isInitial: batchInstance?.primaryBatchInstrument?.isInitial,
                 studyYear: item?.studyYear,
@@ -57,7 +57,7 @@ class MergeDataBuilderService {
                 parentItemId: item?.parentItem?.id,
                 parentDate: item?.parentItem?.batch?.dateCreated,
                 parentName: item?.parentItem?.batch?.primaryInstrument?.name,
-                childItemId: TrackedItems.findByParentItem(item)?.id,
+                childItemId: TrackedItem.findByParentItem(item)?.id,
                 resultName: item?.result?.result?.name,
                 resultDate: item?.result?.receivedDate
             ]
@@ -90,12 +90,13 @@ class MergeDataBuilderService {
             dataSet.add(record)
         }
 
+        return dataSet
 
     }
 
     def addDwellingUnitData(dataSet) {
 
-        return dataSet.collect{ record ->
+        dataSet.collect{ record ->
             def dwellingUnitInstance = DwellingUnit.get(record.dwellingUnitId)
             if (dwellingUnitInstance) {
                 record.address1 = dwellingUnitInstance?.address?.address
@@ -105,14 +106,15 @@ class MergeDataBuilderService {
                 record.cityStateZip =  dwellingUnitInstance?.address?.cityStateZip
             }
         }
+        dataSet
     }
 
     // Note: selectionGroup --> enrollmentType
     //  Example: address1 --> "Mc Namara" (building name), address2 --> "200 Oak St. SE Minneapolis MN 55455"
 
     def addPersonData(dataSet) {
-
-        return dataSet.collect{ record ->
+        
+        dataSet.collect{ record ->
             def personInstance = Person.get(record.personId)
             if (personInstance) {
                 record.subjectId = Subject.findByPerson(personInstance)?.subjectId
@@ -136,6 +138,7 @@ class MergeDataBuilderService {
                 
             }
         }
+        dataSet
     }
     def addCustomData() {
 

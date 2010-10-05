@@ -20,7 +20,6 @@ class BatchCreationDocumentController {
     }
 
     def save = {
-
         def batchCreationConfig = BatchCreationConfig.get(params.batchCreationConfig.id)
         if (batchCreationConfig){
 
@@ -81,9 +80,9 @@ class BatchCreationDocumentController {
     }
 
     def update = {
-        println "${params}"
         def batchCreationDocumentInstance = BatchCreationDocument.get(params.id)
         if (batchCreationDocumentInstance) {
+
             if (params.version) {
                 def version = params.version.toLong()
                 if (batchCreationDocumentInstance.version > version) {
@@ -92,6 +91,16 @@ class BatchCreationDocumentController {
                 }
             }
             batchCreationDocumentInstance.properties = params
+
+            // ngp; save dataSets to the batchCreationDocumentInstance
+            batchCreationDocumentInstance.dataSets = []
+            params?.dataSets?.id?.each{
+                def dataSet = DataSetType.get(it)
+                if (dataSet) {
+                    batchCreationDocumentInstance.addToDataSets(dataSet).save()
+                }
+            }
+
             if (!batchCreationDocumentInstance.hasErrors() && batchCreationDocumentInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batchCreationDocument.label', default: 'BatchCreationDocument'), batchCreationDocumentInstance.id])}"
                 redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationDocumentInstance.batchCreationConfig.id)

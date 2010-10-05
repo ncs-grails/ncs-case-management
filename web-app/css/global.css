@@ -9,6 +9,22 @@ form.ncs input {
     font-variant: small-caps;
 }
 
+.blackBorder {
+	border-color: black;
+	border-style: solid;
+	border-width: thin;
+}
+
+.nowrap {
+    display: inline-block;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.indent {
+    padding-left: 2em;
+}
+
 .maroonBorder {
 	border-color: #7A0019;
 	border-style: solid;
@@ -150,7 +166,7 @@ h1.batchReport {
     font-weight:bold;
 }
 
-.p1 {
+.pr1 {
     padding-left: 0.5em;
 }
 
@@ -163,6 +179,32 @@ m1 {
     font-weight:bold;
 }
 
-.clear {clear:both;}
+
+span.fixedFont {
+    font-family: Courier, monospace;
+}
+
+span.barcode {
+    font-family: Code39Eight, monospace;
+}
+
+.clear { clear:both; }
 
 .clearabove {line-height:0;height:0;font-size:0;clear:both;} /* Use on a clearing element following a float */
+
+a.csv {
+    background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
+    padding-left: 28px;
+    padding-right: 0.5em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    border-radius: 0.25em;
+    border-width: thin;
+    border-style: solid;
+}
+
+dl.menu dd {
+    padding: 0.5em;
+}

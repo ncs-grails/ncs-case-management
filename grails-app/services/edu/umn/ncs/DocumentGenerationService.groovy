@@ -13,6 +13,7 @@ class DocumentGenerationService {
 
     static transactional = true
     DataSource dataSource
+    def mergeDataBuilderService
 
     def appName = 'ncs-case-management'
 
@@ -537,23 +538,22 @@ class DocumentGenerationService {
     def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
 
         // the stuff to write to the file
-        def mergeSourceContents = ""
-        // the file name... we should trim off the file name from the end of
-        // the path.  (q:\stuff\data.csv --> data.csv)
-        def mergeSourceFile = new File(batchCreationDocumentInstance.mergeSourceFile).name
+        def mergeSourceContents = new StringBuffer()
 
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
-        if (batchCreationDocumentInstance.useDwelling) {
-            outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
-        } else if (batchCreationDocumentInstance.usePerson) {
-            outputData = mergeDataBuilderService.addPersonData(outputData)
+
+        batchCreationDocumentInstance.dataSets.each{
+            if (it.code == "dwelling") {
+                outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
+            } else if (it.code == "person") {
+                outputData = mergeDataBuilderService.addPersonData(outputData)
+            }
         }
 
-        // Make sure the dataset is not empty!
 
-        if (outputData) {
+         if (outputData) {
             // assume this doesn't work
             // Render outputData as CSV
 
@@ -574,20 +574,27 @@ class DocumentGenerationService {
             // write the data
             outputData.each{ row ->
                 columnNames.eachWithIndex{ col, i ->
+
                     if (i > 0) {
                         mergeSourceContents << ","
                     }
-                    mergeSourceContents << ("\"" + row[col].replace("\"", "\"\"") + "\"")
+                    // default content is empty
+                    def columnValue = ""
+                    // If there's a non-null value...
+                    if (row[col] != null) {
+                        // take the content and escape the double quotes (")
+                        def columnContent = row[col].toString().replace('"', '""')
+                        // then surround it with double quotes
+                        columnValue = '"' + columnContent  + '"'
+                    }
+
+                    mergeSourceContents << columnValue
                 }
                 mergeSourceContents << "\n"
             }
         }
         
         return mergeSourceContents
-        
-        // do this in the controller:
-        // response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
-        // render(contentType: "text/csv", text: mergeSourceContents);
     }
 	
     def getDocumentLocation(BatchCreationDocument batchCreationDocumentInstance) {

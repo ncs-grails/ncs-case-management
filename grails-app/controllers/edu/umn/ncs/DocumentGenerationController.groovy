@@ -10,6 +10,45 @@ class DocumentGenerationController {
     // TODO: Show/Add items per Person
     // TODO: Show/Add items per dwelling unit
 
+    // this is for testing, TODO: DELETE ME!
+    def testGenerate = {
+        def batchCreationConfigInstance = BatchCreationConfig.get(1)
+        def docGenParams = [manual: false,
+            username:username,
+            config:batchCreationConfigInstance]
+
+        def batchInstance = documentGenerationService.generateMailing(docGenParams)
+        [batchCreationConfigInstance:batchCreationConfigInstance,
+            batchInstance:batchInstance]
+    }
+
+    // this sends a CSV file to the user on the other end
+    def downloadDataset = {
+        println "params in downloadDataset --> ${params}"
+
+        def batchInstance = Batch.get(params?.batch?.id)
+        def batchCreationDocumentInstance = BatchCreationDocument.get(params?.batchCreationDocument?.id)
+
+        // make sure the required params were passed
+        if (batchInstance && batchCreationDocumentInstance) {
+
+            // the file name... we should trim off the file name from the end of
+            // the path.  (q:\stuff\data.csv --> data.csv)
+
+            def filepath = batchCreationDocumentInstance.mergeSourceFile
+            def mergeSourceFile = new File(filepath).name
+
+            def mergeSourceContents = documentGenerationService.generateMergeData(batchInstance, batchCreationDocumentInstance)
+
+            //response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
+            //render(contentType: "text/csv", text: mergeSourceContents);
+            render(text: mergeSourceContents);
+        } else {
+            flash.message = "something went horribly wrong. (We can't find the batch or the document)."
+            redirect(action:"printDetails")
+        }
+    }
+
     def find = {
         flash.message = null
         def batchCreationQueue = null
@@ -24,14 +63,14 @@ class DocumentGenerationController {
 
             if (source.name == 'person' ) {
                 person = Person.get(params.sourceValue)
-                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, person:person)
+                batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, person:person)
             } else if (source.name == 'household' ) {
                 household = Household.get(params.sourceValue)
-                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, household:household)
+                batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, household:household)
             } else if (source.name == 'dwellingUnit' ) {
-                 println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
+                println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
                 dwellingUnit = DwellingUnit.get(params.sourceValue)
-                batchCreationQueue = BatchCreationQueue.findWhere(username:username, source:source, dwellingUnit:dwellingUnit)
+                batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, dwellingUnit:dwellingUnit)
             }
 
             if (person || household || dwellingUnit) {
@@ -57,7 +96,18 @@ class DocumentGenerationController {
     def index = { 
         redirect(action:'generation', params:params)
     }
-	
+
+    // display details for printing the batch
+    def printDetails = {
+
+        println "This is what we got for print details: \n ${params}"
+        
+        def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfig?.id)
+        def batchInstance = Batch.get(params?.batch?.id)
+
+        [batchCreationConfigInstance:batchCreationConfigInstance, batchInstance:batchInstance]
+    }
+
     // display a batch report
     def batchReport = {
 
@@ -84,16 +134,7 @@ class DocumentGenerationController {
         [batchInstance:batchInstance, batchInstanceList:batchInstanceList]
     }
 
-    def testGenerate = {
-        def batchCreationConfigInstance = BatchCreationConfig.get(1)
-        def docGenParams = [manual: false,
-            username:username,
-            config:batchCreationConfigInstance]
 
-        def batchInstance = documentGenerationService.generateMailing(docGenParams)
-        [batchCreationConfigInstance:batchCreationConfigInstance,
-            batchInstance:batchInstance]
-    }
 
     // here is the batch generation FSM
     def generationFlow = {
@@ -169,6 +210,9 @@ class DocumentGenerationController {
                 def useMaxPieces = false
 
                 if (batchCreationConfigInstance) {
+                    // Save this to the flow
+                    flow.batchCreationConfigInstance = batchCreationConfigInstance
+
                     mailDate = mailDate + batchCreationConfigInstance.mailDateDaysShift
                     if (batchCreationConfigInstance.maxPieces > 0) {
                         useMaxPieces = true
@@ -182,25 +226,15 @@ class DocumentGenerationController {
         }
         showConfig {
             on("return").to "loadRecentBatches"
-            on("manualGenerateAction").to "manualGenerateAction"
+            on("manualGenerateAction"){
+                // Clear the user's manual queue
+                def sql = "delete BatchCreationQueue bcq where bcq.username = ?"
+                BatchCreationQueue.executeUpdate(sql, [username])
+            }.to "manualGenerate"
             on("autoGenerate").to "autoGenerate"
             on("optionalGenerate").to "optionalGenerate"
-            on("reGenerate").to "printDetails"
-            on("batchReport").to "showBatchReport"
+            on("reGenerate").to "showPrintDetails"
         }
-        manualGenerateAction{
-            action {
-                def nBatchCreationQueue = BatchCreationQueue.count()
-                if (nBatchCreationQueue > 0) {
-                    BatchCreationQueue.executeUpdate("delete BatchCreationQueue")
-                }
-            }
-            on("success"){
-                [batchCreationConfigId:params?.id]
-            }.to "manualGenerate"
-            on("return").to "showConfig"
-        }
-
         manualGenerate {
             on("generateDocuments").to "generateDocuments"
             on("return").to "showConfig"
@@ -208,8 +242,11 @@ class DocumentGenerationController {
         }
         generateDocuments {
             action {
+                // ** Manually Generate Documents **
                 def batchInstance = null
-                def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
+                // def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
+                // pull the creation config from the flow scope
+                def batchCreationConfigInstance = flow.batchCreationConfigInstance
                 def docGenParams = [manual:true, username:username]
 
                 if (batchCreationConfigInstance) {
@@ -222,13 +259,17 @@ class DocumentGenerationController {
                         docGenParams.maxPieces = params.maxPieces
                     }
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
-
+                    
+                    // save it to the flow
+                    if (batchInstance) {
+                        flow.batchInstance = batchInstance
+                    }
                 }
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,
                     batchInstance:batchInstance]
             }
-            on("success").to "printDetails"
+            on("success").to "showPrintDetails"
             on("return").to "showConfig"
             on("error").to "errorGeneratingBatch"
             
@@ -238,6 +279,7 @@ class DocumentGenerationController {
         }
         autoGenerate{
             action {
+                // ** automatically generate documents **
                 def batchInstance = null
                 def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
                 def results = null
@@ -253,25 +295,25 @@ class DocumentGenerationController {
                         docGenParams.maxPieces = params.maxPieces
                     }
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
+                    
+                    if (batchInstance) {
+                        flow.batchInstance = batchInstance
+                    }
+
                 }
                 [batchCreationConfigInstance:batchCreationConfigInstance,
                     batchInstance:batchInstance]
             }
-            on("success").to "printDetails"
+            on("success").to "showPrintDetails"
             on("error").to "errorGeneratingBatch"
         }
-        errorGeneratingBatch()
-        printDetails{
-            // TODO:
-            //   Open Batch Report if set to true
-            //   Display link to D/L merge data, and show where to save it
-            //   Display link to merge documents
-
-            on("report").to "batchReport"
-            on("return").to "showConfig"
+        errorGeneratingBatch{
+            
         }
-        showBatchReport{
-            redirect(controller:"documentGeneration",action:'batchReport', id:params.batch?.id)
+        showPrintDetails{
+            redirect(controller:"documentGeneration",action:'printDetails', 
+                params:['batchCreationConfig.id':flow.batchCreationConfigInstance.id,
+                    'batch.id':flow.batchInstance.id])
         }
     }
 }

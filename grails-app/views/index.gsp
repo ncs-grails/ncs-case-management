@@ -88,27 +88,27 @@
 
 			<div id="pageList" class="dialog">
 			  <h2>Available Pages</h2>
-			  <dl>
+			  <dl class="menu">
 				<dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
-				<dt>
+				<dd>
 				  Manage the instruments used to interact with study subjects.
 				  Instruments include such items as invitations, surveys, phone
 				  calls, events, etc...
-				</dt>
+				</dd>
 				<dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
-				<dt>
+				<dd>
 				  Configure the way that batches of instruments are generated
 				  in the system so that they can be properly tracked
-				</dt>
+				</dd>
 				<dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
-				<dt>
+				<dd>
 				  Generate instrument batches either automatically or by hand.
-				</dt>
+				</dd>
 
 				<dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>
-				<dt>
+				<dd>
 				  Use this to test Doc Gen
-				</dt>
+				</dd>
 
 				
 			  </dl>

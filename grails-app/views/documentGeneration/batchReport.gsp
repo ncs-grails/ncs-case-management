@@ -51,34 +51,53 @@
 
 
 
-    <!-- PRIMARY BATCH ATTACHMENTS -->
 
-  <g:each var="a" in="${batchInstance?.instruments.find{ !it?.isPrimary }}">
-    <div class="attachment">
-      <div class="instrument">${a.instrument?.name}</div>
-      <div class="instrumentVersion"> Version:
-        <span class="version">${a?.version}
+    <!-- List the batches -->
+  <g:each var="b" in="${batchInstanceList}">
+
+    <div class="clear">
+
+      <div class="instrumentName blackBorder nowrap">${b?.primaryInstrument?.name}</div>
+
+      <div class="isInitial blackBorder nowrap">${b?.primaryBatchInstrument?.isInitial}</div>
+
+      <div class="instrumentVersion nowrap"> Version:
+        <div class="version blackBorder nowrap">${b?.primaryBatchInstrument?.version}
+        </div>
+      </div>
+    </div>
+
+    <div class="indent clear">
+
+      <!-- BATCH ATTACHMENTS -->
+      <g:each var="a" in="${b?.instruments.find{ !it?.isPrimary }}">
+        <div class="attachment">
+          <div class="instrument">${a.instrument?.name}</div>
+          <div class="instrumentVersion"> Version:
+            <div class="version  blackBorder ">${a?.version}
+            </div>
+          </div>
+        </div>
+      </g:each>
+
+      <div class="mode blackBorder nowrap">
+        <span class="direction">${b.direction}</span>
+        <span class="format">${b.format}</span>
+      </div>
+      <div class="batchId nowrap">Batch ID:
+        <span class="batch-id fixedFont">
+${b.id}
+        </span>
+        <!-- TODO: -->
+        <span class="batch-id-barcode barcode">
+          *${b.id}*
         </span>
       </div>
-      <div class="isInitial">${a.isInitial}</div>
-      <div class="isResend">${a.isResend}</div>
+
     </div>
+
+    <p/>
   </g:each>
-
-  <!-- CHILD / SISTER BATCHES -->
-
-  <div class="dataitem">
-    <div class="datavalue">
-      CHILD Batches
-    </div>
-  </div>
-  <g:each var="b" in="${batchInstanceList}">
-    <div class="dataitem">
-      <div class="datavalue w50"><span> ${b?.primaryInstrument?.name}</span></div>
-    </div>
-    <div class="clear"></div>
-  </g:each>
-
 
   <hr/>
   <!-- PRINT FOOTER INFO -->

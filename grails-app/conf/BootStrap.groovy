@@ -102,6 +102,22 @@ class BootStrap {
             internal = new BatchDirection(name:'internal').save()
         }
 
+        // MergeDataSource
+        def dwellingUnitData = DataSetType.findByCode("dwelling")
+        if (! dwellingUnitData) {
+            dwellingUnitData = new DataSetType(name:"Dwelling Unit", code:'dwelling').save()
+        }
+
+        def personData = DataSetType.findByCode("person")
+        if (! personData) {
+            personData = new DataSetType(name:"Person", code:'person').save()
+        }
+
+        def customData = DataSetType.findByCode("custom")
+        if (! customData) {
+            customData = new DataSetType(name:"Custom", code:'custom').save()
+        }
+
         // InstrumentFormat
         def firstClassMail = InstrumentFormat.findByName('first class mail')
         if (!firstClassMail) {
