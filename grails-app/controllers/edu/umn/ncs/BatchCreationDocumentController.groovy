@@ -20,17 +20,29 @@ class BatchCreationDocumentController {
     }
 
     def save = {
+
         def batchCreationConfig = BatchCreationConfig.get(params.batchCreationConfig.id)
         if (batchCreationConfig){
+            
+            if (params?.documentLocation && params?.mergeSourceFile) {
+                def batchCreationDocumentInstance = new BatchCreationDocument(params)
 
-            def batchCreationDocumentInstance = new BatchCreationDocument(params)
-            if (batchCreationDocumentInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.created.message', args: [message(code: 'batchCreationDocument.label', default: 'BatchCreationDocument'), batchCreationDocumentInstance.id])}"
-                redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
-            }
-            else {
-                flash.message = "failed to save new document"
+                params?.dataSets?.id?.each{
+                    def dataSet = DataSetType.get(it)
+                    if (dataSet) {
+                        batchCreationDocumentInstance.addToDataSets(dataSet).save()
+                    }
+                }
 
+                if (batchCreationDocumentInstance.save(flush: true)) {
+                    flash.message = "${message(code: 'default.created.message', args: [message(code: 'batchCreationDocument.label', default: 'BatchCreationDocument'), batchCreationDocumentInstance.id])}"
+                    redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
+                } else {
+                    flash.message = "failed to save new document"
+                    redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
+                }
+            } else {
+                flash.message = "Document location and merge datasource required. New document was not saved."
                 redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
             }
         } else {

@@ -144,7 +144,7 @@ class DocumentGenerationController {
         loadRecentBatches {
             action {
 
-                println "loadRecentBatches params: ${params}"
+                println "updated loadRecentBatches params: ${params}"
 
                 def q = params.q
                 println "${q}"
@@ -159,12 +159,18 @@ class DocumentGenerationController {
                 // find recently generated batch config types
                 def criteria = BatchCreationConfig.createCriteria()
 
-                batchCreationConfigRecentList = criteria.listDistinct{
+                batchCreationConfigRecentList = criteria.list{
+                    batches {
+                        eq("batchRunBy", username)
+                        gt('dateCreated', aboutSixMonthsAgo)
+                    }
+                }
+                /*batchCreationConfigRecentList = criteria.listDistinct{
                     batches {
                         eq('batchRunBy', username)
                         gt('dateCreated', aboutSixMonthsAgo)
                     }
-                }
+                }*/
 
                 //		order('dateCreated', 'desc')
 

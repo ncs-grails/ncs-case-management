@@ -86,7 +86,6 @@
                 <span class="value">
 
                   <g:each var="msg" in="${DataSetType.list()}">
-                    
                     <g:if test="${d.dataSets.find{ it.id == msg.id}}" >
                       <input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" checked="checked" />
                     </g:if>
@@ -98,6 +97,7 @@
                   </g:each>
                 </span>
               </div>
+
 
               <g:actionSubmit action="update" value="Save" />
               <g:actionSubmit action="delete" value="Remove" />

@@ -22,6 +22,7 @@ class BatchCreationConfigController {
     }
 
     def save = {
+
         def batchCreationConfigInstance = new BatchCreationConfig(params)
         if (batchCreationConfigInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), batchCreationConfigInstance.id])}"
