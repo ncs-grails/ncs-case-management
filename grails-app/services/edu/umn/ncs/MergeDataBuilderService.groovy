@@ -40,6 +40,7 @@ class MergeDataBuilderService {
 
             def record = [
                 itemId: item.id,
+                itemIdBarcode: "*${item.id}*",
                 batchId: batchInstance?.id,
                 batchDate: batchInstance?.dateCreated,
                 mailDate: batchInstance?.mailDate,
@@ -99,6 +100,7 @@ class MergeDataBuilderService {
         dataSet.collect{ record ->
             def dwellingUnitInstance = DwellingUnit.get(record.dwellingUnitId)
             if (dwellingUnitInstance) {
+                record.salutation = "Dear Neighbor"
                 record.address1 = dwellingUnitInstance?.address?.address
                 record.address2 = dwellingUnitInstance?.address?.address2
                 record.zipCode =  dwellingUnitInstance?.address?.zipCode

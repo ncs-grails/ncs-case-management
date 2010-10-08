@@ -24,7 +24,7 @@ class DocumentGenerationController {
 
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
-        println "params in downloadDataset --> ${params}"
+        //println "params in downloadDataset --> ${params}"
 
         def batchInstance = Batch.get(params?.batch?.id)
         def batchCreationDocumentInstance = BatchCreationDocument.get(params?.batchCreationDocument?.id)
@@ -40,9 +40,11 @@ class DocumentGenerationController {
 
             def mergeSourceContents = documentGenerationService.generateMergeData(batchInstance, batchCreationDocumentInstance)
 
-            //response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
-            //render(contentType: "text/csv", text: mergeSourceContents);
-            render(text: mergeSourceContents);
+            response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
+            render(contentType: "text/csv", text: mergeSourceContents);
+            
+            // Use for debugging (doesn't download)
+            //render(text: mergeSourceContents);
         } else {
             flash.message = "something went horribly wrong. (We can't find the batch or the document)."
             redirect(action:"printDetails")
@@ -144,7 +146,7 @@ class DocumentGenerationController {
         loadRecentBatches {
             action {
 
-                println "updated loadRecentBatches params: ${params}"
+                println "loadRecentBatches params: ${params}"
 
                 def q = params.q
                 println "${q}"
@@ -159,18 +161,12 @@ class DocumentGenerationController {
                 // find recently generated batch config types
                 def criteria = BatchCreationConfig.createCriteria()
 
-                batchCreationConfigRecentList = criteria.list{
-                    batches {
-                        eq("batchRunBy", username)
-                        gt('dateCreated', aboutSixMonthsAgo)
-                    }
-                }
-                /*batchCreationConfigRecentList = criteria.listDistinct{
+                batchCreationConfigRecentList = criteria.listDistinct{
                     batches {
                         eq('batchRunBy', username)
                         gt('dateCreated', aboutSixMonthsAgo)
                     }
-                }*/
+                }
 
                 //		order('dateCreated', 'desc')
 
@@ -224,11 +220,21 @@ class DocumentGenerationController {
                         useMaxPieces = true
                     }
                 }
+
+                // list the batches
+                def batchInstanceList = batchCreationConfigInstance?.batches
+                    .findAll{it.master == null && it.pieces > 0 }
+                    .sort{ -it.id }
+
                 [batchCreationConfigInstance:batchCreationConfigInstance,
-                    mailDate:mailDate, useMaxPieces:useMaxPieces]
+                    mailDate:mailDate,
+                    useMaxPieces:useMaxPieces,
+                    batchInstanceList: batchInstanceList]
             }
             on("success").to "showConfig"
-            on("error").to "loadRecentBatches"
+            on("error"){
+                println "ERROR: couldn't run [showConfig] from [loadConfig]"
+            }.to "loadRecentBatches"
         }
         showConfig {
             on("return").to "loadRecentBatches"

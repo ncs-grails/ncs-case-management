@@ -81,7 +81,7 @@
 
               <div class="prop">
                 <span class="name">
-                  <label for="mergeSourceQuery"><g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" /></label>
+                  <g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" />
                 </span>
                 <span class="value">
 
@@ -129,10 +129,14 @@
 
             <div class="prop">
               <span class="name">
-                <label for="mergeSourceQuery"><g:message code="batchCreationDocument.mergeSourceQuery.label" default="Merge Source Query" /></label>
+                <g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" />
               </span>
               <span class="value">
-                <g:textArea name="mergeSourceQuery" rows="3" cols="80"></g:textArea>
+
+                <g:each var="msg" in="${DataSetType.list()}">
+                  <input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" />
+                  <label for="dataSet-${msg.id}">${msg.name}</label>
+                </g:each>
               </span>
             </div>
 

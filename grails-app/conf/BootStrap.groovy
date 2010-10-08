@@ -4,7 +4,14 @@ class BootStrap {
 
     def init = { servletContext ->
 
+        // 
+        // TODO: Min Batch.id should be 10,000
+        // TODO: Min TrackedItem.id should be 1,000,000
+        
         // Global BootStrap
+
+        // itemId = 0
+        // itemBarcode = "B" + Batch.id
 
         def today = new Date()
         def appName = 'ncs-case-management'
@@ -20,9 +27,14 @@ class BootStrap {
             homeAddress = new AddressType(name:'home').save()
         }
         def seasonalAddress = AddressType.findByName('seasonal')
-        if (! homeAddress) {
+        if (! seasonalAddress) {
             seasonalAddress = new AddressType(name:'seasonal').save()
         }
+        def workAddress = AddressType.findByName('work')
+        if (! workAddress) {
+            workAddress = new AddressType(name:'work').save()
+        }
+
         //ContactRoleType
         def emergencyContact = ContactRoleType.findByName('emergency')
         if (! emergencyContact) {
@@ -242,8 +254,58 @@ class BootStrap {
                     def du = new DwellingUnit(address:sa,
                         appCreated:'byHand').save()
 
-                     //println "Created Dwelling unit: ${du?.id}:${sa?.id}"
+                    //println "Created Dwelling unit: ${du?.id}:${sa?.id}"
                 }
+
+
+                // TODO:
+                // Add Person as Tracking Document recipient
+                // add them to batches ... at the beginning of the batch.
+
+                def sourceEnHS = new Source(name:"EnHS", selectable:false).save()
+
+                // Create Address for Screening Center Locations
+                def mac = new StreetAddress(address:'200 Oak St SE Ste 350',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55455, zip4:2008,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+
+                def mtc = new StreetAddress(address:'1100 Washington Ave S Ste 100',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55415, zip4:1273,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+
+                def bsteward = new Person(title:'Ms',
+                    firstName:'Bonika',
+                    lastName:'Steward',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                def dmd = new Person(title:'Ms',
+                    firstName:'Donna',
+                    lastName:'DesMarais',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                bsteward.addToStreetAddresses(addressType:workAddress, 
+                    streetAddress:mtc, infoSource:sourceEnHS, preferredOrder:1).save()
+
+                dmd.addToStreetAddresses(addressType:workAddress,
+                    streetAddress:mac, infoSource:sourceEnHS, preferredOrder:1).save()
+
+                // Create tracking document recipients
+                def bstewardRecipient = new TrackingDocumentRecipient(person: bsteward).save()
+                println "saving person in recipients --> ${bstewardRecipient?.person?.id}"
+
+                def dmdRecipient = new TrackingDocumentRecipient(person: dmd).save()
 
                 // throw some test data into the database
                 def myAddress = new StreetAddress(address:'3323 Buchanan St NE',

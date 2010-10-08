@@ -552,6 +552,13 @@ class DocumentGenerationService {
             }
         }
 
+        outputData = outputData.sort{ it.itemId }
+
+        def recNo = 1
+        outputData.each{
+            it.recordNumber = recNo
+            recNo++
+        }
 
          if (outputData) {
             // assume this doesn't work
@@ -569,7 +576,8 @@ class DocumentGenerationService {
                 }
                 mergeSourceContents << ("\"" + col.replace("\"", "\"\"") + "\"")
             }
-            mergeSourceContents << "\n"
+            // Using \r\n for MS Windows
+            mergeSourceContents << "\r\n"
 
             // write the data
             outputData.each{ row ->
@@ -590,7 +598,7 @@ class DocumentGenerationService {
 
                     mergeSourceContents << columnValue
                 }
-                mergeSourceContents << "\n"
+                mergeSourceContents << "\r\n"
             }
         }
         

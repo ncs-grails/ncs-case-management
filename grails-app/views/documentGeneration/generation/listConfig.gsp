@@ -46,17 +46,11 @@
             <g:each in="${batchCreationConfigInstanceList}" status="i" var="batchCreationConfigInstance">
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                <td><g:link action="generation" id="${batchCreationConfigInstance.id}">
-${batchCreationConfigInstance?.instrument?.study?.name}
-              </g:link></td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${batchCreationConfigInstance?.instrument?.study?.name}</g:link></td>
 
-              <td><g:link action="generation" id="${batchCreationConfigInstance.id}">
-${batchCreationConfigInstance?.instrument?.name}
-              </g:link></td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${batchCreationConfigInstance?.instrument?.name}</g:link></td>
 
-              <td><g:link action="generation" id="${batchCreationConfigInstance.id}">
-${fieldValue(bean: batchCreationConfigInstance, field: "name")}
-              </g:link></td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${fieldValue(bean: batchCreationConfigInstance, field: "name")}</g:link></td>
 
               </tr>
             </g:each>
@@ -83,18 +77,11 @@ ${fieldValue(bean: batchCreationConfigInstance, field: "name")}
           <g:each in="${batchCreationConfigRecentList}" status="i" var="batchCreationConfigInstance">
             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-              <td><g:link action="generation" id="${batchCreationConfigInstance.id}">
-${batchCreationConfigInstance?.instrument?.study?.name}
-              </g:link></td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${batchCreationConfigInstance?.instrument?.study?.name}</g:link></td>
 
-              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">
-${batchCreationConfigInstance?.instrument?.name}
-            </g:link>
-            </td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${batchCreationConfigInstance?.instrument?.name}</g:link></td>
 
-            <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">
-${fieldValue(bean: batchCreationConfigInstance, field: "name")}
-            </g:link></td>
+              <td><g:link action="generation" event="load" id="${batchCreationConfigInstance.id}">${fieldValue(bean: batchCreationConfigInstance, field: "name")}</g:link></td>
 
             </tr>
           </g:each>

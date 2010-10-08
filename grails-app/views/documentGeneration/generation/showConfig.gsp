@@ -38,15 +38,19 @@ ${batchCreationConfigInstance?.name}
             <thead>
               <tr>
                 <th><input type="radio" disabled="disabled" /></th>
+                <th>${message(code: 'batch.label', default: 'Batch ID')}</th>
                 <th>${message(code: 'study.nickName.label', default: 'Study')}</th>
                 <th>${message(code: 'instrument.name.label', default: 'Instrument')}</th>
                 <th>Peices</th>
               </tr>
             </thead>
             <tbody>
-            <g:each in="${batchCreationConfigInstance?.batches.find{it.master == null}}" status="i" var="batchInstance">
+            <g:each in="${batchInstanceList}" status="i" var="batchInstance">
+
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                 <td><g:radio id="batchId-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
+
+               <td><label for="batchId-${batchInstance.id}">${batchInstance.id}</label></td>
 
               <td><label for="batchId-${batchInstance.id}">${batchInstance?.primaryInstrument?.study?.name}</label></td>
 
