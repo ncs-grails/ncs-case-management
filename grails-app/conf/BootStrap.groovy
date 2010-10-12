@@ -257,56 +257,6 @@ class BootStrap {
                     //println "Created Dwelling unit: ${du?.id}:${sa?.id}"
                 }
 
-
-                // TODO:
-                // Add Person as Tracking Document recipient
-                // add them to batches ... at the beginning of the batch.
-
-                def sourceEnHS = new Source(name:"EnHS", selectable:false).save()
-
-                // Create Address for Screening Center Locations
-                def mac = new StreetAddress(address:'200 Oak St SE Ste 350',
-                    city:'Minneapolis',
-                    state:'MN', zipCode:55455, zip4:2008,
-                    county:'Hennepin', country:us,
-                    appCreated:'byHand').save()
-
-                def mtc = new StreetAddress(address:'1100 Washington Ave S Ste 100',
-                    city:'Minneapolis',
-                    state:'MN', zipCode:55415, zip4:1273,
-                    county:'Hennepin', country:us,
-                    appCreated:'byHand').save()
-
-                def bsteward = new Person(title:'Ms',
-                    firstName:'Bonika',
-                    lastName:'Steward',
-                    suffix:null,
-                    gender:female,
-                    alive:true,
-                    isRecruitable:false,
-                    appCreated:'byHand').save()
-
-                def dmd = new Person(title:'Ms',
-                    firstName:'Donna',
-                    lastName:'DesMarais',
-                    suffix:null,
-                    gender:female,
-                    alive:true,
-                    isRecruitable:false,
-                    appCreated:'byHand').save()
-
-                bsteward.addToStreetAddresses(addressType:workAddress, 
-                    streetAddress:mtc, infoSource:sourceEnHS, preferredOrder:1).save()
-
-                dmd.addToStreetAddresses(addressType:workAddress,
-                    streetAddress:mac, infoSource:sourceEnHS, preferredOrder:1).save()
-
-                // Create tracking document recipients
-                def bstewardRecipient = new TrackingDocumentRecipient(person: bsteward).save()
-                println "saving person in recipients --> ${bstewardRecipient?.person?.id}"
-
-                def dmdRecipient = new TrackingDocumentRecipient(person: dmd).save()
-
                 // throw some test data into the database
                 def myAddress = new StreetAddress(address:'3323 Buchanan St NE',
                     city:'Minneapolis',
@@ -328,7 +278,7 @@ class BootStrap {
                 def myUnit = new DwellingUnit(address:myAddress,
                     appCreated:'byHand').save()
 
-                def hiQ = new Instrument(name:'High Intensity Questionnaire',
+                def hiQ = new Instrument(name:'Household Inventory Questionnaire',
                     nickName:'HiQ', study:ncs, requiresPrimaryContact:true).save()
 
                 def faq = new Instrument(name:'Frequently Asked Questions',
@@ -381,6 +331,57 @@ FROM dwelling_unit du INNER JOIN
                     relation:childOf,
                     parentInstrument:hiQ).save()
 
+
+
+                // TODO:
+                // Add Person as Tracking Document recipient
+                // add them to batches ... at the beginning of the batch.
+
+                def sourceEnHS = new Source(name:"EnHS", selectable:false).save()
+
+                // Create Address for Screening Center Locations
+                def mac = new StreetAddress(address:'200 Oak St SE Ste 350',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55455, zip4:2008,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+
+                def mtc = new StreetAddress(address:'1100 Washington Ave S Ste 100',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55415, zip4:1273,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+
+                def bsteward = new Person(title:'Ms',
+                    firstName:'Bonika',
+                    lastName:'Steward',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                def dmd = new Person(title:'Ms',
+                    firstName:'Donna',
+                    lastName:'DesMarais',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                bsteward.addToStreetAddresses(addressType:workAddress,
+                    streetAddress:mtc, infoSource:sourceEnHS, preferredOrder:1).save()
+
+                dmd.addToStreetAddresses(addressType:workAddress,
+                    streetAddress:mac, infoSource:sourceEnHS, preferredOrder:1).save()
+
+                // Create tracking document recipients
+                def bstewardRecipient = new TrackingDocumentRecipient(person: bsteward).save()
+                def dmdRecipient = new TrackingDocumentRecipient(person: dmd).save()
+
+                bccHiQ.addToRecipients(bstewardRecipient)
+
                 // Fake Mailing #1
                 // generate a batch
 
@@ -401,6 +402,14 @@ FROM dwelling_unit du INNER JOIN
                     // add an instrument
                     batchHiQ.addToInstruments(instrument:hiQ, isInitial:initial).save()
 
+                    if (!batchHiQ.save()) {
+                        batchHiQ.errors.each{err ->
+                            println "ERROR saving recipient >> ${err}"
+                        }
+                    } else {
+                        println "batchHiQ recipient ID >> ${bstewardRecipient?.id}"
+                    }
+                    
                     // add items to the batch
                     // batchHiQ.addToItems().save()
                 }

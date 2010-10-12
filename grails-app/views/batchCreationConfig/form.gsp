@@ -290,6 +290,19 @@
 	  </span>
 	</div>
 
+    	<div class="prop">
+	  <span class="name">
+		<label for="trackingDocumentRecipient"><g:message code="batchCreationConfig.generateTrackingDocument.label" default="Generate Tracking Document" /></label>
+	  </span>
+	  <span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'trackingDocumentRecipient', 'errors')}">
+		<g:select name="trackingDocumentRecipient"
+                          from="${edu.umn.ncs.TrackingDocumentRecipient.list()}"
+                          optionKey="id"
+                          value="${batchCreationConfigInstance.recipients}"/>
+
+	  </span>
+	</div>
+
   </div>
 
   <div id="tabs-studyyear">

@@ -102,7 +102,6 @@ class BatchCreationConfigController {
         println "PARAMS: \n ${params} \n"
 
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
-
         if (batchCreationConfigInstance) {
 
             // save the old selection query information for later...
@@ -125,6 +124,16 @@ class BatchCreationConfigController {
             if (oldQuery != batchCreationConfigInstance.selectionQuery && oldQuery) {
                 // add the query to the archived queries
                 batchCreationConfigInstance.addToArchivedQueries(selectionQuery: oldQuery)
+            }
+
+            if (params?.trackingDocumentRecipient){
+                batchCreationConfigInstance.recipients = []
+                params.trackingDocumentRecipient.each{
+                    def trackingDocumentRecipient = TrackingDocumentRecipient.get(it)
+                    if (trackingDocumentRecipient){
+                        batchCreationConfigInstance.addToRecipients(trackingDocumentRecipient)
+                    }
+                }
             }
 
             if (!batchCreationConfigInstance.hasErrors() && batchCreationConfigInstance.save(flush: true)) {
