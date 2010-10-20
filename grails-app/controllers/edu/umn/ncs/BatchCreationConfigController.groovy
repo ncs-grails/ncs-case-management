@@ -1,5 +1,8 @@
 package edu.umn.ncs
+// Let's us use security annotations
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
 class BatchCreationConfigController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -17,6 +20,7 @@ class BatchCreationConfigController {
 
     def create = {
         def batchCreationConfigInstance = new BatchCreationConfig()
+        batchCreationConfigInstance.recipients = [ 0 ]
         batchCreationConfigInstance.properties = params
         return [batchCreationConfigInstance: batchCreationConfigInstance]
     }

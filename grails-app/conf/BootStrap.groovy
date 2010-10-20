@@ -4,7 +4,7 @@ class BootStrap {
 
     def init = { servletContext ->
 
-        // 
+        // This will be done on the MySQL side using an identy seed
         // TODO: Min Batch.id should be 10,000
         // TODO: Min TrackedItem.id should be 1,000,000
         
@@ -15,6 +15,8 @@ class BootStrap {
 
         def today = new Date()
         def appName = 'ncs-case-management'
+
+        def site = "umn"
 
         /*** People Seciton ***/
         /* Items: AddressType, ContactRole, Country, EmailType,
@@ -80,7 +82,7 @@ class BootStrap {
             mother = new RelationshipType(name:'mother').save()
         }
         //Study
-        def ncs = Study.findByName("National Children's Study")
+        def ncs = Study.findByName("NCS")
         if (! ncs) {
             ncs = new Study(name:"NCS",
                 fullName:"National Children's Study",
@@ -194,6 +196,100 @@ class BootStrap {
         def dwellingUnitSource = BatchCreationQueueSource.findByName("dwellingUnit")
         if (!dwellingUnitSource) {
             dwellingUnitSource = new BatchCreationQueueSource(name:'dwellingUnit').save()
+        }
+
+        // Create Recruitment Groups
+
+        // Pilot
+        def rgPilot = RecruitmentGroup.get(1)
+        if (! rgPilot) {
+            rgPilot = new RecruitmentGroup(name:"Pilot",
+                pilot:true, highIntensityQuestionnaire:false,
+                questionnaireIncentive: false).save()
+        }
+        // HiQ + Incentive
+        def rgHiqI = RecruitmentGroup.get(2)
+        if (! rgHiqI) {
+            rgHiqI = new RecruitmentGroup(name:"HiQ + Incentive",
+                pilot:false, highIntensityQuestionnaire:true,
+                questionnaireIncentive: true).save()
+        }
+        // HiQ + No Incentive
+        def rgHiQ = RecruitmentGroup.get(3)
+        if (! rgHiQ) {
+            rgHiQ = new RecruitmentGroup(name:"HiQ + No Incentive",
+                pilot:false, highIntensityQuestionnaire:true,
+                questionnaireIncentive: false).save()
+        }
+        // No HiQ + Incentive
+        def rgNQI = RecruitmentGroup.get(4)
+        if (! rgNQI) {
+            rgNQI = new RecruitmentGroup(name:"No HiQ + Incentive",
+                pilot:false, highIntensityQuestionnaire:false,
+                questionnaireIncentive: true).save()
+        }
+        // No HiQ + No Incentive
+        def rgNQ = RecruitmentGroup.get(5)
+        if (! rgNQ) {
+            rgNQ = new RecruitmentGroup(name:"No HiQ + No Incentive",
+                pilot:false, highIntensityQuestionnaire:false,
+                questionnaireIncentive: false).save()
+        }
+
+
+        if (site == "umn") {
+            // Create Address for Screening Center Locations
+            def mac = StreetAddress.findByAddressAndZipCode('200 Oak St SE Ste 350', 55455)
+            if ( ! mac ) {
+                mac = new StreetAddress(address:'200 Oak St SE Ste 350',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55455, zip4:2008,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+            }
+
+            def mtc = StreetAddress.findByAddressAndZipCode('1100 Washington Ave S Ste 102', 55415)
+            if ( ! mtc ) {
+                mtc = new StreetAddress(address:'1100 Washington Ave S Ste 102',
+                    city:'Minneapolis',
+                    state:'MN', zipCode:55415, zip4:1273,
+                    county:'Hennepin', country:us,
+                    appCreated:'byHand').save()
+            }
+
+            // Create names for tracking document recipients
+            def bstewardRecipient
+
+            def bsteward = Person.findByFirstNameAndLastName('Bonika', 'Steward')
+            if ( ! bsteward ) {
+                bsteward = new Person(title:'Ms',
+                    firstName:'Bonika',
+                    lastName:'Steward',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                    bstewardRecipient = new TrackingDocumentRecipient(person: bsteward, address:mtc).save()
+            }
+
+            def dmd = Person.findByFirstNameAndLastName('Donna', 'DesMarais')
+            def dmdRecipient
+            if ( ! dmd ) {
+                dmd = new Person(title:'Ms',
+                    firstName:'Donna',
+                    lastName:'DesMarais',
+                    suffix:null,
+                    gender:female,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                dmdRecipient = new TrackingDocumentRecipient(person: dmd, address:mac).save()
+            }
+
+
         }
 
         // Test Data
@@ -332,53 +428,9 @@ FROM dwelling_unit du INNER JOIN
                     parentInstrument:hiQ).save()
 
 
-
-                // TODO:
-                // Add Person as Tracking Document recipient
-                // add them to batches ... at the beginning of the batch.
-
                 def sourceEnHS = new Source(name:"EnHS", selectable:false).save()
 
-                // Create Address for Screening Center Locations
-                def mac = new StreetAddress(address:'200 Oak St SE Ste 350',
-                    city:'Minneapolis',
-                    state:'MN', zipCode:55455, zip4:2008,
-                    county:'Hennepin', country:us,
-                    appCreated:'byHand').save()
-
-                def mtc = new StreetAddress(address:'1100 Washington Ave S Ste 100',
-                    city:'Minneapolis',
-                    state:'MN', zipCode:55415, zip4:1273,
-                    county:'Hennepin', country:us,
-                    appCreated:'byHand').save()
-
-                def bsteward = new Person(title:'Ms',
-                    firstName:'Bonika',
-                    lastName:'Steward',
-                    suffix:null,
-                    gender:female,
-                    alive:true,
-                    isRecruitable:false,
-                    appCreated:'byHand').save()
-
-                def dmd = new Person(title:'Ms',
-                    firstName:'Donna',
-                    lastName:'DesMarais',
-                    suffix:null,
-                    gender:female,
-                    alive:true,
-                    isRecruitable:false,
-                    appCreated:'byHand').save()
-
-                bsteward.addToStreetAddresses(addressType:workAddress,
-                    streetAddress:mtc, infoSource:sourceEnHS, preferredOrder:1).save()
-
-                dmd.addToStreetAddresses(addressType:workAddress,
-                    streetAddress:mac, infoSource:sourceEnHS, preferredOrder:1).save()
-
-                // Create tracking document recipients
-                def bstewardRecipient = new TrackingDocumentRecipient(person: bsteward).save()
-                def dmdRecipient = new TrackingDocumentRecipient(person: dmd).save()
+                def bstewardRecipient = TrackingDocumentRecipient.get(1)
 
                 bccHiQ.addToRecipients(bstewardRecipient)
 

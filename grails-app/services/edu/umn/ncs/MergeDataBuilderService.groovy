@@ -1,30 +1,5 @@
 package edu.umn.ncs
 
-/*
- * This service will build a merge data set from a print queue based on the requested
- * criteria.
- *
- * Criteria Available (TODO)
- *   Base: sid + barcode, bid + barcode, batchDate, mailDate, peices, eventDesc,
- *     studyName, fullStudyName, isInitial, instrumentDate, studyYear,
- *     expirationDate, version, documentTitle, instrumentId, instructions,
- *     reason, comments, parentSID, parentDate, parentName, childSID (first),
- *     childData, childName, result, recievedData
- *
- *   Dwelling Unit:
- *      dewllingId, address1, address2, zipCode. cityStateZip
- *
- *   Person:
- *      personId, participantId, selectionDate, selectionGroup,
- *      fullName, salutation, title, firstName, lastName, gender, birthDate,
- *      deathDate, address1, address2, zipCode, cityStateZip, primaryPhone,
- *      primaryPhoneType, primaryEmail, primaryEmailType
- *
- *   Custom?:
- *   Appointment?:
- *
- */
-
 class MergeDataBuilderService {
 
     static transactional = true
@@ -40,7 +15,7 @@ class MergeDataBuilderService {
 
             def record = [
                 itemId: item.id,
-                itemIdBarcode: "*${item.id}*",
+                itemIdBarcode: "*I${item.id}*",
                 batchId: batchInstance?.id,
                 batchDate: batchInstance?.dateCreated,
                 mailDate: batchInstance?.mailDate,
@@ -71,6 +46,12 @@ class MergeDataBuilderService {
             }
             if (item.person) {
                 record.personId = item.person.id
+                record.fullName = item.person?.fullName
+                record.title = item.person?.title
+                record.firstName = item.person?.firstName
+                record.lastName = item.person?.lastName
+                record.gender = item.person?.gender?.name
+                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender.id == 1) ? "Dear Mr. " + record.lastName : (record.gender.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
             }
 
             def comments = TrackedItemComment.findByItemAndSubject(item, 'general')
@@ -87,27 +68,81 @@ class MergeDataBuilderService {
             if (reason) {
                 record.reason = reason.text
             }
-            
             dataSet.add(record)
         }
 
-        return dataSet
 
+        // Add Tracking Recipient info (if it exists...)
+
+        def trackingDocumentRecipients = batchInstance?.creationConfig?.recipients
+
+        trackingDocumentRecipients.each {
+            def record = [
+                itemId: 0,
+                itemIdBarcode: "*B${batchInstance?.id}*",
+                batchId: batchInstance?.id,
+                batchDate: batchInstance?.dateCreated,
+                mailDate: batchInstance?.mailDate,
+                instrumentDate: batchInstance?.instrumentDate,
+                pieces: batchInstance?.pieces,
+                instrumentId: batchInstance?.primaryInstrument?.id,
+                instrumentName: batchInstance?.primaryInstrument?.name,
+                studyName: batchInstance?.primaryInstrument?.study?.name,
+                documentTitle: batchInstance?.primaryInstrument?.study?.name + ' ' + batchInstance?.primaryInstrument?.name,
+                fullStudyName: batchInstance?.primaryInstrument?.study?.fullName,
+                isInitial: batchInstance?.primaryBatchInstrument?.isInitial,
+                studyYear: null,
+                expirationDate: null,
+                instrumentVersion: batchInstance?.primaryBatchInstrument?.itemVersion,
+                parentItemId: null,
+                parentDate: null,
+                parentName: null,
+                childItemId: null,
+                resultName: null,
+                resultDate: null,
+                dwellingUnitId: 0,
+                householdId: 0,
+                personId: 0,
+                address: it.address?.address,
+                address2: it.address?.address2,
+                zipCode: it.address?.zipCode,
+                country: it.address?.country?.name,
+                cityStateZip: it.address?.cityStateZip
+
+            ]
+
+            if (it?.person) {
+                record.personId = it.person.id
+                record.fullName = it.person?.fullName
+                record.title = it.person?.title
+                record.firstName = it.person?.firstName
+                record.lastName = it.person?.lastName
+                record.gender = it.person?.gender?.name
+                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender.id == 1) ? "Dear Mr. " + record.lastName : (record.gender.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
+            }
+
+             dataSet.add(record)
+
+        }
+
+        return dataSet
     }
 
     def addDwellingUnitData(dataSet) {
 
         dataSet.collect{ record ->
+
             def dwellingUnitInstance = DwellingUnit.get(record.dwellingUnitId)
             if (dwellingUnitInstance) {
                 record.salutation = "Dear Neighbor"
-                record.address1 = dwellingUnitInstance?.address?.address
+                record.address = dwellingUnitInstance?.address?.address
                 record.address2 = dwellingUnitInstance?.address?.address2
                 record.zipCode =  dwellingUnitInstance?.address?.zipCode
                 record.country = dwellingUnitInstance?.address?.country?.name
                 record.cityStateZip =  dwellingUnitInstance?.address?.cityStateZip
             }
         }
+
         dataSet
     }
 
@@ -129,6 +164,8 @@ class MergeDataBuilderService {
                 record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender == "male") ? "Dear Mr. " + record.lastName : (record.gender == "female") ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
                 record.address = personInstance?.bestAddress?.address
                 record.address2 = personInstance?.bestAddress?.address2
+                record.zipCode =  personInstance?.bestAddress?.zipCode
+                record.country = personInstance?.bestAddress?.country?.name
                 record.cityStateZip = personInstance?.bestAddress?.cityStateZip
                 record.primaryPhone = personInstance?.primaryPhone?.phoneNumber?.prettyPhone
                 record.primaryPhoneType = personInstance?.primaryPhone?.phoneType?.name

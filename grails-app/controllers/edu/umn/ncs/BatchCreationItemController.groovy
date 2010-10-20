@@ -1,5 +1,8 @@
 package edu.umn.ncs
+// Let's us use security annotations
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_DOCGEN'])
 class BatchCreationItemController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

@@ -208,3 +208,11 @@ a.csv {
 dl.menu dd {
     padding: 0.5em;
 }
+
+#auth_links {
+    text-align:left;
+    float:left;
+    background-color:#fff;
+    padding-right:18px;
+    line-height:22px;
+}

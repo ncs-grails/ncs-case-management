@@ -83,3 +83,5 @@ log4j = {
 }
 
 grails.views.javascript.library="jquery"
+
+//log4j.logger.org.springframework.security='off,stdout'

@@ -1,26 +1,12 @@
 package edu.umn.ncs
+// Let's us use security annotations
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_DOCGEN'])
 class DocumentGenerationController {
     javax.sql.DataSource dataSource
     def documentGenerationService
     def username = 'ajz'
-
-    //
-    // TODO: Show BatchQueue
-    // TODO: Show/Add items per Person
-    // TODO: Show/Add items per dwelling unit
-
-    // this is for testing, TODO: DELETE ME!
-    def testGenerate = {
-        def batchCreationConfigInstance = BatchCreationConfig.get(1)
-        def docGenParams = [manual: false,
-            username:username,
-            config:batchCreationConfigInstance]
-
-        def batchInstance = documentGenerationService.generateMailing(docGenParams)
-        [batchCreationConfigInstance:batchCreationConfigInstance,
-            batchInstance:batchInstance]
-    }
 
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
@@ -70,7 +56,7 @@ class DocumentGenerationController {
                 household = Household.get(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, household:household)
             } else if (source.name == 'dwellingUnit' ) {
-                println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
+                // println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
                 dwellingUnit = DwellingUnit.get(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, dwellingUnit:dwellingUnit)
             }
@@ -88,7 +74,7 @@ class DocumentGenerationController {
 
         def batchCreationQueueList = null
         def nBatchCreationQueue = BatchCreationQueue.count()
-        println "nBatchCreationQueue -> ${nBatchCreationQueue}"
+        // println "nBatchCreationQueue -> ${nBatchCreationQueue}"
         if (nBatchCreationQueue > 0 ) {
             batchCreationQueueList = BatchCreationQueue.list()
         }
@@ -102,7 +88,7 @@ class DocumentGenerationController {
     // display details for printing the batch
     def printDetails = {
 
-        println "This is what we got for print details: \n ${params}"
+        // println "This is what we got for print details: \n ${params}"
         
         def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfig?.id)
         def batchInstance = Batch.get(params?.batch?.id)
@@ -146,10 +132,10 @@ class DocumentGenerationController {
         loadRecentBatches {
             action {
 
-                println "loadRecentBatches params: ${params}"
+                // println "loadRecentBatches params: ${params}"
 
                 def q = params.q
-                println "${q}"
+                // println "${q}"
 
                 // List of matching configs per search criteria
                 def batchCreationConfigInstanceList = []

@@ -292,11 +292,13 @@
 
     	<div class="prop">
 	  <span class="name">
-		<label for="trackingDocumentRecipient"><g:message code="batchCreationConfig.generateTrackingDocument.label" default="Generate Tracking Document" /></label>
+                <!-- TODO: Add no selection option -->
+		<label for="trackingDocumentRecipient"><g:message code="batchCreationConfig.generateTrackingDocument.label" default="Select Tracking Document Recipient" /></label>
 	  </span>
 	  <span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'trackingDocumentRecipient', 'errors')}">
 		<g:select name="trackingDocumentRecipient"
                           from="${edu.umn.ncs.TrackingDocumentRecipient.list()}"
+                          onSelection="${['null':'Select one or more...']}"
                           optionKey="id"
                           value="${batchCreationConfigInstance.recipients}"/>
 

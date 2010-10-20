@@ -149,17 +149,6 @@ class DocumentGenerationService {
                         // ... we could do some null checks in the table though...
                         // The class is: BatchCreationQueue (table = batch_creation_queue)
 
-                        // BatchCreationQueue needs to go into (results)
-
-
-                        // ngp: do I have to do anything with the maildate in manual batch generation? (ask ajz) Refering to:
-                        /*
-                                             if (selectionQuery.contains(':mailDate')) {
-                                                   selectionParams.mailDate = params.mailDate
-                                               }
-                            */
-
-
                     }
                 } else {
 
@@ -543,7 +532,6 @@ class DocumentGenerationService {
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
-
         batchCreationDocumentInstance.dataSets.each{
             if (it.code == "dwelling") {
                 outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
@@ -567,6 +555,10 @@ class DocumentGenerationService {
             // get a field list
             def firstRow = outputData[0]
             def columnNames = firstRow.collect{ it.key }
+
+            /*columnNames.each{
+                println "Dataset columnNames >> ${it}"
+            }*/
 
             // write the header column
             //  "ID","FirstName","MiddleName","LastName","Suffix"

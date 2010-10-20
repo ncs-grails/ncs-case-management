@@ -23,8 +23,8 @@
         <g:each var="ds" in="${batchCreationConfigInstance?.documents}">
           <g:if test="${ds.mergeSourceFile != null}">
             <p>Right-Click and choose "Save Link As..."</p>
-            <g:link action="downloadDataset" class="csv" params="${ [ 'batch.id':batchInstance.id, 'batchCreationDocument.id': ds.id ] }" >
-              ${ds.mergeSourceFile}
+            <g:link action="downloadDataset" class="csv" params="${ [ 'batch.id':batchInstance?.id, 'batchCreationDocument.id': ds?.id ] }" >
+              ${ds?.mergeSourceFile}
             </g:link>
           </g:if>
         </g:each>

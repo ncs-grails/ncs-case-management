@@ -47,7 +47,19 @@
 
     <div id="header">
 
-	  <!-- BEGNIN CAMPUS LINKS -->
+	  <!-- BEGIN LOGIN/LOGOUT -->
+	  <div id="auth_links">
+            <g:isLoggedIn>
+		Logged in as: <g:loggedInUserInfo field="username"/>
+                <g:link controller="logout" action="index">Log Out</g:link>
+            </g:isLoggedIn>
+            <g:isNotLoggedIn>
+                Not Logged In
+            </g:isNotLoggedIn>
+	  </div>
+	  <!-- END CAMPUS LINKS -->
+
+        <!-- BEGIN CAMPUS LINKS -->
 	  <div id="campus_links">
 		<p>Campuses: </p>
 		<ul>
