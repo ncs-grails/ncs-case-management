@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Auto Document Generation - National Children's Study</title>
+    <title>Manual Document Generation - National Children's Study</title>
     <meta name="layout" content="ncs" />
      <g:set var="entityName" value="${message(code: 'documentGeneration.label', default: 'DocumentGeneration')}" />
   </head>

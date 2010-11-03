@@ -105,10 +105,18 @@
 				  Generate instrument batches either automatically or by hand.
           </dd>
 
+          <dt><g:link controller="receiptItems" action="index">Receipt Items</g:link></dt>
+          <dd>
+                                  Receipt documents
+          </dd>
+
+
+        <!-- I think AJZ deleted testGenerate from the Controller
           <dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>
           <dd>
 				  Use this to test Doc Gen
           </dd>
+        -->
 
 
         </dl>
