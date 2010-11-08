@@ -110,6 +110,11 @@
                                   Receipt documents
           </dd>
 
+          <dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
+        <dd>
+            Manage mailing dates and quota for the instrument.
+        </dd>
+
 
         <!-- I think AJZ deleted testGenerate from the Controller
           <dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>
