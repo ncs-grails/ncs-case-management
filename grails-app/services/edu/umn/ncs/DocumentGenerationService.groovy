@@ -161,8 +161,7 @@ class DocumentGenerationService {
                     if (!params.comments)  {
                         comments = batchCreationConfigInstance.defaultComments
                     }
-                    
-                    
+
                     def selectionQuery = batchCreationConfigInstance.selectionQuery
                     def selectionParams = [:]
                     // Replace :mailDate with actual mail date
@@ -179,7 +178,14 @@ class DocumentGenerationService {
                     // If it's auto selection..
                     def sql = new Sql(dataSource)
                     if (sql) {
-                        println "${new Date()}"
+
+                        // ngp debug;
+                        def selectionQueryPilot = "call advance_letter_pilot(?)"
+                        def selectionParamsPilot = [new Date()]
+                        sql.eachRow(selectionQueryPilot, selectionParamsPilot){
+                            println "Pilot query results--> ${it[0]}"
+                        }
+
                         if (selectionParams) {
                             results = sql.rows(selectionQuery, selectionParams)
                         } else {

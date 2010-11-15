@@ -2,7 +2,15 @@ package edu.umn.ncs
 
 class RecruitmentSegmentGroup {
 
-	Float populationRatio
-    RecruitmentSegment segment
     RecruitmentGroup recruitmentGroup
+    RecruitmentSegment segment
+    Integer selectionCount
+    Float populationRatio
+
+    static constraints = {
+        recruitmentGroup()
+        segment()
+        selectionCount()
+        populationRatio()
+    }
 }

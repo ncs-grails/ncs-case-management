@@ -157,9 +157,13 @@ class BootStrap {
         }
 
         // Result
-        def received = Result.findByName('received')
-        if (!received) {
-            received = new Result(name:'received').save()
+        def deceasedResult = Result.findByName('deceased')
+        if (!deceasedResult) {
+            deceasedResult = new Result(name:'received', abbreviation:'dead').save()
+        }
+        def receivedResult = Result.findByName('received')
+        if (!receivedResult) {
+            receivedResult = new Result(name:'received', abbreviation:'rcvd').save()
         }
 
         // Relationship between sub batches
@@ -197,6 +201,7 @@ class BootStrap {
         if (!dwellingUnitSource) {
             dwellingUnitSource = new BatchCreationQueueSource(name:'dwellingUnit').save()
         }
+
 
         // Create Recruitment Groups
 
@@ -374,8 +379,8 @@ class BootStrap {
                 def myUnit = new DwellingUnit(address:myAddress,
                     appCreated:'byHand').save()
 
-                def hiQ = new Instrument(name:'Household Inventory Questionnaire',
-                    nickName:'HiQ', study:ncs, requiresPrimaryContact:true).save()
+                def advLtr = new Instrument(name:'Advance Letter',
+                    nickName:'AdvLtr', study:ncs, requiresPrimaryContact:true).save()
 
                 def faq = new Instrument(name:'Frequently Asked Questions',
                     nickName:'FAQ', study:ncs, requiresPrimaryContact:false).save()
@@ -395,77 +400,34 @@ class BootStrap {
                 def tracingLog = new Instrument(name:'Tracing Log',
                     nickName:'T-LOG', study:ncs, requiresPrimaryContact:false).save()
 
-                def sql = """SELECT du.id AS dwelling_unit
-FROM dwelling_unit du INNER JOIN
-  street_address sa ON du.address_id = sa.id""";
+                def sql = "CALL advance_letter_pilot(CURDATE())";
 
-                def bccHiQ = new BatchCreationConfig(name:'HiQ Initial',
-                    instrument:hiQ, format:firstClassMail, direction: outgoing,
+                def bccAdv = new BatchCreationConfig(name:'Advance Letter',
+                    instrument:advLtr, format:firstClassMail, direction: outgoing,
                     isInitial:initial, selectionQuery:sql, active:true, manualSelection:true,
                     oneBatchEventPerson:true).save()
 
                 // add a document
-                bccHiQ.addToDocuments(
-                    documentLocation:'n:/merge_documents/hiq_letter_merge.doc',
-                    mergeSourceQuery:"qDefault()",
-                    mergeSourceFile:'q:/merge_data/hi_q_source.txt')
-                .addToDocuments(
-                    documentLocation:'n:/merge_documents/frequently_asked_questions.doc')
-                .save()
-
-                // for test adding dependent before parent subitem added
-                bccHiQ.addToSubItems(instrument:asu,
-                    direction:outgoing,
-                    format:firstClassMail,
-                    relation:childOf,
-                    parentInstrument:faq).save()
-
-                // add a item
-                bccHiQ.addToSubItems(instrument:faq,
-                    direction:outgoing,
-                    format:firstClassMail,
-                    relation:childOf,
-                    parentInstrument:hiQ).save()
-
+                bccAdv.addToDocuments(
+                    documentLocation:'n:/Production Documents/Advance Letter/ncs_advance_letter_merge.docx',
+                    mergeSourceFile:'q:/merge_data/advltr_source.txt').save()
 
                 def sourceEnHS = new Source(name:"EnHS", selectable:false).save()
 
                 def bstewardRecipient = TrackingDocumentRecipient.get(1)
 
-                bccHiQ.addToRecipients(bstewardRecipient)
+                bccAdv.addToRecipients(bstewardRecipient)
 
-                // Fake Mailing #1
-                // generate a batch
 
-                def batchHiQ = new Batch(instrument:hiQ, format:firstClassMail,
-                    direction: outgoing, instrumentDate: today, batchRunBy:'ajz',
-                    batchRunByWhat: appName, trackingDocumentSent:false,
-                    creationConfig: bccHiQ)
+                // set up mailing
 
-                bccHiQ.addToBatches(batchHiQ)
-
-                if (! bccHiQ.save() ) {
-                    println "ERRORS:"
-                    bccHiQ.errors.each{ error ->
-                        println "ERROR>> ${error} "
-                    }
-                    println ""
-                } else {
-                    // add an instrument
-                    batchHiQ.addToInstruments(instrument:hiQ, isInitial:initial).save()
-
-                    if (!batchHiQ.save()) {
-                        batchHiQ.errors.each{err ->
-                            println "ERROR saving recipient >> ${err}"
-                        }
-                    } else {
-                        println "batchHiQ recipient ID >> ${bstewardRecipient?.id}"
-                    }
-                    
-                    // add items to the batch
-                    // batchHiQ.addToItems().save()
-                }
-
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,10,22), quota: 406)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,10,28), quota: 832)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,05), quota: 1292)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,12), quota: 1797)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,19), quota: 2356)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,2), quota: 2978)
+                new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,9), quota: 3669)
             }
         }
 
