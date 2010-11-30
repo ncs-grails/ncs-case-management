@@ -10,8 +10,6 @@
 <body>
   <div class="nav">
     <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-    <span class="menuButton"><g:link action="generation" event="load" id="${batchCreationConfigInstance?.id}">${batchCreationConfigInstance?.instrument?.study?.name}
-${batchCreationConfigInstance?.instrument?.name}</g:link></span>
   </div>
   <div class="body">
     <h1>Counts by Segment and Group</h1>
@@ -20,7 +18,7 @@ ${batchCreationConfigInstance?.instrument?.name}</g:link></span>
     </g:if>
 
     <fieldset class="maroonBorder">
-      <legend>Advance Letter</legend>
+      <legend>${batchCreationConfigInstance?.name}</legend>
         <div class="list">
           <table>
             <thead>
@@ -40,8 +38,8 @@ ${batchCreationConfigInstance?.instrument?.name}</g:link></span>
 
                 <td>${advLetterSentInstance.segment_id}</td>
                 <td>${advLetterSentInstance.name}</td>
-                <td>${advLetterSentInstance.segment_ratio}</td>
-                <td>${advLetterSentInstance.group_ratio}</td>
+                <td>${advLetterSentInstance.segmentRatio}</td>
+                <td>${advLetterSentInstance.groupRatio}</td>
                 <td>${advLetterSentInstance.sent}</td>
 
               </tr>

@@ -20,9 +20,9 @@ class ReportService {
 
                         def selectionQuery = """SELECT ds.segment_id,
                                                         rg.name,
-                                                        rs.population_ratio as `segment ratio`,
-                                                        rsg.population_ratio as `group ratio` ,
-                                                        count(ti.dwelling_unit_id) as Sent
+                                                        rs.population_ratio as `segmentRatio`,
+                                                        rsg.population_ratio as `groupRatio` ,
+                                                        count(ti.dwelling_unit_id) as sent
                                                     FROM tracked_item ti INNER JOIN
                                                         batch b ON b.id = ti.batch_id INNER JOIN
                                                         batch_instrument bi ON ti.batch_id = bi.batch_id INNER JOIN

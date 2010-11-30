@@ -136,7 +136,7 @@ class DocumentGenerationController {
 
     def batchAnalysis = {
 
-        def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
+        def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfig?.id)
 
         // child batches
         def batchInstanceList = []
@@ -144,9 +144,19 @@ class DocumentGenerationController {
 
         def advLetterSentInstanceList = reportService.batchAnalysis(batchInstance.id)
 
+            // get a field list
+            /*def firstRow = advLetterSentInstanceList[0]
+            def columnNames = firstRow.collect{ it.key }
+
+            columnNames.each{
+                println "Dataset columnNames >> ${it}"
+            }
+            */
+
         [advLetterSentInstanceList: advLetterSentInstanceList,
             advLetterSentInstanceTotal: advLetterSentInstanceList.count(),
-            batchCreationConfigInstance: batchCreationConfigInstance]
+            batchCreationConfigInstance: batchCreationConfigInstance,
+            batchInstance: batchInstance]
     }
 
 
