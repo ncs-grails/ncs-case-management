@@ -15,9 +15,7 @@ class ReceiptItemsController {
         redirect(action: "receipt", params: params)
     }
 
-    def receipt = {
-        ["testRender": "Test Render!"]
-    }
+    def receipt = { }
 
     def receiptItem = {
 

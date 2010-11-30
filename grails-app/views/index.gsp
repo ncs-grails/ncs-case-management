@@ -115,6 +115,10 @@
             Manage mailing dates and quota for the instrument.
         </dd>
 
+          <dt><g:link controller="report" action="index">Reports</g:link></dt>
+        <dd>
+            View Reports
+        </dd>
 
         <!-- I think AJZ deleted testGenerate from the Controller
           <dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>

@@ -16,7 +16,7 @@ class DocumentGenerationService {
     def mergeDataBuilderService
 
     def appName = 'ncs-case-management'
-
+    
     // Loads an existing mailing into the print queue
     def reQueueMailing(Batch batchInstance, String username) {
 
@@ -179,13 +179,6 @@ class DocumentGenerationService {
                     def sql = new Sql(dataSource)
                     if (sql) {
 
-                        // ngp debug;
-                        def selectionQueryPilot = "call advance_letter_pilot(?)"
-                        def selectionParamsPilot = [new Date()]
-                        sql.eachRow(selectionQueryPilot, selectionParamsPilot){
-                            println "Pilot query results--> ${it[0]}"
-                        }
-
                         if (selectionParams) {
                             results = sql.rows(selectionQuery, selectionParams)
                         } else {
@@ -209,7 +202,7 @@ class DocumentGenerationService {
 
                                 if (!bcq.validate()) {
                                     // invalid selection list!
-                                    println "invalid selection list row: ${bcq?.dwellingUnit?.address?.address}"
+                                    println "invalid selection list row: ${row}, expected [person, household, or dwelling_unit]"
                                     validSelectionList = false
                                 }
                             }

@@ -4,9 +4,21 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_DOCGEN'])
 class DocumentGenerationController {
-    javax.sql.DataSource dataSource
     def documentGenerationService
+    def reportService
     def username = 'ajz'
+
+     // this is for testing, TODO: DELETE ME!
+    def testGenerate = {
+        def batchCreationConfigInstance = BatchCreationConfig.get(1)
+        def docGenParams = [manual: false,
+            username:username,
+            config:batchCreationConfigInstance]
+
+        def batchInstance = documentGenerationService.generateMailing(docGenParams)
+        [batchCreationConfigInstance:batchCreationConfigInstance,
+            batchInstance:batchInstance]
+    }
 
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
@@ -100,13 +112,13 @@ class DocumentGenerationController {
     def batchReport = {
 
         // primary batch
-        def batchInstance = Batch.get(params.id)
+        def batchInstance = Batch.get(params?.id)
         // child batches
         def batchInstanceList = []
 
         // If we didn't find the batch, see if the param is batch.id instead of id
         if (!batchInstance) {
-            batchInstance = Batch.get(params.batch?.id)
+            batchInstance = Batch.get(params?.batch?.id)
         }
 
         // Hopefully we found one by now.  If so, let's fill the batch report
@@ -122,6 +134,20 @@ class DocumentGenerationController {
         [batchInstance:batchInstance, batchInstanceList:batchInstanceList]
     }
 
+    def batchAnalysis = {
+
+        def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
+
+        // child batches
+        def batchInstanceList = []
+        def batchInstance = Batch.get(params?.batch?.id)
+
+        def advLetterSentInstanceList = reportService.batchAnalysis(batchInstance.id)
+
+        [advLetterSentInstanceList: advLetterSentInstanceList,
+            advLetterSentInstanceTotal: advLetterSentInstanceList.count(),
+            batchCreationConfigInstance: batchCreationConfigInstance]
+    }
 
 
     // here is the batch generation FSM
@@ -134,7 +160,7 @@ class DocumentGenerationController {
 
                 // println "loadRecentBatches params: ${params}"
 
-                def q = params.q
+                def q = params?.q
                 // println "${q}"
 
                 // List of matching configs per search criteria
@@ -193,7 +219,7 @@ class DocumentGenerationController {
         loadConfig {
             action {
                 // return instance of config
-                def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+                def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
                 def mailDate = new Date()
                 def useMaxPieces = false
 
@@ -210,7 +236,7 @@ class DocumentGenerationController {
                 // list the batches
                 def batchInstanceList = batchCreationConfigInstance?.batches
                     .findAll{it.master == null && it.pieces > 0 }
-                    .sort{ -it.id }
+                    .sort{ -it?.id }
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,
                     mailDate:mailDate,
@@ -279,7 +305,7 @@ class DocumentGenerationController {
             action {
                 // ** automatically generate documents **
                 def batchInstance = null
-                def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+                def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
                 def results = null
                 def docGenParams = [manual:false, username:username]
 
@@ -296,6 +322,8 @@ class DocumentGenerationController {
                     
                     if (batchInstance) {
                         flow.batchInstance = batchInstance
+                    } else {
+                        flow.batchInstance = null
                     }
 
                 }
@@ -310,8 +338,8 @@ class DocumentGenerationController {
         }
         showPrintDetails{
             redirect(controller:"documentGeneration",action:'printDetails', 
-                params:['batchCreationConfig.id':flow.batchCreationConfigInstance.id,
-                    'batch.id':flow.batchInstance.id])
+                params:['batchCreationConfig.id':flow?.batchCreationConfigInstance?.id,
+                    'batch.id':flow?.batchInstance?.id])
         }
     }
 }
