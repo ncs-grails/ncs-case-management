@@ -14,7 +14,8 @@ class RecruitmentGroup {
     // The first one will be true
     Boolean pilot
     // These two are only true where pilot = false
-    Boolean highIntensityQuestionnaire
+    Boolean householdInventoryQuestionnaire
+	
     Boolean questionnaireIncentive
 
     static hasMany = [ recruitmentSegmentGroups: RecruitmentSegmentGroup ]

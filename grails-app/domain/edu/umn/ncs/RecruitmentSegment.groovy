@@ -7,6 +7,8 @@ class RecruitmentSegment {
     Integer selectionCount
     Float populationRatio
 
+	IntensityGroup intensityGroup
+
     static hasMany = [ recruitmentSegmentGroups: RecruitmentSegmentGroup ]
     
 }
