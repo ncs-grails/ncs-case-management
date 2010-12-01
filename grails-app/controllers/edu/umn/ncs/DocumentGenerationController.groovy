@@ -172,6 +172,9 @@ class DocumentGenerationController {
 
                 def q = params?.q
                 // println "${q}"
+				
+				// set a default value for batchInstance
+				flow.batchInstance = [id:0]
 
                 // List of matching configs per search criteria
                 def batchCreationConfigInstanceList = []
@@ -278,6 +281,7 @@ class DocumentGenerationController {
             action {
                 // ** Manually Generate Documents **
                 def batchInstance = null
+
                 // def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
                 // pull the creation config from the flow scope
                 def batchCreationConfigInstance = flow.batchCreationConfigInstance
@@ -295,11 +299,12 @@ class DocumentGenerationController {
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
                     
                     // save it to the flow
-                    if (batchInstance) {
+                    if (batchInstance?.id) {
                         flow.batchInstance = batchInstance
                     } else {
 						// error creating batch
-						return error()
+						flow.batchInstance = [id:0]
+						return nobatch()
 					}
                 }
 
@@ -307,10 +312,14 @@ class DocumentGenerationController {
                     batchInstance:batchInstance]
             }
             on("success").to "showPrintDetails"
+            on("nobatch").to "nothingToGenerate"
             on("return").to "showConfig"
             on("error").to "errorGeneratingBatch"
             
         }
+		nothingToGenerate{
+            on("return").to "showConfig"
+		}
         optionalGenerate{
             on("return").to "showConfig"
         }
@@ -336,7 +345,9 @@ class DocumentGenerationController {
                     if (batchInstance) {
                         flow.batchInstance = batchInstance
                     } else {
-                        flow.batchInstance = null
+						// error creating batch
+						flow.batchInstance = [id:0]
+						return nobatch()
                     }
 
                 }
@@ -344,6 +355,7 @@ class DocumentGenerationController {
                     batchInstance:batchInstance]
             }
             on("success").to "showPrintDetails"
+            on("nobatch").to "nothingToGenerate"
             on("error").to "errorGeneratingBatch"
         }
         errorGeneratingBatch{
