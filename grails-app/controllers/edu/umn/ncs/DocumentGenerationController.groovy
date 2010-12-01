@@ -297,7 +297,10 @@ class DocumentGenerationController {
                     // save it to the flow
                     if (batchInstance) {
                         flow.batchInstance = batchInstance
-                    }
+                    } else {
+						// error creating batch
+						return error()
+					}
                 }
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,

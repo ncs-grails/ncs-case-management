@@ -14,7 +14,6 @@ class DwellingUnitLink {
 	// The NORC SU_ID
 	String NorcSuId
 
-
     static constraints = {
     }
 }
