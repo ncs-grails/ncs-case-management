@@ -1,16 +1,27 @@
 package edu.umn.ncs
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_DOCGEN'])
 class InstrumentHistoryController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	def authenticateService
+	def appName = 'ncs-case-management'
 
     def index = {
         redirect(action: "list", params: params)
     }
 
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [instrumentHistoryInstanceList: InstrumentHistory.list(params), instrumentHistoryInstanceTotal: InstrumentHistory.count()]
+
+		def instrumentHistoryInstanceList = InstrumentHistory.list()
+		// sort it if anything is in it.
+		if (instrumentHistoryInstanceList ) {
+			instrumentHistoryInstanceList = instrumentHistoryInstanceList.sort{ - it.dateCreated.getDate() }
+		}
+
+		
+        [instrumentHistoryInstanceList: instrumentHistoryInstanceList]
     }
 
     def create = {
@@ -20,7 +31,13 @@ class InstrumentHistoryController {
     }
 
     def save = {
+
         def instrumentHistoryInstance = new InstrumentHistory(params)
+
+		def username = authenticateService.principal().getUsername()
+		instrumentHistoryInstance.userCreated = username
+		instrumentHistoryInstance.appCreated = appName
+
         if (instrumentHistoryInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'instrumentHistory.label', default: 'InstrumentHistory'), instrumentHistoryInstance.id])}"
             redirect(action: "show", id: instrumentHistoryInstance.id)
@@ -71,25 +88,6 @@ class InstrumentHistoryController {
             }
             else {
                 render(view: "edit", model: [instrumentHistoryInstance: instrumentHistoryInstance])
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'instrumentHistory.label', default: 'InstrumentHistory'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    def delete = {
-        def instrumentHistoryInstance = InstrumentHistory.get(params.id)
-        if (instrumentHistoryInstance) {
-            try {
-                instrumentHistoryInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'instrumentHistory.label', default: 'InstrumentHistory'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'instrumentHistory.label', default: 'InstrumentHistory'), params.id])}"
-                redirect(action: "show", id: params.id)
             }
         }
         else {

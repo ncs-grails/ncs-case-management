@@ -202,6 +202,42 @@ class BootStrap {
             dwellingUnitSource = new BatchCreationQueueSource(name:'dwellingUnit').save()
         }
 
+		// Instrument Revision Types
+		def newRevision = InstrumentRevision.findByName("new")
+		if (!newRevision) {
+			newRevision = new InstrumentRevision(name:'new').save()
+		}
+
+		def minorRevision = InstrumentRevision.findByName("minor")
+		if (!minorRevision) {
+			minorRevision = new InstrumentRevision(name:'minor').save()
+		}
+
+		def majorRevision = InstrumentRevision.findByName("major")
+		if (!majorRevision) {
+			majorRevision = new InstrumentRevision(name:'major').save()
+		}
+
+		// Instrument Revision Status
+		def developmentRevisionStatus = InstrumentStatus.findByName("development")
+		if (!developmentRevisionStatus) {
+			developmentRevisionStatus = new InstrumentStatus(name:'development').save()
+		}
+		def productionRevisionStatus = InstrumentStatus.findByName("production")
+		if (!productionRevisionStatus) {
+			productionRevisionStatus = new InstrumentStatus(name:'production').save()
+		}
+
+		// Instrument Approval Types
+		def internalApproval = InstrumentApprovalType.findByName("internal")
+		if (!internalApproval) {
+			internalApproval = new InstrumentApprovalType(name:'internal').save()
+		}
+
+		def irbApproval = InstrumentApprovalType.findByName("irb")
+		if (!irbApproval) {
+			irbApproval = new InstrumentApprovalType(name:'irb').save()
+		}
 
         // Create Recruitment Groups
 
@@ -324,7 +360,6 @@ class BootStrap {
                  * 1528 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2610 |
                  */
 
-/*
                 def myAddressList = [
                     ['1636 BREDA AVE', 'SAINT PAUL', 'MN', '55108', '2701'],
                     ['WYOMING ST E', 'SAINT PAUL', 'MN', '55107', '3240'],
@@ -383,24 +418,6 @@ class BootStrap {
                 def advLtr = new Instrument(name:'Advance Letter',
                     nickName:'AdvLtr', study:ncs, requiresPrimaryContact:true).save()
 
-                def faq = new Instrument(name:'Frequently Asked Questions',
-                    nickName:'FAQ', study:ncs, requiresPrimaryContact:false).save()
-
-                def loQ = new Instrument(name:'Low Intensity Questionnaire',
-                    nickName:'LoQ', study:ncs, requiresPrimaryContact:true).save()
-
-                def asu = new Instrument(name:'Annual Survey Update',
-                    nickName:'ASU', study:ncs, requiresPrimaryContact:true).save()
-
-                def eoi = new Instrument(name:'Event of Interest',
-                    nickName:'EOI', study:ncs, requiresPrimaryContact:false).save()
-
-                def bcert = new Instrument(name:'Birth Certificate',
-                    nickName:'B-Cert', study:ncs, requiresPrimaryContact:false).save()
-
-                def tracingLog = new Instrument(name:'Tracing Log',
-                    nickName:'T-LOG', study:ncs, requiresPrimaryContact:false).save()
-
                 def sql = "CALL advance_letter_pilot(CURDATE())";
 
                 def bccAdv = new BatchCreationConfig(name:'Advance Letter',
@@ -421,7 +438,6 @@ class BootStrap {
 
 
                 // set up mailing
-
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,10,22), quota: 406)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,10,28), quota: 832)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,05), quota: 1292)
@@ -429,7 +445,7 @@ class BootStrap {
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,19), quota: 2356)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,2), quota: 2978)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,9), quota: 3669)
-                */
+
             }
             test {
 

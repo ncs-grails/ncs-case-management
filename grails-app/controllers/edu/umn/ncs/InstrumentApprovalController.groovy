@@ -1,8 +1,12 @@
 package edu.umn.ncs
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_DOCGEN'])
 class InstrumentApprovalController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	def authenticateService
+	def appName = 'ncs-case-management'
 
     def index = {
         redirect(action: "list", params: params)
@@ -21,9 +25,15 @@ class InstrumentApprovalController {
 
     def save = {
         def instrumentApprovalInstance = new InstrumentApproval(params)
+
+		def username = authenticateService.principal().getUsername()
+		instrumentApprovalInstance.userCreated = username
+		instrumentApprovalInstance.appCreated = appName
+
         if (instrumentApprovalInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'instrumentApproval.label', default: 'InstrumentApproval'), instrumentApprovalInstance.id])}"
-            redirect(action: "show", id: instrumentApprovalInstance.id)
+
+            redirect(controller:"instrumentHistory", action: "show", id: instrumentApprovalInstance.instrumentHistory.id)
         }
         else {
             render(view: "create", model: [instrumentApprovalInstance: instrumentApprovalInstance])
@@ -67,7 +77,8 @@ class InstrumentApprovalController {
             instrumentApprovalInstance.properties = params
             if (!instrumentApprovalInstance.hasErrors() && instrumentApprovalInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'instrumentApproval.label', default: 'InstrumentApproval'), instrumentApprovalInstance.id])}"
-                redirect(action: "show", id: instrumentApprovalInstance.id)
+
+	            redirect(controller:"instrumentHistory", action: "show", id: instrumentApprovalInstance.instrumentHistory.id)
             }
             else {
                 render(view: "edit", model: [instrumentApprovalInstance: instrumentApprovalInstance])
@@ -79,22 +90,4 @@ class InstrumentApprovalController {
         }
     }
 
-    def delete = {
-        def instrumentApprovalInstance = InstrumentApproval.get(params.id)
-        if (instrumentApprovalInstance) {
-            try {
-                instrumentApprovalInstance.delete(flush: true)
-                flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'instrumentApproval.label', default: 'InstrumentApproval'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'instrumentApproval.label', default: 'InstrumentApproval'), params.id])}"
-                redirect(action: "show", id: params.id)
-            }
-        }
-        else {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'instrumentApproval.label', default: 'InstrumentApproval'), params.id])}"
-            redirect(action: "list")
-        }
-    }
 }

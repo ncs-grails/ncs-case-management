@@ -8,7 +8,7 @@
   <g:set var="entityName" value="${message(code: 'receipt.label', default: 'Receipt Items')}" />
   <title><g:message code="default.list.label" args="[entityName]" /></title>
 
-  <g:javascript src="ncs-case-management.js" />
+  <g:javascript src="receiptItems.js" />
 
 </head>
 <body>

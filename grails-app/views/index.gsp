@@ -87,7 +87,7 @@
 			documents and tracking the location of study participants.</p>
 
       <div id="pageList" class="dialog">
-        <h2>Available Pages</h2>
+        <h2>Configuration</h2>
         <dl class="menu">
           <dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
           <dd>
@@ -95,40 +95,45 @@
 				  Instruments include such items as invitations, surveys, phone
 				  calls, events, etc...
           </dd>
+          <dt><g:link controller="instrumentHistory" action="list">Instrument Version Tracking</g:link></dt>
+          <dd>
+				  Manage instrument comments, revisions, and approvals.
+          </dd>
           <dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
           <dd>
 				  Configure the way that batches of instruments are generated
 				  in the system so that they can be properly tracked
           </dd>
+          <dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
+		  <dd>
+            Manage mailing dates and quota for the instrument.
+		  </dd>
+        </dl>
+
+        <h2>Data Creation / Entry</h2>
+        <dl class="menu">
           <dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
           <dd>
-				  Generate instrument batches either automatically or by hand.
+			Generate instrument batches either automatically or by hand.
           </dd>
-
           <dt><g:link controller="receiptItems" action="index">Receipt Items</g:link></dt>
           <dd>
-                                  Receipt documents
+			Receipt documents
           </dd>
-
-          <dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
-        <dd>
-            Manage mailing dates and quota for the instrument.
-        </dd>
-
-          <dt><g:link controller="report" action="index">Reports</g:link></dt>
-        <dd>
-            View Reports
-        </dd>
-
-        <!-- I think AJZ deleted testGenerate from the Controller
-          <dt><g:link controller="documentGeneration" action="testGenerate">TEST Document Generation</g:link></dt>
+          <dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
           <dd>
-				  Use this to test Doc Gen
+			Enter mail dates for generated batches
           </dd>
-        -->
-
-
         </dl>
+
+        <h2>Analysis</h2>
+        <dl class="menu">
+          <dt><g:link controller="report" action="index">Reports</g:link></dt>
+		  <dd>
+            View Reports
+		  </dd>
+        </dl>
+
       </div>
 
     </div>

@@ -13,15 +13,15 @@
   </div>
   <div class="body">
     <h1>
-${batchCreationConfigInstance?.instrument?.study?.name}
-${batchCreationConfigInstance?.instrument?.name}
+	  ${batchCreationConfigInstance?.instrument?.study?.name}
+	  ${batchCreationConfigInstance?.instrument?.name}
     </h1>
     <h3>
-${batchCreationConfigInstance?.direction?.name.capitalize()}
-${batchCreationConfigInstance?.isInitial?.name.capitalize()}
-${batchCreationConfigInstance?.format?.name.capitalize()}
+	  ${batchCreationConfigInstance?.direction?.name.capitalize()}
+	  ${batchCreationConfigInstance?.isInitial?.name.capitalize()}
+	  ${batchCreationConfigInstance?.format?.name.capitalize()}
       <br/>
-${batchCreationConfigInstance?.name}
+	  ${batchCreationConfigInstance?.name}
     </h3>
     <g:if test="${flash.message}">
       <div class="message">${flash.message}</div>
