@@ -22,11 +22,6 @@
   <g:form name="batchIdForm" action="entry">
 	
 	<div>
-	  <label for="id">Scan Batch ID here:</label>
-	  <g:textField name="id" value="" />
-	</div>
-
-	<div>
 	  <label for="id">Scan in batch report here: </label>
 	  <g:textField style="border-style: solid; border-width: thin; margin: 1px;" value="" name="id" id="id" />
 	  <g:hiddenField name="referenceDate" value="date.struct" />
