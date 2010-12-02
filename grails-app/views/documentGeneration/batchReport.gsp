@@ -90,8 +90,9 @@ ${b.id}
         </span>
         <!-- TODO: -->
         <span class="batch-id-barcode barcode">
-          *${b.id}*
-        </span>
+		  <img src="${createLink(controller:'barcode', action:'png',
+id:'B' + b.id)}" />
+		</span>
       </div>
 
     </div>
