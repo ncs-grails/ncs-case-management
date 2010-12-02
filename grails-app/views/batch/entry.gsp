@@ -20,6 +20,11 @@
 
   <!-- Mail Date Entry Form -->
   <g:form name="batchIdForm" action="entry">
+	
+	<div>
+	  <label for="id">Scan Batch ID here:</label>
+	  <g:textField name="id" value="" />
+	</div>
 
 	<div>
 	  <label for="id">Scan in batch report here: </label>
