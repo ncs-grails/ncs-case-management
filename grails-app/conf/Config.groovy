@@ -50,10 +50,10 @@ environments {
         grails.serverURL = "https://secure.ncs.umn.edu/${appName}"
     }
     development {
-        grails.serverURL = "https://localhost:8443/${appName}"
+        grails.serverURL = "https://localhost.umn.edu:8443/${appName}"
     }
     test {
-        grails.serverURL = "https://localhost:8443/${appName}"
+        grails.serverURL = "https://localhost.umn.edu:8443/${appName}"
     }
 
 }

@@ -8,6 +8,9 @@
   </head>
   <body>
 
+	<!-- If we wanted letterhead, it could go here. -->
+	<g:include controller="instrument" action="letterhead" />
+
     <!-- PRIMARY BATCH INFORMATION -->
     <h1 class="batchReport">Batch Report</h1>
 
@@ -86,12 +89,11 @@
       </div>
       <div class="batchId nowrap">Batch ID:
         <span class="batch-id fixedFont">
-${b.id}
+		  B${b.id}
         </span>
         <!-- TODO: -->
         <span class="batch-id-barcode barcode">
-		  <img src="${createLink(controller:'barcode', action:'png',
-id:'B' + b.id)}" />
+		  <img src="${createLink(controller:'barcode', action:'png', id:'B' + b.id)}" />
 		</span>
       </div>
 

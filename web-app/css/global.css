@@ -216,3 +216,10 @@ dl.menu dd {
     padding-right:18px;
     line-height:22px;
 }
+
+.letterheadBlock {
+	font-style: italic;
+	font-size: 0.8em;
+	display: inline-block;
+	vertical-align: top;
+}

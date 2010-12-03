@@ -7,6 +7,8 @@ class InstrumentController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+	def letterhead = {}
+
     def index = {
         redirect(action: "list", params: params)
     }
