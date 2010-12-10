@@ -5,8 +5,8 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 class InstrumentHistoryController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	def authenticateService
-	def appName = 'ncs-case-management'
+    def authenticateService
+    def appName = 'ncs-case-management'
 
     def index = {
         redirect(action: "list", params: params)
@@ -14,11 +14,11 @@ class InstrumentHistoryController {
 
     def list = {
 
-		def instrumentHistoryInstanceList = InstrumentHistory.list()
-		// sort it if anything is in it.
-		if (instrumentHistoryInstanceList ) {
-			instrumentHistoryInstanceList = instrumentHistoryInstanceList.sort{ - it.dateCreated.getDate() }
-		}
+        def instrumentHistoryInstanceList = InstrumentHistory.list()
+        // sort it if anything is in it.
+        if (instrumentHistoryInstanceList ) {
+            instrumentHistoryInstanceList = instrumentHistoryInstanceList.sort{ - it.dateCreated.getDate() }
+        }
 
 		
         [instrumentHistoryInstanceList: instrumentHistoryInstanceList]
@@ -34,9 +34,9 @@ class InstrumentHistoryController {
 
         def instrumentHistoryInstance = new InstrumentHistory(params)
 
-		def username = authenticateService.principal().getUsername()
-		instrumentHistoryInstance.userCreated = username
-		instrumentHistoryInstance.appCreated = appName
+        def username = authenticateService.principal().getUsername()
+        instrumentHistoryInstance.userCreated = username
+        instrumentHistoryInstance.appCreated = appName
 
         if (instrumentHistoryInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'instrumentHistory.label', default: 'InstrumentHistory'), instrumentHistoryInstance.id])}"

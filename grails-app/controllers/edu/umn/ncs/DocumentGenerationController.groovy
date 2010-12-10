@@ -6,10 +6,15 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 class DocumentGenerationController {
     def documentGenerationService
     def reportService
-    def username = 'ajz'
+    def authenticateService
 
+    def ngp = {
+        render "${authenticateService?.principal()?.username}"
+    }
      // this is for testing, TODO: DELETE ME!
     def testGenerate = {
+        def username = authenticateService?.principal()?.getUsername()
+        
         def batchCreationConfigInstance = BatchCreationConfig.get(1)
         def docGenParams = [manual: false,
             username:username,
@@ -52,6 +57,8 @@ class DocumentGenerationController {
     def find = {
         flash.message = null
         def batchCreationQueue = null
+        def username = authenticateService.principal().getUsername()
+        println "username -> ${username}"
 
         def person = null
         def household = null
@@ -162,19 +169,21 @@ class DocumentGenerationController {
 
     // here is the batch generation FSM
     def generationFlow = {
+        
         // WARNING:  Any thing get gets passed as part of the model
         // needs to implement Serializable.  Otherwise everything comes
         // crumblig down.
         loadRecentBatches {
             action {
 
+                def username = authenticateService?.principal()?.getUsername()
                 // println "loadRecentBatches params: ${params}"
 
                 def q = params?.q
                 // println "${q}"
 				
-				// set a default value for batchInstance
-				flow.batchInstance = [id:0]
+                // set a default value for batchInstance
+                flow.batchInstance = [id:0]
 
                 // List of matching configs per search criteria
                 def batchCreationConfigInstanceList = []
@@ -234,6 +243,7 @@ class DocumentGenerationController {
                 // return instance of config
                 def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
                 def mailDate = new Date()
+                def instrumentDate = new Date()
                 def useMaxPieces = false
 
                 if (batchCreationConfigInstance) {
@@ -253,6 +263,7 @@ class DocumentGenerationController {
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,
                     mailDate:mailDate,
+                    instrumentDate:instrumentDate,
                     useMaxPieces:useMaxPieces,
                     batchInstanceList: batchInstanceList]
             }
@@ -265,6 +276,7 @@ class DocumentGenerationController {
             on("return").to "loadRecentBatches"
             on("manualGenerateAction"){
                 // Clear the user's manual queue
+                def username = authenticateService?.principal()?.getUsername()
                 def sql = "delete BatchCreationQueue bcq where bcq.username = ?"
                 BatchCreationQueue.executeUpdate(sql, [username])
             }.to "manualGenerate"
@@ -285,6 +297,7 @@ class DocumentGenerationController {
                 // def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
                 // pull the creation config from the flow scope
                 def batchCreationConfigInstance = flow.batchCreationConfigInstance
+                def username = authenticateService?.principal()?.getUsername()
                 def docGenParams = [manual:true, username:username]
 
                 if (batchCreationConfigInstance) {
@@ -293,6 +306,9 @@ class DocumentGenerationController {
                     if (params.autoSetMailDate) {
                         docGenParams.mailDate = params.mailDate
                     }
+                    
+                    docGenParams.instrumentDate = params.instrumentDate
+
                     if (params.useMaxPieces == 'true') {
                         docGenParams.maxPieces = params.maxPieces
                     }
@@ -302,10 +318,10 @@ class DocumentGenerationController {
                     if (batchInstance?.id) {
                         flow.batchInstance = batchInstance
                     } else {
-						// error creating batch
-						flow.batchInstance = [id:0]
-						return nobatch()
-					}
+                        // error creating batch
+                        flow.batchInstance = [id:0]
+                        return nobatch()
+                    }
                 }
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,
@@ -329,6 +345,7 @@ class DocumentGenerationController {
                 def batchInstance = null
                 def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
                 def results = null
+                def username = authenticateService?.principal()?.getUsername()
                 def docGenParams = [manual:false, username:username]
 
                 if (batchCreationConfigInstance) {
@@ -340,14 +357,17 @@ class DocumentGenerationController {
                     if (params.useMaxPieces == 'true') {
                         docGenParams.maxPieces = params.maxPieces
                     }
+
+                    docGenParams.instrumentDate = params.instrumentDate
+                    println "before generating docs"
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
                     
                     if (batchInstance) {
                         flow.batchInstance = batchInstance
                     } else {
-						// error creating batch
-						flow.batchInstance = [id:0]
-						return nobatch()
+                        // error creating batch
+                        flow.batchInstance = [id:0]
+                        return nobatch()
                     }
 
                 }

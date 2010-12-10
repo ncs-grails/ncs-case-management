@@ -94,6 +94,11 @@
           </p>
         </g:if>
 
+          <p><!-- Mail Date -->
+          <label for="instrumentDate">Date on Instrument:</label>
+          <g:datePicker name="instrumentDate" value="${params.instrumentDate}" precision="day" />
+          </p>
+
         <!-- Go Button -->
         <g:if test="${batchCreationConfigInstance?.automaticSelection}" >
           <g:submitButton name="autoGenerate" value="Generate New Batch Automatically" />

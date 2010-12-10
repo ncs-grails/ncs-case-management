@@ -64,6 +64,7 @@ class DocumentGenerationService {
          *	config		: BatchCreationConfig
          *	username        : String
          *	mailDate	: Date
+         *	instrumentDate  : Date
          *	maxPieces	: Integer
          *	manual		: Boolean
          *	reason		: String
@@ -84,6 +85,9 @@ class DocumentGenerationService {
         def comments = null       
 
         println "generateMailing params --> ${params}"
+        if (!params.mailDate) {
+            params.mailDate = null
+        }
 
         if (params.config && params.username) {
 
@@ -230,14 +234,38 @@ class DocumentGenerationService {
                     masterBatch = new Batch(batchRunBy:username,
                         format:batchCreationConfigInstance.format,
                         direction:batchCreationConfigInstance.direction,
-                        instrumentDate:now,
+                        instrumentDate: params.instrumentDate,
+                        mailDate: params.mailDate,
                         batchRunByWhat: appName,
                         trackingDocumentSent:batchCreationConfigInstance.generateTrackingDocument,
                         creationConfig:batchCreationConfigInstance)
 
+
+                    def c = InstrumentHistory.createCriteria()
+                    def versionList = c.list{
+                        and{
+                            lt ("startDate", now)
+                            instrument{
+                                eq ("id", batchCreationConfigInstance.instrument.id)
+                            }
+                            or{
+                                gt ("endDate", now)
+                                isNull("endDate")
+                            }
+                        }
+                    }
+
+                    def v = 1
+                    println "default version -> ${v}"
+                    if (versionList) {
+                       v = versionList[0].itemVersion
+                       println "new version -> ${v}"
+                    }
+
                     // Assign Primary Instrment Type to Batch
                     masterBatch.addToInstruments(isPrimary: true,
                         isResend: batchCreationConfigInstance.isResend,
+                        itemVersion: v,
                         instrument:batchCreationConfigInstance.instrument,
                         isInitial:batchCreationConfigInstance.isInitial)
 
@@ -289,7 +317,8 @@ class DocumentGenerationService {
                             master: masterBatch,
                             format:bci.format,
                             direction:bci.direction,
-                            instrumentDate:now,
+                            instrumentDate: params.instrumentDate,
+                            mailDate: params.mailDate,
                             batchRunByWhat: appName,
                             trackingDocumentSent:batchCreationConfigInstance.generateTrackingDocument,
                             creationConfig:batchCreationConfigInstance)
@@ -536,6 +565,8 @@ class DocumentGenerationService {
                 outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
             } else if (it.code == "person") {
                 outputData = mergeDataBuilderService.addPersonData(outputData)
+            } else if (it.code == "norc") {
+                outputData = mergeDataBuilderService.addNORCData(outputData)
             }
         }
 
@@ -545,6 +576,16 @@ class DocumentGenerationService {
         outputData.each{
             it.recordNumber = recNo
             recNo++
+        }
+
+        outputData.each{
+            println "${it.address} -> ${it.recordNumber}"
+        }
+
+        recNo--
+        //adding pieces+tracking documents
+        outputData.each{
+            it.piecesPlusTracking = recNo
         }
 
          if (outputData) {

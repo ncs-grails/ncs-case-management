@@ -44,6 +44,11 @@
       <div class="buttons">
         <span class="button"><g:link controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link></span>
       </div>
+
+      <div>
+        <span class="button"><g:link controller="documentGeneration" action="batchAnalysis" id="${batchInstance?.id}">Batch Analysis Report</g:link></span>
+      </div>
+
     </div>
   </body>
 </html>

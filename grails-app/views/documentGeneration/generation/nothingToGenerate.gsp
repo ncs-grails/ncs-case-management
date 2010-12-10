@@ -31,7 +31,7 @@ ${batchCreationConfigInstance?.name}
       <legend style="margin-left: 0.5em;">Recently Generated Batches</legend>
 
 	  <div class="message">
-			Nothing to generate for ${batchCreationConfigInstance.instrument}.
+              Nothing to generate for ${batchCreationConfigInstance.instrument}.
 	  </div>
 
 	</fieldset>

@@ -122,17 +122,11 @@
           </dd>
           <dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
           <dd>
-			Enter mail dates for generated batches
+                        Enter mail dates for generated batches
           </dd>
         </dl>
 
         <h2>Analysis</h2>
-        <dl class="menu">
-          <dt><g:link controller="report" action="index">Reports</g:link></dt>
-		  <dd>
-            View Reports
-		  </dd>
-        </dl>
 
       </div>
 

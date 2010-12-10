@@ -10,6 +10,7 @@
 <body>
   <div class="nav">
     <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
+    <span class="menuButton"><g:link action="generation" event="loadRecentBatches" id="${batchCreationConfigInstance?.id}"params="[q:'adv']">${batchCreationConfigInstance?.name}</g:link></span>
   </div>
   <div class="body">
     <h1>Counts by Segment and Group</h1>

@@ -23,6 +23,7 @@ class MergeDataBuilderService {
                 pieces: batchInstance?.pieces,
                 instrumentId: batchInstance?.primaryInstrument?.id,
                 instrumentName: batchInstance?.primaryInstrument?.name,
+                studyId: batchInstance?.primaryInstrument?.study?.id,
                 studyName: batchInstance?.primaryInstrument?.study?.name,
                 documentTitle: ((item?.studyYear != null) ? "T" + item?.studyYear + ' ' : '') + batchInstance?.primaryInstrument?.study?.name + ' ' + batchInstance?.primaryInstrument?.name,
                 fullStudyName: batchInstance?.primaryInstrument?.study?.fullName,
@@ -87,6 +88,7 @@ class MergeDataBuilderService {
                 pieces: batchInstance?.pieces,
                 instrumentId: batchInstance?.primaryInstrument?.id,
                 instrumentName: batchInstance?.primaryInstrument?.name,
+                studyId: batchInstance?.primaryInstrument?.study?.id,
                 studyName: batchInstance?.primaryInstrument?.study?.name,
                 documentTitle: batchInstance?.primaryInstrument?.study?.name + ' ' + batchInstance?.primaryInstrument?.name,
                 fullStudyName: batchInstance?.primaryInstrument?.study?.fullName,
@@ -123,6 +125,9 @@ class MergeDataBuilderService {
 
              dataSet.add(record)
 
+            //Send two tracking documents to tracking documents recipients
+            dataSet.add(record)
+
         }
 
         return dataSet
@@ -134,7 +139,7 @@ class MergeDataBuilderService {
 
             def dwellingUnitInstance = DwellingUnit.get(record.dwellingUnitId)
             if (dwellingUnitInstance) {
-                record.salutation = "Dear Neighbor"
+                record.salutation = "Neighbor"
                 record.address = dwellingUnitInstance?.address?.address
                 record.address2 = dwellingUnitInstance?.address?.address2
                 record.zipCode =  dwellingUnitInstance?.address?.zipCode
@@ -175,6 +180,25 @@ class MergeDataBuilderService {
                 record.deathDate = personInstance?.deathDate
                 record.enrollmentType = Subject.findByPerson(personInstance?.enrollment?.name)
                 
+            }
+        }
+        dataSet
+    }
+    def addNORCData(dataSet) {
+        dataSet.collect{record ->
+            def instrumentLinkInstance = InstrumentLink.get(record.instrumentId)
+            def studyLinkInstance = StudyLink.get(record.studyId)
+            def dwellingUnitLinkInstance = DwellingUnitLink.get(record.dwellingUnitId)
+
+            if (instrumentLinkInstance) {
+                record.norcDocId = instrumentLinkInstance?.norcDocId
+            }
+            if (studyLinkInstance) {
+                record.norcProjectId = studyLinkInstance?.norcProjectId
+            }
+            record.norcSuId = ""
+            if (dwellingUnitLinkInstance) {
+                record.norcSuId = dwellingUnitLinkInstance?.norcSuId
             }
         }
         dataSet
