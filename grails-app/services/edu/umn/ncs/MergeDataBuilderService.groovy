@@ -137,7 +137,7 @@ class MergeDataBuilderService {
 
         dataSet.collect{ record ->
 
-            def dwellingUnitInstance = DwellingUnit.get(record.dwellingUnitId)
+            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)
             if (dwellingUnitInstance) {
                 record.salutation = "Neighbor"
                 record.address = dwellingUnitInstance?.address?.address
@@ -157,7 +157,7 @@ class MergeDataBuilderService {
     def addPersonData(dataSet) {
         
         dataSet.collect{ record ->
-            def personInstance = Person.get(record.personId)
+            def personInstance = Person.read(record.personId)
             if (personInstance) {
                 record.subjectId = Subject.findByPerson(personInstance)?.subjectId
                 record.selectionDate = Subject.findByPerson(personInstance)?.selectionDate
@@ -186,9 +186,9 @@ class MergeDataBuilderService {
     }
     def addNORCData(dataSet) {
         dataSet.collect{record ->
-            def instrumentLinkInstance = InstrumentLink.get(record.instrumentId)
-            def studyLinkInstance = StudyLink.get(record.studyId)
-            def dwellingUnitLinkInstance = DwellingUnitLink.get(record.dwellingUnitId)
+            def instrumentLinkInstance = InstrumentLink.read(record.instrumentId)
+            def studyLinkInstance = StudyLink.read(record.studyId)
+            def dwellingUnitLinkInstance = DwellingUnitLink.read(record.dwellingUnitId)
 
             if (instrumentLinkInstance) {
                 record.norcDocId = instrumentLinkInstance?.norcDocId

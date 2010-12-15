@@ -15,7 +15,7 @@ class DocumentGenerationController {
     def testGenerate = {
         def username = authenticateService?.principal()?.getUsername()
         
-        def batchCreationConfigInstance = BatchCreationConfig.get(1)
+        def batchCreationConfigInstance = BatchCreationConfig.read(1)
         def docGenParams = [manual: false,
             username:username,
             config:batchCreationConfigInstance]
@@ -29,8 +29,8 @@ class DocumentGenerationController {
     def downloadDataset = {
         //println "params in downloadDataset --> ${params}"
 
-        def batchInstance = Batch.get(params?.batch?.id)
-        def batchCreationDocumentInstance = BatchCreationDocument.get(params?.batchCreationDocument?.id)
+        def batchInstance = Batch.read(params?.batch?.id)
+        def batchCreationDocumentInstance = BatchCreationDocument.read(params?.batchCreationDocument?.id)
 
         // make sure the required params were passed
         if (batchInstance && batchCreationDocumentInstance) {
@@ -66,17 +66,17 @@ class DocumentGenerationController {
 
         if (params.sourceId && params.sourceValue) {
 
-            def source = BatchCreationQueueSource.get(params.sourceId)
+            def source = BatchCreationQueueSource.read(params.sourceId)
 
             if (source.name == 'person' ) {
-                person = Person.get(params.sourceValue)
+                person = Person.read(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, person:person)
             } else if (source.name == 'household' ) {
-                household = Household.get(params.sourceValue)
+                household = Household.read(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, household:household)
             } else if (source.name == 'dwellingUnit' ) {
                 // println "Creating DwellingUnit ... from Id --> ${params.sourceValue}"
-                dwellingUnit = DwellingUnit.get(params.sourceValue)
+                dwellingUnit = DwellingUnit.read(params.sourceValue)
                 batchCreationQueue = BatchCreationQueue.findAllWhere(username:username, source:source, dwellingUnit:dwellingUnit)
             }
 
@@ -109,8 +109,8 @@ class DocumentGenerationController {
 
         // println "This is what we got for print details: \n ${params}"
         
-        def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfig?.id)
-        def batchInstance = Batch.get(params?.batch?.id)
+        def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
+        def batchInstance = Batch.read(params?.batch?.id)
 
         [batchCreationConfigInstance:batchCreationConfigInstance, batchInstance:batchInstance]
     }
@@ -119,13 +119,13 @@ class DocumentGenerationController {
     def batchReport = {
 
         // primary batch
-        def batchInstance = Batch.get(params?.id)
+        def batchInstance = Batch.read(params?.id)
         // child batches
         def batchInstanceList = []
 
         // If we didn't find the batch, see if the param is batch.id instead of id
         if (!batchInstance) {
-            batchInstance = Batch.get(params?.batch?.id)
+            batchInstance = Batch.read(params?.batch?.id)
         }
 
         // Hopefully we found one by now.  If so, let's fill the batch report
@@ -143,11 +143,11 @@ class DocumentGenerationController {
 
     def batchAnalysis = {
 
-        def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfig?.id)
+        def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
 
         // child batches
         def batchInstanceList = []
-        def batchInstance = Batch.get(params?.batch?.id)
+        def batchInstance = Batch.read(params?.batch?.id)
 
         def advLetterSentInstanceList = reportService.batchAnalysis(batchInstance.id)
 
@@ -241,7 +241,7 @@ class DocumentGenerationController {
         loadConfig {
             action {
                 // return instance of config
-                def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
+                def batchCreationConfigInstance = BatchCreationConfig.read(params?.id)
                 def mailDate = new Date()
                 def instrumentDate = new Date()
                 def useMaxPieces = false
@@ -294,7 +294,7 @@ class DocumentGenerationController {
                 // ** Manually Generate Documents **
                 def batchInstance = null
 
-                // def batchCreationConfigInstance = BatchCreationConfig.get(params?.batchCreationConfigInstance?.id)
+                // def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfigInstance?.id)
                 // pull the creation config from the flow scope
                 def batchCreationConfigInstance = flow.batchCreationConfigInstance
                 def username = authenticateService?.principal()?.getUsername()
@@ -343,7 +343,7 @@ class DocumentGenerationController {
             action {
                 // ** automatically generate documents **
                 def batchInstance = null
-                def batchCreationConfigInstance = BatchCreationConfig.get(params?.id)
+                def batchCreationConfigInstance = BatchCreationConfig.read(params?.id)
                 def results = null
                 def username = authenticateService?.principal()?.getUsername()
                 def docGenParams = [manual:false, username:username]
