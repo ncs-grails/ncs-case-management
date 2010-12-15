@@ -1,6 +1,9 @@
 package edu.umn.ncs
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.converters.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Secured(['ROLE_NCS_DOCGEN'])
 class DocumentGenerationController {
@@ -54,11 +57,73 @@ class DocumentGenerationController {
         }
     }
 
+    def findItem = {
+
+        def pattern = ~/[0-9]*/
+        def username = authenticateService.principal().getUsername()
+        def itemPassed = params.id
+        def batchCreationQueueSourceInstance = BatchCreationQueueSource.get(params?.batchCreationQueueSource?.id)
+        def batchCreationQueueInstance = null
+
+        def dwellingUnit = null
+        def person = null
+        def household = null
+
+        if (batchCreationQueueSourceInstance) {
+
+            if (pattern.matcher(itemPassed).matches()) {
+                if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
+                    dwellingUnit = DwellingUnit.get(itemPassed)
+                    if (dwellingUnit) {
+                        batchCreationQueueInstance = BatchCreationQueue.findAllByDwellingUnitAndSource(dwellingUnit, batchCreationQueueSourceInstance)
+                    }
+                } else if (batchCreationQueueSourceInstance.name == "person") {
+                    person = Person.get(itemPassed)
+                    if (person){
+                        batchCreationQueueInstance = BatchCreationQueue.findAllByPersonAndSource(person, batchCreationQueueSourceInstance)
+                    }
+                } else if (batchCreationQueueSourceInstance.name == "household") {
+                    household = Household.get(itemPassed)
+                    if (household){
+                        batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndSource(household, batchCreationQueueSourceInstance)
+                    }
+                }
+
+                if (!(dwellingUnit || household || person)) {
+                    render "${batchCreationQueueSourceInstance} not found!"
+                } else {
+                    if (batchCreationQueueInstance) {
+                        render "${batchCreationQueueSourceInstance} already in the queue"
+                    } else {
+                        batchCreationQueueInstance = new BatchCreationQueue(source: batchCreationQueueSourceInstance, username: username)
+
+                        if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
+                            batchCreationQueueInstance.dwellingUnit = dwellingUnit
+                        } else if (batchCreationQueueSourceInstance.name == "person") {
+                            batchCreationQueueInstance.person = person
+                        } else if (batchCreationQueueSourceInstance.name == "household") {
+                            batchCreationQueueInstance.household = household
+                        }
+
+                        if (batchCreationQueueInstance.save(flush:true)){
+                            render "${batchCreationQueueSourceInstance} successfully added to the queue!"
+                        } else {
+                            batchCreationQueueInstance.errors.each{
+                                println "error: ${it}"
+                            }
+                        }
+                    }
+                }
+            } else {
+                render "Invalid input!"
+            }
+        }
+    }
+
     def find = {
         flash.message = null
         def batchCreationQueue = null
         def username = authenticateService.principal().getUsername()
-        println "username -> ${username}"
 
         def person = null
         def household = null
@@ -82,7 +147,11 @@ class DocumentGenerationController {
 
             if (person || household || dwellingUnit) {
                 if (!batchCreationQueue) {
-                    batchCreationQueue = new BatchCreationQueue(username:username, source:source, person:person, household:household, dwellingUnit:dwellingUnit)
+                    batchCreationQueue = new BatchCreationQueue(username:username, 
+                                                            source:source,
+                                                            person:person,
+                                                            household:household,
+                                                            dwellingUnit:dwellingUnit)
                     batchCreationQueue.save(flush:true)
                     
                 }

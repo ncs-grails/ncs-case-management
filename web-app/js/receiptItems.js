@@ -1,35 +1,4 @@
 
-/*
-function logItem() {
-    receivedElementId++;
-    var itemId = $("input[name=item]").val();
-
-    itemId = itemId.replace("I");
-
-    alert('I am in logItem! Item ID --> ' + itemId);
-
-    var html = '<div id="scan-' + receivedElementId + '" class="item-' + itemId + '">';
-    html += docId;
-    html += '<span style="padding-left:3em;;" id="scan-' + receivedElementId + '_status">...Processing</span></div>';
-
-    $('#updateMe').append(html);
-  }
-
-function successLogItem() {
-    var docId = $("input[name=item]").val();
-    alert('I am in successLogItem! Item Id --> ' + docId)
-
-    $('#i' + docId).html(docId + '<span style="padding-left:3em;" id="i' + docId + '_status">Received and Logged</span>');
-}
-
-function errorLogItem() {
-    var docId = $("input[name=item]").val();
-    alert('I am in errorLogItem! Item Id --> ' + docId)
-
-    $('#i' + docId).html(docId + '<span style="padding-left:3em;" id="i' + docId + '_status">ERROR: Failed to log item</span>');
-}
-*/
-
 
 var receivedElementId = 0
 

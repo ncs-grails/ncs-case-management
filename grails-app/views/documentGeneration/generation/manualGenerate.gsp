@@ -1,12 +1,15 @@
 <%@ page import="edu.umn.ncs.BatchCreationConfig" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<g:setProvider library="jquery"/>
 
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Manual Document Generation - National Children's Study</title>
     <meta name="layout" content="ncs" />
-     <g:set var="entityName" value="${message(code: 'documentGeneration.label', default: 'DocumentGeneration')}" />
+    <g:set var="entityName" value="${message(code: 'documentGeneration.label', default: 'DocumentGeneration')}" />
+    <g:javascript src="manualgenerate.js"/>
+    <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'documentGeneration.css')}" />
   </head>
   <body>
     <div class="nav">
@@ -25,65 +28,69 @@
         <br/>${batchCreationConfigInstance?.name}
       </h3>
       <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div id="message" class="message">${flash.message}</div>
       </g:if>
 
-      <g:form method="post" controller="documentGeneration" action="generation">
-          <g:hiddenField name="batchCreationConfigInstance.id" value="${batchCreationConfigId}" />
 
-	<div class="prop">
-	  <span class="name">
-		<label for="reason"><g:message code="batchCreationConfig.defaultReason.label" default="Reason" /></label>
-	  </span>
-	  <span class="value">
-		<g:textField name="reason" size="40" value="${batchCreationConfigInstance?.defaultReason}" />
-	  </span>
-	</div>
-
-	<div class="prop">
-	  <span class="name">
-		<label for="instructions"><g:message code="batchCreationConfig.defaultInstructions.label" default="Instructions" /></label>
-	  </span>
-	  <span class="value">
-		<g:textField name="instructions" size="40" value="${batchCreationConfigInstance?.defaultInstructions}" />
-	  </span>
-	</div>
-
-	<div class="prop">
-	  <span class="name">
-		<label for="comments"><g:message code="batchCreationConfig.defaultComments.label" default="Comments" /></label>
-	  </span>
-	  <span class="value">
-		<g:textField name="comments" size="40" value="${batchCreationConfigInstance?.defaultComments}" />
-	  </span>
-	</div>
 
           <div class="prop">
             <span class="name">
-              <label for="sourceId"><g:message code="BatchCreationQueueSource.label" default="Source:" /></label>
+              <label for="batchCreationQueueSource.id"><g:message code="BatchCreationQueueSource.label" default="Source:" /></label>
             </span>
             <span class="value">
-              <g:select name="sourceId" from="${edu.umn.ncs.BatchCreationQueueSource.list()}" optionKey="id" value="" />
+               <g:hiddenField name="findUrl" id="findUrl" value="${createLink(controller:'documentGeneration', action:'findItem', params:[:])}" />
+             <g:select name="batchCreationQueueSource.id" 
+                       id="batchCreationQueueSource.id"
+                       from="${edu.umn.ncs.BatchCreationQueueSource.list()}"
+                       optionKey="id"
+                       value="${edu.umn.ncs.BatchCreationQueueSource.findByName('dwellingUnit').id}" />
             </span>
 
             <span class="name">
               <label for="sourceValue">ID</label>
             </span>
             <span class="value">
-              <g:textField name="sourceValue" value="" />
+              <g:textField name="sourceValue" id="sourceValue" size="15" value="" />
             </span>
           </div>
 
-          <div class="buttons">
-            <span class="button"><g:submitToRemote class="save" value="Search" url="[controller:'documentGeneration',action:'find']" update="[success:'manualGenerationQueue']" /></span>
+        <fieldset class="maroonBorder">
+          <legend id="itemsLegend" style="margin-left: 0.5em;">Entered Items</legend>
+                <div id="manualGenerationQueue">
+                      <p id="deleteMe" class="highlightYellow">Enter at least one of the above items</p>
+                </div>
+        </fieldset>
+
+        <g:form method="post" controller="documentGeneration" action="generation">
+            <g:hiddenField name="batchCreationConfigInstance.id" value="${batchCreationConfigId}" />
+
+          <div class="prop">
+            <span class="name">
+                  <label for="reason"><g:message code="batchCreationConfig.defaultReason.label" default="Reason" /></label>
+            </span>
+            <span class="value">
+                  <g:textField name="reason" size="40" value="${batchCreationConfigInstance?.defaultReason}" />
+            </span>
           </div>
 
-        <fieldset class="maroonBorder">
-          <legend style="margin-left: 0.5em;">Entered items</legend>
-              <div id="manualGenerationQueue">
-                    <p class="highlightYellow">Enter at least one of the above items</p>
-              </div>
-        </fieldset>
+          <div class="prop">
+            <span class="name">
+                  <label for="instructions"><g:message code="batchCreationConfig.defaultInstructions.label" default="Instructions" /></label>
+            </span>
+            <span class="value">
+                  <g:textField name="instructions" size="40" value="${batchCreationConfigInstance?.defaultInstructions}" />
+            </span>
+          </div>
+
+          <div class="prop">
+            <span class="name">
+                  <label for="comments"><g:message code="batchCreationConfig.defaultComments.label" default="Comments" /></label>
+            </span>
+            <span class="value">
+                  <g:textField name="comments" size="40" value="${batchCreationConfigInstance?.defaultComments}" />
+            </span>
+          </div>
+
         <div class="buttons">
           <span class="button"><g:submitButton name="generateDocuments" value="Generate Document(s)" /></span>
         </div>

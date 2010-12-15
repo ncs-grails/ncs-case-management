@@ -23,7 +23,7 @@ class ReceiptItemsController {
         def username = authenticateService.principal().getUsername()
         def appName = "ncs-case-management"
         
-        println "receiptItems params --> ${params}"
+        //println "receiptItems params --> ${params}"
         def trackedItemInstance = null
 
         // Delay Code, used to test out of sequence responses
