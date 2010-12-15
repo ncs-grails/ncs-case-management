@@ -20,7 +20,6 @@ class SearchService {
 		def norcMailingPattern = ~/[0-9]{4}-[0-9]{10}-[0-9]{2}/
 		def norcSuPattern = ~/[0-9]{10}/
 
-		// 0061674400
 		if (debug) {
 			println "SearchService:query:queryString::${queryString}"
 		}
@@ -87,6 +86,7 @@ class SearchService {
 
 		}
 
+		// 0061674400
 		if ( norcSuPattern.matcher(queryString).matches() ) {
 
 			if (debug) {
@@ -94,19 +94,20 @@ class SearchService {
 			}
 
 			// we found a norc SU ID... maybe.
-			def dwellingUnitInstance = DwellingUnitLink.findByNorcSuId(queryString)
+			def dwellingUnitLinkInstance = DwellingUnitLink.findByNorcSuId(queryString)
 
-			if ( dwellingUnitInstance ) {
+			if ( dwellingUnitLinkInstance ) {
 
 				if (debug) {
 					println "found dwelling unit for NORC SU ID pattern ${queryString}..."
 				}
-
+				def dwellingUnitInstance = dwellingUnitLinkInstance.dwellingUnit
+				
 				// we found a NORC mailing barcode
 				results.add([matchType: 'NORC Mailing ID',
 						controller: 'dwellingUnit',
 						action: 'show',
-						description: dwellingUnitInstance.norcSuId,
+						description: dwellingUnitInstance.address.address,
 						id: dwellingUnitInstance.id ])
 			}
 		}
