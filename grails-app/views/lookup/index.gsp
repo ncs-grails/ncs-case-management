@@ -1,6 +1,4 @@
-
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -14,13 +12,18 @@
     </div>
     <div class="body">
 
-      <h1>Page Title</h1>
+      <h1>NCS Lookup</h1>
 
-      <h2>Sub Header</h2>
+      <h2>Please enter an ID or an Address</h2>
+	  
+      <fieldset class="maroonBorder">
+        <legend class="m1">Lookup Search</legend>
+		  <g:remoteField action="find" update="resultsDiv"  name="searchString" />
+      </fieldset>
 
       <fieldset class="maroonBorder">
-        <legend class="m1">Section Header</legend>
-
+        <legend class="m1">Results</legend>
+		<div id="resultsDiv"></div>
       </fieldset>
 
     </div>

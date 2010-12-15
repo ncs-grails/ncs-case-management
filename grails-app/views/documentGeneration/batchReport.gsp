@@ -52,9 +52,6 @@
     <div class="clear"></div>
     <hr/>
 
-
-
-
     <!-- List the batches -->
   <g:each var="b" in="${batchInstanceList}">
 
@@ -96,8 +93,21 @@
 		  <img src="${createLink(controller:'barcode', action:'png', id:'B' + b.id)}" />
 		</span>
       </div>
-
     </div>
+
+  <hr/>
+
+	<div id="manualForm">
+	  <p style="border-bottom: thin solid black; margin-top: 1em; width: 100%;">
+		Tracking Documents Mailed :</p>
+	  <p style="border-bottom: thin solid black; margin-top: 1em; width: 100%;">
+		Peices Mailed Documents :
+		<span style="font-size:1.5em; font-weight: bold;">${batchInstance?.items?.size()}</span></p>
+	  <p style="border-bottom: thin solid black; margin-top: 1em; width: 100%;">
+		Total Mailed :</p>
+	  <p style="border-bottom: thin solid black; margin-top: 1em; width: 100%;">
+		Sample Docs :</p>
+	</div>
 
     <p/>
   </g:each>

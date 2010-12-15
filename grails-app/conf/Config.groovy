@@ -85,3 +85,19 @@ log4j = {
 grails.views.javascript.library="jquery"
 
 //log4j.logger.org.springframework.security='off,stdout'
+
+springcache {
+    defaults {
+        // set default cache properties that will apply to all caches that do not override them
+        eternal = false
+        diskPersistent = false
+    }
+    caches {
+        lookupCache {
+            // set any properties unique to this cache
+            memoryStoreEvictionPolicy = "LRU"
+        }
+    }
+}
+
+

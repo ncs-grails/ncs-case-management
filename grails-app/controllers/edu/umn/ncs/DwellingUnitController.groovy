@@ -2,20 +2,9 @@ package edu.umn.ncs
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_NCS_DOCGEN'])
 class DwellingUnitController {
 
-    def index = {
-		redirect(action:list,params:params)
-	}
-
-	def list = {
-		println "App Name: ${grailsApplication.metadata['app.name']}"
-
-		def dwellingUnitList = DwellingUnit.list(params)
-		return [ dwellingUnitList: dwellingUnitList]
-	}
-
+	@Secured(['ROLE_NCS_DOCGEN'])
 	def quickAdd = {
 
 		def dwellingUnitList = DwellingUnit.list(params)
@@ -34,6 +23,25 @@ class DwellingUnitController {
         else {
             render(view:'list',model:[dwellingUnitInstance:dwellingUnitInstance,
 					dwellingUnitList:dwellingUnitList])
+        }
+		
+	}
+
+	@Secured(['ROLE_NCS_LOOKUP'])
+	def show = {
+        def dwellingUnitInstance = DwellingUnit.read(params.id)
+        if (!dwellingUnitInstance) {
+			response.sendError(404)
+			render "Dwelling Unit ${params.id} Not found"
+        }
+        else {
+			def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
+
+			def trackedItemInstanceList = TrackedItem.findAllByDwellingUnit(dwellingUnitInstance)
+
+            [dwellingUnitInstance: dwellingUnitInstance,
+				dwellingUnitLinkInstance: dwellingUnitLinkInstance,
+				trackedItemInstanceList: trackedItemInstanceList]
         }
 		
 	}
