@@ -70,7 +70,6 @@ class DocumentGenerationController {
         def household = null
 
         if (batchCreationQueueSourceInstance) {
-
             if (pattern.matcher(itemPassed).matches()) {
                 if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
                     dwellingUnit = DwellingUnit.get(itemPassed)
@@ -90,10 +89,10 @@ class DocumentGenerationController {
                 }
 
                 if (!(dwellingUnit || household || person)) {
-                    render "${batchCreationQueueSourceInstance} not found!"
+                    render "Not found!"
                 } else {
                     if (batchCreationQueueInstance) {
-                        render "${batchCreationQueueSourceInstance} already in the queue"
+                        render "Already in the queue"
                     } else {
                         batchCreationQueueInstance = new BatchCreationQueue(source: batchCreationQueueSourceInstance, username: username)
 
@@ -106,7 +105,7 @@ class DocumentGenerationController {
                         }
 
                         if (batchCreationQueueInstance.save(flush:true)){
-                            render "${batchCreationQueueSourceInstance} successfully added to the queue!"
+                            render "Successfully added to the queue!"
                         } else {
                             batchCreationQueueInstance.errors.each{
                                 println "error: ${it}"

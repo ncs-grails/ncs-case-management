@@ -56,6 +56,12 @@
 
         <fieldset class="maroonBorder">
           <legend id="itemsLegend" style="margin-left: 0.5em;">Entered Items</legend>
+
+            <div class="prop-q ubb">
+              <span class="value-q s">ID</span>
+              <span class="value-q s">Source</span>
+              <span class="value-q l">Status</span>
+            </div>
                 <div id="manualGenerationQueue">
                       <p id="deleteMe" class="highlightYellow">Enter at least one of the above items</p>
                 </div>
