@@ -137,7 +137,7 @@ class MailingScheduleController {
                 redirect(controller: "mailingSchedule", action: "list", params: ['instrument.id':instrumentInstance.id])
             } else {
                 flash.message = "Error saving mailing schedule for instrument ${mailingScheduleInstance?.instrument?.name}."
-                redirect(controller: mailingSchedule, action: "list", params: ['instrument.id':instrumentInstance.id])
+                redirect(controller: "mailingSchedule", action: "list", params: ['instrument.id':instrumentInstance.id])
             }
 
         } else {
