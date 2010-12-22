@@ -84,7 +84,7 @@ class DocumentGenerationService {
         def instructions = null
         def comments = null       
 
-        println "generateMailing params --> ${params}"
+        //println "generateMailing params --> ${params}"
         if (!params.mailDate) {
             params.mailDate = null
         }
@@ -107,8 +107,8 @@ class DocumentGenerationService {
             // selection results
             def results
 
-            println "${username} is generating a new ${batchCreationConfigInstance.name} batch"
-            println "BatchCreationConfig instrument:  ${batchCreationConfigInstance.instrument.name} "
+            //println "${username} is generating a new ${batchCreationConfigInstance.name} batch"
+            //println "BatchCreationConfig instrument:  ${batchCreationConfigInstance.instrument.name} "
 
             def manualSelection = false
             def automaticSelection = false
@@ -138,12 +138,6 @@ class DocumentGenerationService {
                                             FROM batch_creation_queue
                                             WHERE (username = ?)"""
                         results = sql.rows(selectionQuery, [params.username])
-
-                        if (results) {
-                            println "results are not NULL!!!!"
-                        } else {
-                            println "selectionQuery returned nothing"
-                        }
 
                         // TODO:
                         // We can assume all of the columns are there
@@ -256,10 +250,8 @@ class DocumentGenerationService {
                     }
 
                     def v = 1
-                    println "default version -> ${v}"
                     if (versionList) {
                        v = versionList[0].itemVersion
-                       println "new version -> ${v}"
                     }
 
                     // Assign Primary Instrment Type to Batch
@@ -274,7 +266,7 @@ class DocumentGenerationService {
                     .findAll{ it.attachmentOf == batchCreationConfigInstance.instrument }
                     .each{ attachment ->
 
-                        println "adding attachment ${attachment.instrument.name}..."
+                        //println "adding attachment ${attachment.instrument.name}..."
 
                         masterBatch.addToInstruments(isPrimary: false,
                             instrument:attachment.instrument,
@@ -289,8 +281,6 @@ class DocumentGenerationService {
                         masterBatch.errors.each{ err ->
                             println "ERROR>> ${err}"
                         }
-                    } else {
-                        println "masterBatch saved!"
                     }
 
                     // save info about the batch so we can create parent item
@@ -310,7 +300,7 @@ class DocumentGenerationService {
                     .findAll{ it.relation != attachmentOf }
                     .each{ bci ->
 
-                        println "creating sub-batch ${bci.instrument.name}..."
+                        //println "creating sub-batch ${bci.instrument.name}..."
 
                         // Create Sub Batch, assigning master
                         def subBatch = new Batch(batchRunBy:username,
@@ -521,9 +511,11 @@ class DocumentGenerationService {
                         batchInfoList.sort{it.sortOrder}.each{ b ->
                             b.batch.save(flush:true)
                             printQueue.save(flush:true)
+                            /*
                             b.batch.items.each{
                                 println " + Created SID: ${it.id} (v3)"
                             }
+                            */
                         }
 
 
@@ -578,9 +570,12 @@ class DocumentGenerationService {
             recNo++
         }
 
+        // Does not update recNo correctly for Tracking documents. Not Fixed
+        /*
         outputData.each{
             println "${it.address} -> ${it.recordNumber}"
         }
+        */
 
         recNo--
         //adding pieces+tracking documents

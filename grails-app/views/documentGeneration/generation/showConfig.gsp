@@ -66,7 +66,6 @@
           <g:actionSubmit action="printDetails" value="Reprint Document(s)" />
           <!-- Batch Report Button -->
           <g:actionSubmit action="batchReport" value="View Batch Report" />
-          <g:actionSubmit action="batchAnalysis" value="Batch Analysis Report" />
         </g:form>
       </div>
     </fieldset>

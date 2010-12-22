@@ -186,19 +186,36 @@ class MergeDataBuilderService {
     }
     def addNORCData(dataSet) {
         dataSet.collect{record ->
-            def instrumentLinkInstance = InstrumentLink.read(record.instrumentId)
-            def studyLinkInstance = StudyLink.read(record.studyId)
-            def dwellingUnitLinkInstance = DwellingUnitLink.read(record.dwellingUnitId)
 
-            if (instrumentLinkInstance) {
-                record.norcDocId = instrumentLinkInstance?.norcDocId
+            // Look up the NORC id varients for our different domain id types
+            def instrumentInstance = Instrument.read(record.instrumentId)
+            if (instrumentInstance) {
+                def instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+                if (instrumentLinkInstance) {
+                    record.norcDocId = instrumentLinkInstance?.norcDocId
+                }
+            } else {
+                record.norcDocId = ""
             }
-            if (studyLinkInstance) {
-                record.norcProjectId = studyLinkInstance?.norcProjectId
+
+            def studyInstance = Study.read(record.studyId)
+            if (studyInstance) {
+                def studyLinkInstance = StudyLink.findByStudy(studyInstance)
+                if (studyLinkInstance) {
+                    record.norcProjectId = studyLinkInstance?.norcProjectId
+                }
+            } else {
+                record.norcProjectId = ""
             }
-            record.norcSuId = ""
-            if (dwellingUnitLinkInstance) {
-                record.norcSuId = dwellingUnitLinkInstance?.norcSuId
+
+            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)
+            if (dwellingUnitInstance) {
+                def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
+                if (dwellingUnitLinkInstance) {
+                    record.norcSuId = dwellingUnitLinkInstance?.norcSuId
+                } 
+            } else {
+                record.norcSuId = ""
             }
         }
         dataSet

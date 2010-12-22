@@ -401,7 +401,6 @@ class DocumentGenerationController {
                     }
 
                     docGenParams.instrumentDate = params.instrumentDate
-                    println "before generating docs"
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
                     
                     if (batchInstance) {
