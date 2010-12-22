@@ -2,7 +2,7 @@ package edu.umn.ncs
 
 import grails.test.*
 
-class ReportControllerTests extends ControllerUnitTestCase {
+class MainMenuControllerTests extends ControllerUnitTestCase {
     protected void setUp() {
         super.setUp()
     }

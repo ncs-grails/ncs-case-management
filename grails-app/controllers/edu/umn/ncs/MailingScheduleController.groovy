@@ -1,7 +1,8 @@
 package edu.umn.ncs
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 class MailingScheduleController {
-
+    @Secured(['ROLE_NCS_DOCGEN'])
     def index = { 
         redirect(action:list, params:params)
     }

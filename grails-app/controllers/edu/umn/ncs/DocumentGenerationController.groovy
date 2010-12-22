@@ -209,32 +209,6 @@ class DocumentGenerationController {
         [batchInstance:batchInstance, batchInstanceList:batchInstanceList]
     }
 
-    def batchAnalysis = {
-
-        def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
-
-        // child batches
-        def batchInstanceList = []
-        def batchInstance = Batch.read(params?.batch?.id)
-
-        def advLetterSentInstanceList = reportService.batchAnalysis(batchInstance.id)
-
-            // get a field list
-            /*def firstRow = advLetterSentInstanceList[0]
-            def columnNames = firstRow.collect{ it.key }
-
-            columnNames.each{
-                println "Dataset columnNames >> ${it}"
-            }
-            */
-
-        [advLetterSentInstanceList: advLetterSentInstanceList,
-            advLetterSentInstanceTotal: advLetterSentInstanceList.count(),
-            batchCreationConfigInstance: batchCreationConfigInstance,
-            batchInstance: batchInstance]
-    }
-
-
     // here is the batch generation FSM
     def generationFlow = {
         

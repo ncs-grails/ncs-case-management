@@ -127,9 +127,10 @@
         </dl>
 
         <h2>Analysis</h2>
-
+        <dl class="menu">
+          <dt><a href="https://secure.ncs.umn.edu/ncs-reports/jasper/?_format=PDF&_name=Advance%20Mailing%20Summary%20Report&_file=advance_mailing_report">Advance Mailing Summary Report</a></dt>
+        </dl>
       </div>
-
     </div>
   </body>
 </html>
