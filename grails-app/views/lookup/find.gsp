@@ -3,6 +3,7 @@
   <thead>
 	<tr>
 	  <th>Match Type</th>
+	  <th>Description</th>
 	  <th>Matched ID</th>
 	</tr>
   </thead>
@@ -15,6 +16,7 @@
 	<g:each var="r" in="${results}">
 	  <tr>
 		<td>${r.matchType}</td>
+		<td>${r.description}</td>
 		<td><g:link controller="${r.controller}" action="${r.action}" id="${r.id}">
 		  ${r.id}</g:link></td>
 	  </tr>

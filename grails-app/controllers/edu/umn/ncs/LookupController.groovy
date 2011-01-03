@@ -5,12 +5,14 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 
-@Secured(['ROLE_NCS_LOOKUP'])
+@Secured(['ROLE_NCS_LOOKUP', 'ROLE_NCS_IT'])
 class LookupController {
 
 	def searchService
 
 	// default search form
+	
+	// Turn this off in production!!!
 	@CacheFlush("lookupCache")
     def index = { }
 
@@ -18,7 +20,7 @@ class LookupController {
 	@Cacheable("lookupCache")
 	def find = {
 
-		println "LookupController:find:params::${params}"
+		//println "LookupController:find:params::${params}"
 		// 0061674400
 
 		def results = []
@@ -29,14 +31,13 @@ class LookupController {
 
 		if ( ! searchString ) {
 			flash.message = "Please enter some search parameters."
-			println "LookupController:find:Nothing Passed."
+			//println "LookupController:find:Nothing Passed."
 		} else {
 
-			println "LookupController:find:searchString::${searchString}"
+			//println "LookupController:find:searchString::${searchString}"
 
 			// now we begin our searching...
 			results = searchService.query(searchString)
-			
 		}
 
 		[ searchString:searchString, results: results ]

@@ -51,6 +51,10 @@
     </style>
   </head>
   <body>
+	<div class="nav">
+		<span class="logoutButton"><g:link class="create" controller="logout" action="index">Logout</g:link></span>
+	</div>
+
     <div id="nav">
       <div class="homePagePanel">
         <div class="panelTop"></div>
@@ -126,9 +130,17 @@
           </dd>
         </dl>
 
-        <h2>Analysis</h2>
+        <h2>Reporting</h2>
         <dl class="menu">
+          <dt><g:link controller="lookup">Lookup</g:link></dt>
+          <dd>
+			Search for dwelling units, or people and view information about them
+          </dd>
+
           <dt><a href="https://secure.ncs.umn.edu/ncs-reports/jasper/?_format=PDF&_name=Advance%20Mailing%20Summary%20Report&_file=advance_mailing_report">Advance Mailing Summary Report</a></dt>
+		  <dd>
+			NGP, Put a description here =)
+		  </dd>
         </dl>
       </div>
     </div>

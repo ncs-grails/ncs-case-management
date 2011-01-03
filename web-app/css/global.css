@@ -223,3 +223,9 @@ dl.menu dd {
 	display: inline-block;
 	vertical-align: top;
 }
+
+.logoutButton {
+	background: url(../images/skin/logout.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
