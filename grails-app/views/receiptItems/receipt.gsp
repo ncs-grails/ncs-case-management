@@ -7,7 +7,7 @@
     <meta name="layout" content="ncs" />
   <g:set var="entityName" value="${message(code: 'receipt.label', default: 'Receipt Items')}" />
   <title><g:message code="default.list.label" args="[entityName]" /></title>
-
+  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'receiptItems.css')}" />
   <g:javascript src="receiptItems.js" />
 
 </head>
@@ -15,7 +15,7 @@
   <div class="nav">
     <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
   </div>
-  <div class="body">
+  <div class="body container_12">
     <h1>Receipt Items</h1>
 
     <g:if test="${flash.message}">
@@ -24,17 +24,16 @@
 
     <g:form action="receiptItem" name="receiptForm"></g:form>
 
-    <div class="prop">
-      <span class="name">
-        <label for="item"><g:message code="receiptItems.item.label" default="Item to receipt" /></label>
-      </span>
-      <span class="value">
-        <input type="text" size="15" id="barcode" name="barcode" value="" />
-      </span>
-    </div>
+      <div class="prop">
+        <span class="name">
+          <label for="item"><g:message code="receiptItems.item.label" default="Item to receipt" /></label>
+        </span>
+        <span class="value">
+          <input type="text" size="15" id="barcode" name="barcode" value="" />
+        </span>
+      </div>
 
-    <div id="resultLog"></div>
-
+      <div id="resultLog" class="grid_12"></div>
   </div>
 </body>
 </html>

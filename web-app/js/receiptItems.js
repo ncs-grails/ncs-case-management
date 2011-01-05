@@ -20,7 +20,7 @@ $(document).ready(function(){
         strHtml += barcodeValue;
         strHtml += '<span style="padding-left:3em;;" id="scan-' + receivedElementId + '-status">...Processing</span></div>';
 
-        $('#resultLog').append(strHtml);
+        $('#resultLog').prepend(strHtml);
 
         ///////////////////////////
         // send the ajax request //

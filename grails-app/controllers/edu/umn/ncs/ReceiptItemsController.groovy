@@ -3,7 +3,7 @@ package edu.umn.ncs
 import grails.converters.*
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_NCS'])
+@Secured(['ROLE_NCS_RECEIPT'])
 class ReceiptItemsController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -57,8 +57,8 @@ class ReceiptItemsController {
 
             def receivedResult = Result.findByName('received')
 
-            println "barcodeValue: ${barcodeValue}"
-            println "barcodeValue[1]: ${barcodeValue[0]}"
+            //println "barcodeValue: ${barcodeValue}"
+            //println "barcodeValue[1]: ${barcodeValue[0]}"
 
             if (barcodeValue[0] == "I") {
                 // we have an item
@@ -102,6 +102,35 @@ class ReceiptItemsController {
             } else if (barcodeValue[0] == "B") {
                 // we have a batch id
                 result.trackingDocument = true
+
+                try {
+                    def id = Integer.parseInt(barcodeValue.replace("B", ""))
+
+                    def batchInstance = Batch.get(barcodeValue.replace("B", ""))
+                    if (batchInstance) {
+                        if (!batchInstance.trackingReturnDate) {
+
+                            batchInstance.trackingReturnDate = new Date()
+                            batchInstance.save(flush:true)
+                            result.success = true
+
+                        result.trackedItemId = "Tracking Document for Batch # ${batchInstance.id}"
+                        result.instrumentName = batchInstance.primaryInstrument.toString()
+                        result.studyName =  batchInstance.primaryInstrument.study.toString()
+                        result.resultDate = batchInstance.trackingReturnDate
+                        result.resultName = "Received"
+
+                        } else {
+                            result.errorText = "Already Receipted on ${batchInstance.trackingReturnDate}"
+                        }
+                    } else {
+                        result.errorText = "Batch does not exist!"
+                    }
+
+                } catch (Exception e) {
+                    result.errorText = "Invalid Batch id."
+                }
+
             } else {
                 // invalid barcode!
                 result.errorText = "invalid barcode"
