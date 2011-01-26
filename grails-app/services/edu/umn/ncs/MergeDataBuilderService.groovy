@@ -52,7 +52,7 @@ class MergeDataBuilderService {
                 record.firstName = item.person?.firstName
                 record.lastName = item.person?.lastName
                 record.gender = item.person?.gender?.name
-                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender.id == 1) ? "Dear Mr. " + record.lastName : (record.gender.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
+                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender?.id == 1) ? "Dear Mr. " + record.lastName : (record.gender?.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
             }
 
             def comments = TrackedItemComment.findByItemAndSubject(item, 'general')
@@ -120,13 +120,10 @@ class MergeDataBuilderService {
                 record.firstName = it.person?.firstName
                 record.lastName = it.person?.lastName
                 record.gender = it.person?.gender?.name
-                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender.id == 1) ? "Dear Mr. " + record.lastName : (record.gender.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
+                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender?.id == 1) ? "Dear Mr. " + record.lastName : (record.gender?.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
             }
 
              dataSet.add(record)
-
-            //Send two tracking documents to tracking documents recipients
-            dataSet.add(record)
 
         }
 

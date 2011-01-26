@@ -188,8 +188,11 @@ class DocumentGenerationController {
 
         // primary batch
         def batchInstance = Batch.read(params?.id)
+
         // child batches
         def batchInstanceList = []
+        def sampleDocuments = []
+        def allTrackingDocuments = []
 
         // If we didn't find the batch, see if the param is batch.id instead of id
         if (!batchInstance) {
@@ -199,6 +202,12 @@ class DocumentGenerationController {
         // Hopefully we found one by now.  If so, let's fill the batch report
         // batch list.  Master first.
         if (batchInstance) {
+            allTrackingDocuments = batchInstance?.creationConfig?.recipients
+            batchInstance?.creationConfig?.recipients?.each{
+                if (it?.person?.firstName == "Sample") {
+                   sampleDocuments.add(it)
+                }
+            }
             // Add master batch to the list
             batchInstanceList.add(batchInstance)
             // add all the batches that belong to the master
@@ -206,7 +215,10 @@ class DocumentGenerationController {
         }
 
         // Pack it up and ship it off to the view...
-        [batchInstance:batchInstance, batchInstanceList:batchInstanceList]
+        [batchInstance:batchInstance, 
+            batchInstanceList:batchInstanceList,
+            sampleDocumentsTotal: sampleDocuments.size(),
+            notSampleTrackingDocumentsTotal: allTrackingDocuments.size() - sampleDocuments.size()]
     }
 
     // here is the batch generation FSM
@@ -299,9 +311,24 @@ class DocumentGenerationController {
                 }
 
                 // list the batches
-                def batchInstanceList = batchCreationConfigInstance?.batches
-                    .findAll{it.master == null && it.pieces > 0 }
-                    .sort{ -it?.id }
+
+                def c = Batch.createCriteria()
+                def batchInstanceList = c.list{
+                    and {
+                        isNull("master")
+                        creationConfig{
+                            eq("id", batchCreationConfigInstance.id)
+                        }
+                    }
+                    order("id", "desc")
+                }
+
+                
+                    /*def batchInstanceList = batchCreationConfigInstance?.batches
+                        .findAll{it.master == null }
+                        .sort{ -it?.id }
+                        */
+                
 
                 [batchCreationConfigInstance:batchCreationConfigInstance,
                     mailDate:mailDate,

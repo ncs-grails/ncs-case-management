@@ -148,9 +148,16 @@ h1.batchReport {
 .w50 {
     width:50%;
 }
+.w35 {
+    width:35%;
+}
 .w20 {
     width:20%;
 }
+.w15 {
+    width:15%;
+}
+
 
 .w50l {
     width:50%;
@@ -160,6 +167,14 @@ h1.batchReport {
 .w50r {
     width:50%;
     text-align:right;
+}
+
+.mt1 {
+    margin-top: 1em; 
+}
+
+.bb1 {
+    border-bottom: thin solid black;
 }
 
 .b {

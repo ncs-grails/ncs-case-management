@@ -330,6 +330,20 @@ class BootStrap {
                 dmdRecipient = new TrackingDocumentRecipient(person: dmd, address:mac).save()
             }
 
+            def sd = Person.findByFirstNameAndLastName('Sample', 'Document')
+            def sdRecipient
+            if (!sd) {
+                sd = new Person(title:null,
+                    firstName:'Sample',
+                    lastName:'Document',
+                    suffix:null,
+                    gender:null,
+                    alive:true,
+                    isRecruitable:false,
+                    appCreated:'byHand').save()
+
+                sdRecipient = new TrackingDocumentRecipient(person: sd, address:mac).save()
+            }
 
         }
 
