@@ -22,9 +22,23 @@
       <div class="message">${flash.message}</div>
     </g:if>
 
-    <g:form action="receiptItem" name="receiptForm"></g:form>
+      <g:form action="receipt">
+		<div class="prop">
+		  <span class="name">
+			<label for="receiptDate">Receipt Date: <g:formatDate format="yyyy-MM-dd" date="${receiptDate}" /> </label>
+		  </span>
+		  <span class="value">
+			<g:datePicker name="receiptDate" value="${receiptDate}" precision="minute" />
+			<g:submitButton name="submit" value="Change Receipt Date" />
+		  </span>
+		</div>
+	  </g:form>
 
-      <div class="prop">
+	  <g:form action="receiptItem" name="receiptForm">
+		<g:hiddenField name="receiptDateInstance" value="${receiptDate}" />
+	  </g:form>
+
+	  <div class="prop">
         <span class="name">
           <label for="item"><g:message code="receiptItems.item.label" default="Item to receipt" /></label>
         </span>

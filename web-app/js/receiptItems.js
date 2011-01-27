@@ -7,6 +7,8 @@ $(document).ready(function(){
 
         // get the value entered in the field
         var barcodeValue = $(this).val();
+		// get the receipt date
+		var receiptDateInstance = $("#receiptDateInstance").val();
         // clear the input
         $(this).val("");
         // set the focus back to the input field
@@ -29,7 +31,7 @@ $(document).ready(function(){
         // get the URL to send it to
         var url = $('form[name="receiptForm"]').attr("action");
         // build the data
-        var data = { "id": barcodeValue, "divId": receivedElementId };
+        var data = { "id": barcodeValue, "divId": receivedElementId, "receiptDateInstance": receiptDateInstance };
 
         $.getJSON(url, data, function(data, textStatus){
 

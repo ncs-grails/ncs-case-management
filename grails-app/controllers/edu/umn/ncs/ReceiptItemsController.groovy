@@ -15,7 +15,14 @@ class ReceiptItemsController {
         redirect(action: "receipt", params: params)
     }
 
-    def receipt = { }
+    def receipt = {
+		def receiptDate = params.receiptDate
+
+		if ( ! receiptDate ) {
+			receiptDate = new Date()
+		}
+		[ receiptDate: receiptDate ]
+	}
 
     def receiptItem = {
 
@@ -33,6 +40,12 @@ class ReceiptItemsController {
         sleep(sleepTime)
         println "...Done."
          */
+
+		def receivedDate = params.receiptDateInstance
+		if ( ! receivedDate ) {
+			receivedDate = new Date()
+		}
+		//println "receiptItems:receivedDate::${receivedDate}"
 
         // prep all the things we'll need to send back
         def result = [
@@ -78,12 +91,13 @@ class ReceiptItemsController {
                         result.resultName = trackedItemInstance.result.result.name
 
                         result.success = false
-                        result.errorText = "Item already receipted."
+                        result.errorText = "Item already receipted ${result.resultDate}."
 
                     } else {
                         
                         // tie the result back to the item
-                        trackedItemInstance.result = new ItemResult(result:receivedResult, userCreated: username, appCreated: appName)
+                        trackedItemInstance.result = new ItemResult(result:receivedResult, 
+							userCreated: username, appCreated: appName, receivedDate: receivedDate)
                         if ( trackedItemInstance.save(flush:true) ) {
                             result.success = true
                             result.resultDate = trackedItemInstance.result.receivedDate
@@ -110,7 +124,7 @@ class ReceiptItemsController {
                     if (batchInstance) {
                         if (!batchInstance.trackingReturnDate) {
 
-                            batchInstance.trackingReturnDate = new Date()
+                            batchInstance.trackingReturnDate = receivedDate
                             batchInstance.save(flush:true)
                             result.success = true
 
