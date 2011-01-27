@@ -348,6 +348,16 @@ class DocumentGenerationController {
                 def username = authenticateService?.principal()?.getUsername()
                 def sql = "delete BatchCreationQueue bcq where bcq.username = ?"
                 BatchCreationQueue.executeUpdate(sql, [username])
+
+                if (params?.instrumentDate) {
+                    flow.instrumentDate = params.instrumentDate
+                } else {
+                    flow.instrumentDate = null
+                }
+                if (params?.autoSetMailDate) {
+                    flow.autoSetMailDate = params.autoSetMailDate
+                    flow.mailDate = params.mailDate
+                }
             }.to "manualGenerate"
             on("autoGenerate").to "autoGenerate"
             on("optionalGenerate").to "optionalGenerate"
@@ -374,13 +384,21 @@ class DocumentGenerationController {
 
                     if (params.autoSetMailDate) {
                         docGenParams.mailDate = params.mailDate
+                    } else if (flow?.autoSetMailDate) {
+                        docGenParams.mailDate = flow.mailDate
+                    }
+
+                    if (params?.instrumentDate) {
+                        docGenParams.instrumentDate = params.instrumentDate
+                    } else if (flow?.instrumentDate){
+                        docGenParams.instrumentDate = flow.instrumentDate
                     }
                     
-                    docGenParams.instrumentDate = params.instrumentDate
 
                     if (params.useMaxPieces == 'true') {
                         docGenParams.maxPieces = params.maxPieces
                     }
+
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
                     
                     // save it to the flow

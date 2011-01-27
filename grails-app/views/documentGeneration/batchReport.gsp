@@ -42,9 +42,9 @@
     <div class="clear"></div>
 
     <div class="dataitem">
-      <div class="datavalue w15">Date Run: </div>
-      <div class="datavalue w35"><span class="b"><g:formatDate format="MM/dd/yyyy" date="${batchInstance?.dateCreated}"/></span></div>
-      <div class="datavalue w50">Date Called Campus Courier: ___________________</div>
+      <div class="datavalue w20">Date Run: </div>
+      <div class="datavalue w30"><span class="b"><g:formatDate format="MM/dd/yyyy" date="${batchInstance?.dateCreated}"/></span></div>
+      <div class="datavalue w50">Date Called Campus Courier: ________</div>
     </div>
     <div class="clear"></div>
 
@@ -58,17 +58,17 @@
           &nbsp;
         </g:else>
       </div>
-      <div class="datavalue w15">Run By: </div>
-      <div class="datavalue w35"><span class="b" id="batchRunBy">${batchInstance?.batchRunBy}</span></div>
+      <div class="datavalue w20">Run By: </div>
+      <div class="datavalue w30"><span class="b" id="batchRunBy">${batchInstance?.batchRunBy}</span></div>
     </div>
 
     <div class="clear"></div>
 
     <div class="dataitem">
-      <div class="datavalue w15">Resend?: </div>
-      <div class="datavalue w35"><span class="b" id="isResend">${batchInstance?.primaryBatchInstrument?.isResend}</span></div>
-      <div class="datavalue w15">Tracking Sent: </div>
-      <div class="datavalue w35"><span class="b" id="trackingDocumentSent">${batchInstance?.trackingDocumentSent}</span></div>
+      <div class="datavalue w20">Resend?: </div>
+      <div class="datavalue w30"><span class="b" id="isResend">${batchInstance?.primaryBatchInstrument?.isResend}</span></div>
+      <div class="datavalue w20">Tracking Sent: </div>
+      <div class="datavalue w30"><span class="b" id="trackingDocumentSent">${batchInstance?.trackingDocumentSent}</span></div>
     </div>
     <div class="clear"></div>
 
@@ -119,33 +119,33 @@
   <hr/>
 
       <div class="dataitem mt1">
-        <div class="datavalue w50 bb1">Sample Documents :</div>
-        <div class="datavalue w50"><span style="font-size:1em; font-weight: bold; text-align:right;">${sampleDocumentsTotal}</span></div>
+        <div class="datavalue w70 ">Sample Documents :</div>
+        <div class="datavalue w30"><span style="font-size:1em; font-weight: bold; text-align:right;">${sampleDocumentsTotal}</span></div>
       </div>
         <div class="clear"></div>
 
       <div class="dataitem mt1">
-        <div class="datavalue w50 bb1">Tracking Documents Mailed :</div>
-        <div class="datavalue w50"><span style="font-size:1.1em; font-weight: bold;">${notSampleTrackingDocumentsTotal}</span></div>
+        <div class="datavalue w70 bb1">Tracking Documents Mailed :</div>
+        <div class="datavalue w30"><span style="font-size:1.1em; font-weight: bold;">${notSampleTrackingDocumentsTotal}</span></div>
       </div>
         <div class="clear"></div>
 
       <div class="dataitem mt1">
-        <div class="datavalue w50 bb1">Mailed Document excluding tracking or sample):</div>
-        <div class="datavalue w50"><span style="font-size:1.1em; font-weight: bold;">${batchInstance?.items?.size()}</span></div>
+        <div class="datavalue w70 bb1">Mailed Document (excluding tracking and sample):</div>
+        <div class="datavalue w30"><span style="font-size:1.1em; font-weight: bold;">${batchInstance?.items?.size()}</span></div>
       </div>
         <div class="clear"></div>
 
     <hr/>
 
       <div class="dataitem mt1">
-        <div class="datavalue w50 bb1">Total Mailed :</div>
-        <div class="datavalue w50"><span style="font-size:1.1em; font-weight: bold;">${batchInstance?.items?.size() + notSampleTrackingDocumentsTotal}</span></div>
+        <div class="datavalue w70 bb1">Total Mailed :</div>
+        <div class="datavalue w30"><span style="font-size:1.1em; font-weight: bold;">${batchInstance?.items?.size() + notSampleTrackingDocumentsTotal}</span></div>
       </div>
         <div class="clear"></div>
 
       <div class="dataitem mt1">
-        <div class="datavalue w50 bb1 b">Date Mailed: </div>
+        <div class="datavalue w70 bb1 b">Date Mailed: </div>
       </div>
         <div class="clear"></div>
 
@@ -179,7 +179,7 @@
       <span id="now">${new Date()}</span>
     </div>
     <p style="font-size:1.5em; font-weight: bold; font-style: italic;">
-      * Please fill in mail date and fax this to me when complete at (612) 625-4363
+      * Please fill in mail date and fax this to me when completed at (612) 625-4363
     </p>
   </div>
 </body>

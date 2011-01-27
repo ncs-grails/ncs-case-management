@@ -141,23 +141,24 @@ h1.batchReport {
     color:#000;
 }
 
-.w30 {
-    width:30%;
-}
-
-.w50 {
-    width:50%;
-}
-.w35 {
-    width:35%;
+.w15 {
+    width:15%;
 }
 .w20 {
     width:20%;
 }
-.w15 {
-    width:15%;
+.w30 {
+    width:30%;
 }
-
+.w35 {
+    width:35%;
+}
+.w50 {
+    width:50%;
+}
+.w70 {
+    width:70%;
+}
 
 .w50l {
     width:50%;
