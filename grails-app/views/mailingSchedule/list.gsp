@@ -43,11 +43,16 @@
 
         <g:sortableColumn property="quota" title="${message(code: 'mailingSchedule.quota.label', default: 'Cumulative Quota')}" />
 
+        <th style="font-weight:bold;color: #333333;">Delta</th>
+
         <th style="font-weight:bold;color: #333333;">Remove?</th>
 
         </tr>
         </thead>
         <tbody>
+
+        <g:set var="lastQuota" value="${0}" />
+
         <g:each in="${mailingScheduleInstanceList}" status="i" var="mailingScheduleInstance">
           <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
@@ -57,9 +62,14 @@
 
           <td><g:link action="edit" id="${mailingScheduleInstance.id}">${fieldValue(bean: mailingScheduleInstance, field: "quota")}</g:link></td>
 
+          <td><g:link action="edit" id="${mailingScheduleInstance.id}">${mailingScheduleInstance?.quota - lastQuota}</g:link></td>
+
           <td><g:link action="delete" id="${mailingScheduleInstance.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
             Remove</g:link></td>
           </tr>
+
+          <g:set var="lastQuota" value="${mailingScheduleInstance?.quota}"/>
+
         </g:each>
         </tbody>
       </table>

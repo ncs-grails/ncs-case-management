@@ -41,6 +41,8 @@
                 <th>${message(code: 'batch.label', default: 'Batch ID')}</th>
                 <th>${message(code: 'study.nickName.label', default: 'Study')}</th>
                 <th>${message(code: 'instrument.name.label', default: 'Instrument')}</th>
+                <th>${message(code: 'dateCreated.name.label', default: 'Date Created')}</th>
+                <th>${message(code: 'instrumentDate.name.label', default: 'Instrument Date')}</th>
                 <th>Peices</th>
               </tr>
             </thead>
@@ -55,6 +57,10 @@
               <td><label for="batchId-${batchInstance.id}">${batchInstance?.primaryInstrument?.study?.name}</label></td>
 
               <td><label for="batchId-${batchInstance.id}">${batchInstance?.primaryInstrument?.name}</label></td>
+
+              <td><label for="batchId-${batchInstance.id}"><g:formatDate format="MM/dd/yyyy" date="${batchInstance?.dateCreated}"/></label></td>
+
+              <td><label for="batchId-${batchInstance.id}"><g:formatDate format="MM/dd/yyyy" date="${batchInstance?.instrumentDate}"/></label></td>
 
               <td><label for="batchId-${batchInstance.id}">${batchInstance?.pieces}</label></td>
               </tr>
