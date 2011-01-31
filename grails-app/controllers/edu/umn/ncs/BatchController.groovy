@@ -40,7 +40,6 @@ class BatchController {
 						batchInstance.mailDate = referenceDate
 						// TODO: we should probably update the provenance fields here
 						batchInstance.save(flush:true)
-
 						flash.message = "${batchInstance.primaryInstrument.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated."
 
 					} else {
@@ -81,12 +80,33 @@ class BatchController {
 				between("dateCreated", referenceDate - 14, referenceDate + 1)
 			}
 		}
-		
 		[ referenceDate: referenceDate, 
 			sentBatchInstanceList:sentBatchInstanceList,
 			unsentBatchInstanceList:unsentBatchInstanceList ]
-
 	}
+
+    def listByDate = {
+        def listByDateSelect = params?.listByDateSelect
+
+        println "params.batchListDate -> ${listByDateSelect}"
+
+        if (!listByDateSelect) {
+            listByDateSelect = new Date()
+        }
+
+        // create a criteria for querying
+        def c = Batch.createCriteria()
+
+        //All batches for the passed date month that do not have mail date
+        /*def unsentBatchInstanceList = c.list{
+            and {
+                isNull("mailDate")
+             ???   between("dateCreated", listByDateSelect, listByDateSelect.addMonth(1))
+            }
+        }*/
+
+        [ listByDateSelect: listByDateSelect ]
+    }
 	
     def noneFound = {}
 }

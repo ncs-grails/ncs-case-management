@@ -44,7 +44,10 @@ class ReceiptItemsController {
 		def receivedDate = params.receiptDateInstance
 		if ( ! receivedDate ) {
 			receivedDate = new Date()
-		}
+		} else {
+                    // Mon Jan 31 13:38:42 CST 2011
+                    receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
+                }
 		//println "receiptItems:receivedDate::${receivedDate}"
 
         // prep all the things we'll need to send back
@@ -118,9 +121,9 @@ class ReceiptItemsController {
                 result.trackingDocument = true
 
                 try {
-                    def id = Integer.parseInt(barcodeValue.replace("B", ""))
+                    def batchId = Integer.parseInt(barcodeValue.replace("B", ""))
 
-                    def batchInstance = Batch.get(barcodeValue.replace("B", ""))
+                    def batchInstance = Batch.get(batchId)
                     if (batchInstance) {
                         if (!batchInstance.trackingReturnDate) {
 
@@ -142,6 +145,7 @@ class ReceiptItemsController {
                     }
 
                 } catch (Exception e) {
+                    println "${e}"
                     result.errorText = "Invalid Batch id."
                 }
 

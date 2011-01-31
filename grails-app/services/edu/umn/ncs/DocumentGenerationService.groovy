@@ -102,7 +102,7 @@ class DocumentGenerationService {
             printQueue.save(flush:true)
 
 
-            def batchCreationConfigInstance = params.config
+            def batchCreationConfigInstance = BatchCreationConfig.get(params.config.id)
             def username = params.username
             // selection results
             def results

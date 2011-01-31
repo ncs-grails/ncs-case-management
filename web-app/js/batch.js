@@ -9,7 +9,11 @@ $(document).ready(function(){
 
 	/* resubmit form on date change */
 	$('select[name^="referenceDate_"]').change(function(){
-		$('form[name="mailDateForm"]').submit();
+            $('form[name="mailDateForm"]').submit();
 	});
+
+        $('select[name^="listByDateSelect_"]').change(function(){
+            $('form[name="listByDateForm"]').submit();
+        });
 
 });
