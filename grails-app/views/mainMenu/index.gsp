@@ -91,28 +91,34 @@
 			documents and tracking the location of study participants.</p>
 
       <div id="pageList" class="dialog">
-        <h2>Configuration</h2>
-        <dl class="menu">
-          <dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
-          <dd>
-				  Manage the instruments used to interact with study subjects.
-				  Instruments include such items as invitations, surveys, phone
-				  calls, events, etc...
-          </dd>
-          <dt><g:link controller="instrumentHistory" action="list">Instrument Version Tracking</g:link></dt>
-          <dd>
-				  Manage instrument comments, revisions, and approvals.
-          </dd>
-          <dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
-          <dd>
-				  Configure the way that batches of instruments are generated
-				  in the system so that they can be properly tracked
-          </dd>
-          <dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
-		  <dd>
-            Manage mailing dates and quota for the instrument.
-		  </dd>
-        </dl>
+
+
+        <g:ifAnyGranted role="ROLE_NCS_IT">
+
+          <h2>Configuration</h2>
+          <dl class="menu">
+            <dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
+            <dd>
+                                    Manage the instruments used to interact with study subjects.
+                                    Instruments include such items as invitations, surveys, phone
+                                    calls, events, etc...
+            </dd>
+            <dt><g:link controller="instrumentHistory" action="list">Instrument Version Tracking</g:link></dt>
+            <dd>
+                                    Manage instrument comments, revisions, and approvals.
+            </dd>
+            <dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
+            <dd>
+                                    Configure the way that batches of instruments are generated
+                                    in the system so that they can be properly tracked
+            </dd>
+            <dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
+                    <dd>
+              Manage mailing dates and quota for the instrument.
+                    </dd>
+          </dl>
+        </g:ifAnyGranted>
+
 
         <h2>Data Creation / Entry</h2>
         <dl class="menu">
@@ -137,7 +143,8 @@
 			Search for dwelling units, or people and view information about them
           </dd>
 
-          <dt><a href="https://secure.ncs.umn.edu/ncs-reports/jasper/?_format=PDF&_name=Advance%20Mailing%20Summary%20Report&_file=advance_mailing_report">Advance Mailing Summary Report</a></dt>
+          <dt>
+            <a href="https://secure.ncs.umn.edu/ncs-reports/jasper/?_format=PDF&_name=Advance%20Mailing%20Summary%20Report&_file=advance_mailing_report">Advance Mailing Summary Report</a></dt>
 		  <dd>
 			NGP, Put a description here =)
 		  </dd>
