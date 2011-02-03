@@ -15,7 +15,7 @@
 		<label for="name"><g:message code="batchCreationConfig.name.label" default="Name" /></label>
 	  </span>
 	  <span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'name', 'errors')}">
-		<g:textField name="name" size="30" maxlength="32" value="${batchCreationConfigInstance?.name}" />
+		<g:textField name="name" size="30" maxlength="128" value="${batchCreationConfigInstance?.name}" />
 	  </span>
 	</div>
 
