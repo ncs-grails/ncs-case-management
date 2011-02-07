@@ -88,22 +88,29 @@ class BatchController {
     def listByDate = {
         def listByDateSelect = params?.listByDateSelect
 
-        println "params.batchListDate -> ${listByDateSelect}"
+        println "listByDateSelect before new Date()-> ${listByDateSelect}"
 
         if (!listByDateSelect) {
             listByDateSelect = new Date()
         }
+         println "listByDateSelect + 30-> ${listByDateSelect + 30}"
 
         // create a criteria for querying
         def c = Batch.createCriteria()
 
         //All batches for the passed date month that do not have mail date
-        /*def unsentBatchInstanceList = c.list{
+        def unsentBatchInstanceList = c.list{
             and {
-                isNull("mailDate")
-             ???   between("dateCreated", listByDateSelect, listByDateSelect.addMonth(1))
+
+                between("dateCreated", listByDateSelect, listByDateSelect + 30)
             }
-        }*/
+        }
+
+
+        unsentBatchInstanceList.each{
+            println "${it.id}"
+        }
+
 
         [ listByDateSelect: listByDateSelect ]
     }

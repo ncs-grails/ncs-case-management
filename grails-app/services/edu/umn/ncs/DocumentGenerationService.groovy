@@ -123,6 +123,7 @@ class DocumentGenerationService {
 
             if (!dataSource) {
                 println "Error: connecting to dataSource in DocumentGenerationService"
+                throw new DocumentGenerationException("Where did the database server go?")
             } else {
                 
                 if (manualSelection) {
@@ -201,6 +202,7 @@ class DocumentGenerationService {
                                 if (!bcq.validate()) {
                                     // invalid selection list!
                                     println "invalid selection list row: ${row}, expected [person, household, or dwelling_unit]"
+                                    throw new DocumentGenerationException("invalid selection list row: ${row}, expected [person, household, or dwelling_unit]")
                                     validSelectionList = false
                                 }
                             }
@@ -210,6 +212,7 @@ class DocumentGenerationService {
                         }
                     } else {
                         println "Error: running selectionQuery!"
+                        throw new DocumentGenerationException("An error occurred running the selection query")
                         validSelectionList = false
                     }
                 }
@@ -379,7 +382,8 @@ class DocumentGenerationService {
                                     it.instrument.id == bil.childOfInstrument.id
                                 }?.sortOrder
 
-                                println "My Order: ${bil.sortOrder} , my parent's order: ${parentOrder}"
+                                // println "My Order: ${bil.sortOrder} , my parent's order: ${parentOrder}"
+
                                 // if the parent batch is slated to be created after
                                 // this one (or presumably at the same time), change
                                 // this order of this batch to ensure we don't get
@@ -432,11 +436,9 @@ class DocumentGenerationService {
                                 // VERY IMPORTANT to sort this so the dependent batches show up first!!!
                                 // Should be sorted by childOfBatch
 
-                                batchInfoList.sort{
-                                    it.sortList
-                                }
+                                batchInfoList = batchInfoList.sort{ it.sortOrder }
 
-                                batchInfoList.sort{it.sortOrder}.each{ b ->
+                                batchInfoList.each{ b ->
 
                                     def trackedItem = new TrackedItem(person:bcq.person,
                                         household:bcq.household,
@@ -458,11 +460,12 @@ class DocumentGenerationService {
                                     // because they both become child of parent items
                                     // if doc gen is configured as such...
                                     if (!b.childOfBatch && batchCreationConfigInstance.useParentItem && row.containsKey('parent_item')) {
-                                        def parent = TrackedItem.get(row.parent_item)
+                                        def parent = TrackedItem.read(row.parent_item)
                                         if (parent) {
                                             trackedItem.parentItem = parent
                                         } else {
                                             println "WARNING: Parent Item ID: ${row.parent_item} not found!"
+                                            throw new DocumentGenerationException("Can't find parent tracked item for master batch.")
                                         }
                                     } else if (! b.master && b.childOfBatch) {
                                         // This sid is the child of another sid in the same run!
@@ -471,8 +474,58 @@ class DocumentGenerationService {
                                             trackedItem.parentItem = parent
                                         } else {
                                             println "ERROR: Something went horribly wrong! (We couldn't find the parent tracked item)"
+                                            throw new DocumentGenerationException("Can't find parent tracked item of sister/parent/master batch.")
                                         }
 
+                                    } else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
+                                        && !row.containsKey('parent_item')
+                                        && batchCreationConfigInstance.parentInstrument  
+                                        && batchCreationConfigInstance.parentDirection  
+                                        && batchCreationConfigInstance.parentFormat  
+                                        && batchCreationConfigInstance.isInitial ) {
+
+                                        // WARNING!
+                                        // This method is slow as it creates one query per record, so
+                                        // a mailing of 2000 will run 2000 queries (or more)
+
+                                        // we should hunt for the parent sid
+                                        def cti = TrackedItem.createCriteria()
+                                        def trackedItemInstanceList = cti.list{
+                                            batch{
+                                                and {
+                                                    instruments{
+                                                        instrument{
+                                                            eq("id", batchCreationConfigInstance.parentInstrument?.id)
+                                                        }
+                                                    }
+                                                    direction{
+                                                        eq("id", batchCreationConfigInstance.parentDirection?.id)
+                                                    }
+                                                    format{
+                                                        eq("id", batchCreationConfigInstance.parentFormat?.id)
+                                                    }
+                                                    isInitial{
+                                                        eq("id", batchCreationConfigInstance.isInitial?.id)
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (trackedItemInstanceList) {
+                                            // grab the first one.
+                                            parent = trackedItemInstanceList[0]
+                                        }
+
+                                        if (parent) {
+                                            trackedItem.parentItem = parent
+                                        } else {
+                                            println "WARNING: Parent Item ID not found for: ${row}"
+                                            throw new DocumentGenerationException("Can't find parent tracked item using implied information.")
+                                        }
+                                    } else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
+                                        && !row.containsKey('parent_item') ) {
+                                        println "ERROR: Someone set the batch config to require a parent_item, but didn't specify the tracked_item.id AS parent_item"
+                                        throw new DocumentGenerationException("Can't find parent_item column in data source even though config requires it.")
                                     }
 
                                     if (batchCreationConfigInstance.useExpiration && row.containsKey('expire_date')) {
@@ -521,6 +574,7 @@ class DocumentGenerationService {
 
                     } else {
                         println "Error: no results returned!"
+                        throw new DocumentGenerationException("No results returned!")
                         emptySelectionList = true
                     }
 
