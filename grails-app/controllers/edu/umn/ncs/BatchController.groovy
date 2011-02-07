@@ -1,23 +1,55 @@
 package edu.umn.ncs
 
+import org.joda.time.*
+import org.joda.time.contrib.hibernate.*
+
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_DOCGEN'])
 class BatchController {
 
+	def emailService
+
     def index = { 
-        redirect(action:'show',params:params)
+        redirect(action:'entry',params:params)
     }
 
-    def show = {
-        def batchInstance = Batch.get(params.id)
+	def sendNightlyReport = {
 
-        if (!batchInstance) {
-            redirect(action:'noneFound',params:params)
-        }
-        [batchInstance:batchInstance]
-    }
+		// emailService.sendProductionReport(params)
+		emailService.sendProductionReport()
+		
+		redirect(controller:"mainMenu", action:"index")
+
+	}
+
+	def nightlyReport = {
+		def referenceDate = params.referenceDate
+		def midnight = new LocalTime(0, 0)
+
+		if ( ! referenceDate ) {
+			referenceDate = new LocalDate()
+		} else {
+			referenceDate = new LocalDate(referenceDate)
+		}
+
+
+		def startDate = referenceDate.toDateTime(midnight).toCalendar().getTime()
+		def endDate = referenceDate.plusDays(1).toDateTime(midnight).toCalendar().getTime()
+		
+		def c = Batch.createCriteria()
+
+		def batchInstanceList = c.list{
+			gt("dateCreated", startDate)
+			lt("dateCreated", endDate)
+		}
+
+
+		[ referenceDate: startDate,
+			batchInstanceList: batchInstanceList,
+			customizable: true]
+	}
 
 	def entry = {
 		// reference date
@@ -114,6 +146,4 @@ class BatchController {
 
         [ listByDateSelect: listByDateSelect ]
     }
-	
-    def noneFound = {}
 }

@@ -34,7 +34,7 @@
                                   <label for="name"><g:message code="instrument.name.label" default="Name" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: instrumentInstance, field: 'name', 'errors')}">
-                                    <g:textField name="name" maxlength="16" value="${instrumentInstance?.name}" />
+                                    <g:textField name="name" maxlength="64" value="${instrumentInstance?.name}" />
                                 </td>
                             </tr>
                         
