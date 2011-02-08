@@ -12,8 +12,4 @@ $(document).ready(function(){
             $('form[name="mailDateForm"]').submit();
 	});
 
-        $('select[name^="listByDateSelect_"]').change(function(){
-            $('form[name="listByDateForm"]').submit();
-        });
-
 });
