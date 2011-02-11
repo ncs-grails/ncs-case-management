@@ -123,7 +123,7 @@ class BatchController {
 
     def listByDate = {
 
-        println "Batch:listByDate:params::${params}"
+        //println "Batch:listByDate:params::${params}"
 
         def referenceDate = params?.referenceDate
         def midnight = new LocalTime(0, 0)
@@ -191,6 +191,15 @@ class BatchController {
             if (params.printingServicesDate && params.printingServicesDate < batchInstance.dateCreated) {
                 batchInstance.errors.rejectValue("printingServicesDate", "batch.printingServicesDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Printing Services Date must come after date generated")
                     render(view: "edit", model: [ batchInstance: batchInstance,
+                        referenceDateMonth: referenceDateMonth,
+                        referenceDateYear: referenceDateYear,
+                        yearRange: yearRange])
+                    return
+            }
+
+            if (params.addressAndMailingDate && params.addressAndMailingDate < batchInstance.dateCreated){
+                batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
+                    render(view: "edit", model: [batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])

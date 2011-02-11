@@ -144,9 +144,9 @@
           </dd>
 
           <dt>
-            <a href="https://secure.ncs.umn.edu/ncs-reports/jasper/?_format=PDF&_name=Advance%20Mailing%20Summary%20Report&_file=advance_mailing_report">Advance Mailing Summary Report</a></dt>
+          <g:link controller="batch" action="listByDate">List of Generated Batches By Month</g:link>
 		  <dd>
-			NGP, Put a description here =)
+			Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 		  </dd>
         </dl>
       </div>
