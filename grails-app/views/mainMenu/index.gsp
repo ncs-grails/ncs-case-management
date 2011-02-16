@@ -159,7 +159,7 @@ documents and tracking the location of study participants.</p>
 				<g:if test="${reportInstance?.enabled}">
 					<g:if test="${reportInstance?.adminsOnly}">
 						<g:ifAnyGranted role="ROLE_NCS_IT">
-							<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}">${reportInstance?.title}</g:link></dt>
+							<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link></dt>
 							<dd>
 								<g:if test="${reportInstance?.subtitle}">
 									${reportInstance?.subtitle}
@@ -171,7 +171,7 @@ documents and tracking the location of study participants.</p>
 						</g:ifAnyGranted>		
 					</g:if>
 					<g:else>
-						<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}">${reportInstance?.title}</g:link></dt>
+						<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link></dt>
 						<dd>
 							<g:if test="${reportInstance?.subtitle}">
 								${reportInstance?.subtitle}
