@@ -148,7 +148,7 @@ class BatchController {
                 between("dateCreated", startDate, endDate)
             }
         }
-
+		//println "Returning ${unsentBatchInstanceList}"
         [ referenceDate: startDate, 
             endDate: endDate,
             unsentBatchInstanceList: unsentBatchInstanceList]
