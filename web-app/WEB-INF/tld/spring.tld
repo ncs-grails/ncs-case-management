@@ -11,7 +11,8 @@
 
 	<uri>http://www.springframework.org/tags</uri>
 
-	<description>Spring Framework JSP Tag Library. Authors: Rod Johnson, Juergen Hoeller</description>
+	<description>Spring Framework JSP Tag Library. Authors: Rod Johnson,
+		Juergen Hoeller</description>
 
 
 	<tag>
@@ -41,9 +42,12 @@
 		<body-content>JSP</body-content>
 
 		<description>
-			Escapes its enclosed body content, applying HTML escaping and/or JavaScript escaping.
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			Escapes its enclosed body content, applying HTML escaping
+			and/or JavaScript escaping.
+			The HTML escaping flag participates in a
+			page-wide or application-wide setting
+			(i.e. by HtmlEscapeTag or a
+			"defaultHtmlEscape" context-param in web.xml).
 		</description>
 
 		<attribute>
@@ -68,9 +72,12 @@
 		<body-content>JSP</body-content>
 
 		<description>
-			Retrieves the message with the given code, or text if code isn't resolvable.
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			Retrieves the message with the given code, or text if
+			code isn't resolvable.
+			The HTML escaping flag participates in a
+			page-wide or application-wide setting
+			(i.e. by HtmlEscapeTag or a
+			"defaultHtmlEscape" context-param in web.xml).
 		</description>
 
 		<attribute>
@@ -125,9 +132,12 @@
 		<body-content>JSP</body-content>
 
 		<description>
-			Retrieves the theme message with the given code, or text if code isn't resolvable.
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			Retrieves the theme message with the given code, or text
+			if code isn't resolvable.
+			The HTML escaping flag participates in a
+			page-wide or application-wide setting
+			(i.e. by HtmlEscapeTag or a
+			"defaultHtmlEscape" context-param in web.xml).
 		</description>
 
 		<attribute>
@@ -183,8 +193,10 @@
 
 		<description>
 			Provides Errors instance in case of bind errors.
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			The HTML
+			escaping flag participates in a page-wide or application-wide setting
+			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in
+			web.xml).
 		</description>
 
 		<variable>
@@ -239,8 +251,11 @@
 
 		<description>
 			Provides BindStatus object for the given bind path.
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			The
+			HTML escaping flag participates in a page-wide or application-wide
+			setting
+			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param
+			in web.xml).
 		</description>
 
 		<variable>
@@ -276,10 +291,14 @@
 		<body-content>JSP</body-content>
 
 		<description>
-			Provides transformation of variables to Strings, using an appropriate
-			custom PropertyEditor from BindTag (can only be used inside BindTag).
-			The HTML escaping flag participates in a page-wide or application-wide setting
-			(i.e. by HtmlEscapeTag or a "defaultHtmlEscape" context-param in web.xml).
+			Provides transformation of variables to Strings, using an
+			appropriate
+			custom PropertyEditor from BindTag (can only be used
+			inside BindTag).
+			The HTML escaping flag participates in a page-wide or
+			application-wide setting
+			(i.e. by HtmlEscapeTag or a
+			"defaultHtmlEscape" context-param in web.xml).
 		</description>
 
 		<attribute>

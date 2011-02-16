@@ -113,3 +113,11 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentLocalDateTime, class: org.joda.time.LocalDateTime
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
+
+// BIRT Report config
+birt {
+	reportHome = "/var/lib/webreports"
+	//reportHome = "reports"
+	engineHome = "/usr/share/birt-runtime-2_6_1/ReportEngine"
+	imageUrl = "images/reports"
+}

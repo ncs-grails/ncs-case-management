@@ -1,57 +1,59 @@
 
-<%@ page import="edu.umn.ncs.MailingSchedule" %>
+<%@ page import="edu.umn.ncs.MailingSchedule"%>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="layout" content="ncs" />
-  <g:set var="entityName" value="${message(code: 'mailingSchedule.label', default: 'Mailing Schedule')}" />
-  <title><g:message code="default.list.label" args="[entityName]" /></title>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="ncs" />
+<g:set var="entityName"
+	value="${message(code: 'mailingSchedule.label', default: 'Mailing Schedule')}" />
+<title><g:message code="default.list.label" args="[entityName]" /></title>
 </head>
 <body>
-  <div class="nav">
-    <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-  </div>
-  <div class="body">
-    <h1><g:message code="default.list.label" args="[entityName]" /></h1>
-    <g:if test="${flash.message}">
-      <div class="message">${flash.message}</div>
-    </g:if>
+<div class="nav"><span class="menuButton"><a class="home"
+	href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
+</div>
+<div class="body">
+<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+<g:if test="${flash.message}">
+	<div class="message">
+	${flash.message}
+	</div>
+</g:if> <g:form action="list" method="post">
+	<div class="dialog">
+	<div class="prop"><span class="name"> <label
+		for="instrument"><g:message code="instrumentInstance.label"
+		default="Instrument" /></label> </span> <span
+		class="value ${hasErrors(bean: instrumentInstance, field: 'id', 'errors')}">
+	<g:select name="instrument.id" from="${instrumentInstanceList}"
+		optionKey="id" value="${instrumentInstance?.id}" /> <g:submitButton
+		name="list" class="save" value="View" /> </span></div>
+	</div>
+</g:form>
 
+<div class="list">
+<table>
+	<thead>
+		<tr>
 
-    <g:form action="list" method="post" >
-      <div class="dialog">
-        <div class="prop">
-          <span class="name">
-            <label for="instrument"><g:message code="instrumentInstance.label" default="Instrument" /></label>
-          </span>
-          <span class="value ${hasErrors(bean: instrumentInstance, field: 'id', 'errors')}">
-            <g:select name="instrument.id" from="${instrumentInstanceList}" optionKey="id" value="${instrumentInstance?.id}"  />
-            <g:submitButton name="list" class="save" value="View" />
-          </span>
-        </div>
-      </div>
-    </g:form>
+			<th style="font-weight: bold; color: #333333;"><g:message
+				code="mailingSchedule.instrument.label" default="Instrument" /></th>
 
-    <div class="list">
-      <table>
-        <thead>
-          <tr>
+			<g:sortableColumn property="checkpointDate"
+				title="${message(code: 'mailingSchedule.checkpointDate.label', default: 'Checkpoint Date')}" />
 
-        <th style="font-weight:bold;color: #333333;"><g:message code="mailingSchedule.instrument.label" default="Instrument" /></th>
+			<g:sortableColumn property="quota"
+				title="${message(code: 'mailingSchedule.quota.label', default: 'Cumulative Quota')}" />
 
-        <g:sortableColumn property="checkpointDate" title="${message(code: 'mailingSchedule.checkpointDate.label', default: 'Checkpoint Date')}" />
+			<th style="font-weight: bold; color: #333333;">Delta</th>
 
-        <g:sortableColumn property="quota" title="${message(code: 'mailingSchedule.quota.label', default: 'Cumulative Quota')}" />
+			<th style="font-weight: bold; color: #333333;">Remove?</th>
 
-        <th style="font-weight:bold;color: #333333;">Delta</th>
+		</tr>
+	</thead>
+	<tbody>
 
-        <th style="font-weight:bold;color: #333333;">Remove?</th>
-
-        </tr>
-        </thead>
-        <tbody>
-
-        <g:set var="lastQuota" value="${0}" />
+		<g:set var="lastQuota"
+			value="${0}" />
 
         <g:each in="${mailingScheduleInstanceList}" status="i" var="mailingScheduleInstance">
           <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">

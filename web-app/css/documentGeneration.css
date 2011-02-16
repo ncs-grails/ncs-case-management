@@ -1,46 +1,49 @@
 #manualGenerationQueue {
-    max-height: 10em;
-    overflow: auto;
+	max-height: 10em;
+	overflow: auto;
 }
 
 .prop-q {
-    padding: 5px;
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    margin-top: 5px;
-    padding: 7px 12px;
+	padding: 5px;
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	border: 1px solid #ccc;
+	margin-top: 5px;
+	padding: 7px 12px;
 }
+
 .prop-q .name-q {
-    text-align: left;
-    width: 15%;
-    white-space: nowrap;
+	text-align: left;
+	width: 15%;
+	white-space: nowrap;
 }
+
 .prop-q .value-q {
-    text-align: left;
-    width: 100%;
-    background: center left no-repeat;
-    color: #333;
+	text-align: left;
+	width: 100%;
+	background: center left no-repeat;
+	color: #333;
 }
 
 .l {
-    padding-left: 45px;
+	padding-left: 45px;
 }
 
 .s {
-    padding-left: 25px;
+	padding-left: 25px;
 }
 
 .ubb {
-    border-style: solid none solid none;
+	border-style: solid none solid none;
 }
 
 .bb {
-    border-style: none none solid none;
+	border-style: none none solid none;
 }
 
 .odd {
-    background: #f7f7f7;
+	background: #f7f7f7;
 }
+
 .even {
-    background: #fff;
+	background: #fff;
 }

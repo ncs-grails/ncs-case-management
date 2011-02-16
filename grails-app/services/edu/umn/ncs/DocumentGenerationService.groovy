@@ -123,7 +123,7 @@ class DocumentGenerationService {
 
             if (!dataSource) {
                 println "Error: connecting to dataSource in DocumentGenerationService"
-                throw new DocumentGenerationException("Where did the database server go?")
+                //throw new DocumentGenerationException("Where did the database server go?")
             } else {
                 
                 if (manualSelection) {
@@ -202,7 +202,7 @@ class DocumentGenerationService {
                                 if (!bcq.validate()) {
                                     // invalid selection list!
                                     println "invalid selection list row: ${row}, expected [person, household, or dwelling_unit]"
-                                    throw new DocumentGenerationException("invalid selection list row: ${row}, expected [person, household, or dwelling_unit]")
+                                    //throw new DocumentGenerationException("invalid selection list row: ${row}, expected [person, household, or dwelling_unit]")
                                     validSelectionList = false
                                 }
                             }
@@ -212,7 +212,7 @@ class DocumentGenerationService {
                         }
                     } else {
                         println "Error: running selectionQuery!"
-                        throw new DocumentGenerationException("An error occurred running the selection query")
+                        //throw new DocumentGenerationException("An error occurred running the selection query")
                         validSelectionList = false
                     }
                 }
@@ -465,7 +465,7 @@ class DocumentGenerationService {
                                             trackedItem.parentItem = parent
                                         } else {
                                             println "WARNING: Parent Item ID: ${row.parent_item} not found!"
-                                            throw new DocumentGenerationException("Can't find parent tracked item for master batch.")
+                                            //throw new DocumentGenerationException("Can't find parent tracked item for master batch.")
                                         }
                                     } else if (! b.master && b.childOfBatch) {
                                         // This sid is the child of another sid in the same run!
@@ -474,7 +474,7 @@ class DocumentGenerationService {
                                             trackedItem.parentItem = parent
                                         } else {
                                             println "ERROR: Something went horribly wrong! (We couldn't find the parent tracked item)"
-                                            throw new DocumentGenerationException("Can't find parent tracked item of sister/parent/master batch.")
+                                            //throw new DocumentGenerationException("Can't find parent tracked item of sister/parent/master batch.")
                                         }
 
                                     } else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
@@ -520,12 +520,12 @@ class DocumentGenerationService {
                                             trackedItem.parentItem = parent
                                         } else {
                                             println "WARNING: Parent Item ID not found for: ${row}"
-                                            throw new DocumentGenerationException("Can't find parent tracked item using implied information.")
+                                            //throw new DocumentGenerationException("Can't find parent tracked item using implied information.")
                                         }
                                     } else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
                                         && !row.containsKey('parent_item') ) {
                                         println "ERROR: Someone set the batch config to require a parent_item, but didn't specify the tracked_item.id AS parent_item"
-                                        throw new DocumentGenerationException("Can't find parent_item column in data source even though config requires it.")
+                                        //throw new DocumentGenerationException("Can't find parent_item column in data source even though config requires it.")
                                     }
 
                                     if (batchCreationConfigInstance.useExpiration && row.containsKey('expire_date')) {
@@ -574,7 +574,7 @@ class DocumentGenerationService {
 
                     } else {
                         println "Error: no results returned!"
-                        throw new DocumentGenerationException("No results returned!")
+                        //throw new DocumentGenerationException("No results returned!")
                         emptySelectionList = true
                     }
 
