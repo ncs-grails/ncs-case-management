@@ -145,9 +145,13 @@ documents and tracking the location of study participants.</p>
 			</dd>
 
 			<g:ifAnyGranted role="ROLE_NCS_IT">
+				<dt><g:link controller="report">Report Administration</g:link></dt>
+				<dd>
+					List of created reports (Admins only)
+				</dd>
 				<dt><g:link controller="report" action="create">Create a Report</g:link></dt>
 				<dd>
-					Upload a BIRT report or create a SQL only report
+					Upload a BIRT report or create a SQL only report (Admins Only)
 				</dd>
 			</g:ifAnyGranted>
 			
@@ -163,10 +167,19 @@ documents and tracking the location of study participants.</p>
 								<g:else>
 									${reportInstance?.description}
 								</g:else>
-						</dd>	
+							</dd>	
 						</g:ifAnyGranted>		
 					</g:if>
 					<g:else>
+						<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}">${reportInstance?.title}</g:link></dt>
+						<dd>
+							<g:if test="${reportInstance?.subtitle}">
+								${reportInstance?.subtitle}
+							</g:if>
+							<g:else>
+								${reportInstance?.description}
+							</g:else>
+						</dd>	
 					</g:else>			
 				</g:if>
 			</g:each>

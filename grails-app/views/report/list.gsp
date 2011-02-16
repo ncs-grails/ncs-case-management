@@ -64,7 +64,7 @@
                             <td>${fieldValue(bean: reportInstance, field: "userUpdated")}</td>
 							
 							<td>
-					            <g:link action="showReport" id="${reportInstance.id}">View</g:link>
+					            <g:link action="showReport" id="${reportInstance.id}" target="_blank">View</g:link>
 							</td>
 							
                             <td><g:if test="${reportInstance.useQuery}">NA</g:if><g:else><g:link action="exportReportToFile" id="${reportInstance.id}" params="[format:'pdf']">PDF</g:link></g:else></td>

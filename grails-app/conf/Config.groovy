@@ -48,12 +48,24 @@ grails.spring.bean.packages = []
 environments {
     production {
         grails.serverURL = "https://secure.ncs.umn.edu/${appName}"
+		// BIRT environment
+		birt.reportHome = "/var/lib/webreports"
+		birt.engineHome = "/usr/local/birt/ReportEngine"
+		birt.imageUrl = "images/reports"
     }
     development {
         grails.serverURL = "https://localhost.umn.edu:8443/${appName}"
+		// BIRT environment
+		birt.reportHome = "/var/lib/webreports"
+		birt.engineHome = "/usr/local/birt/ReportEngine"
+		birt.imageUrl = "images/reports"
     }
     test {
         grails.serverURL = "https://localhost.umn.edu:8443/${appName}"
+		// BIRT environment
+		birt.reportHome = "/var/lib/webreports"
+		birt.engineHome = "/usr/local/birt/ReportEngine"
+		birt.imageUrl = "images/reports"
     }
 
 }
@@ -114,10 +126,3 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
 
-// BIRT Report config
-birt {
-	reportHome = "/var/lib/webreports"
-	//reportHome = "reports"
-	engineHome = "/usr/share/birt-runtime-2_6_1/ReportEngine"
-	imageUrl = "images/reports"
-}
