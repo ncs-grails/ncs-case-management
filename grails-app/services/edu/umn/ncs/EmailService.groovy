@@ -48,6 +48,14 @@ class EmailService {
 						model:[ referenceDate: dateRange.startDate,
 							batchInstanceList: batchInstanceList])
 				}
+			} else {
+				mailService.sendMail {
+					to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+					from "info@ncs.umn.edu"
+					subject "NCS Production Report for ${referenceDate}"
+					body "No batches generated, nothing to send!"
+				}
+
 			}
 		}
 	}
@@ -59,6 +67,8 @@ class EmailService {
 			, 'msg@cccs.umn.edu'
 			, 'Barron-Martin@norc.org'
 			, 'Sokolowski-John@norc.uchicago.edu' ]
+
+		recipients = [ 'ajz@cccs.umn.edu' ]
 
 		// get the time range for yesterday (or whatever reference date)
 		def dateRange = getFullDayRange(params?.referenceDate)
@@ -76,17 +86,22 @@ class EmailService {
 			// disable it for now
 			// disable it for now
 			// disable it for now
-		} else if (false) {
+		} else {
 
 			def now = new Date()
 			// query the batches
-			def c = Batch.createCriteria()
+			def c = BatchLink.createCriteria()
 			// finding all mailed batches
 			def batchInstanceList = c.list{
-				or {
-					isNotNull("mailDate")
-					isNotNull("addressAndMailingDate")
-					lt("instrumentDate", dateRange.endDate)
+				and {
+					isNull("dateNorcNotified")
+					batch {
+						or {
+							isNotNull("mailDate")
+							isNotNull("addressAndMailingDate")
+							lt("instrumentDate", dateRange.endDate)
+						}
+					}
 				}
 			}
 

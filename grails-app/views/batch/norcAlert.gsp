@@ -9,12 +9,12 @@
 <hr />
 
 <g:if test="${customizable}">
-	<g:form action="nightlyReport">
+	<g:form action="norcAlert">
 		<g:datePicker name="referenceDate" value="${referenceDate}"
 			precision="day" />
 		<g:submitButton name="update" value="Update" />
 	</g:form>
-	<g:form action="sendNightlyReport">
+	<g:form action="sendNorcAlert">
 		<g:hiddenField name="referenceDate" value="date.struct" />
 		<g:hiddenField name="referenceDate_day"
 			value="${formatDate(date:referenceDate, format:'d')}" />
@@ -23,7 +23,7 @@
 		<g:hiddenField name="referenceDate_year"
 			value="${formatDate(date:referenceDate, format:'yyyy')}" />
 
-		<g:submitButton action="sendNightlyReport" name="remoteDestination"
+		<g:submitButton action="sendNorcAlert" name="remoteDestination"
 			value="Email Report" />
 	</g:form>
 	<div id="remoteDestination"></div>
