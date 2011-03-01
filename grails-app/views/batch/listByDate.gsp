@@ -22,6 +22,7 @@
     <!-- Mail Date Entry Form -->
     <g:form name="mailDateForm" action="listByDate">
 
+
           <fieldset class="maroonBorder">
             <legend style="margin-left: 0.5em;">Choose the month for the batches you would like to view:</legend>
             <label for="referenceDate">List Batches By Date: </label>
@@ -30,7 +31,7 @@
     </g:form>
 
     <fieldset class="maroonBorder">
-      <legend style="margin-left:0.5em">Batches generated, but not mailed 1 month prior to <g:formatDate date="${endDate}" format="MM-dd-yyyy"/></legend>
+      <legend style="margin-left:0.5em">Batches generated 1 month prior to <g:formatDate date="${endDate}" format="MM-dd-yyyy"/></legend>
 
         <div class="list">
           <table style="font-size:0.85em;">
@@ -44,13 +45,13 @@
                 <th>${message(code: 'dateCreated.label', default: 'Date Created')} </th>
                 <th>${message(code: 'instrumentDate.label', default: 'Instrument Date')} </th>
                 <th>${message(code: 'mailDate.label', default: 'Mail Date')} </th>
-                <th>${message(code: 'printingServicesDate.label', default: 'Printing Services')} </th>
+                <th>${message(code: 'calledCampusCourierDate.label', default: 'Campus Courier')} </th>
                 <th>${message(code: 'receiptDate.label', default: 'Tracking Return')} </th>
                 <th>Edit</th>
             </tr>
             </thead>
             <tbody>
-            <g:each in="${unsentBatchInstanceList}" status="i" var="b">
+            <g:each in="${batchInstanceList}" status="i" var="b">
               
               <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                 
@@ -62,7 +63,7 @@
                 <td><g:formatDate date="${b?.dateCreated}" format="M/d/yyyy"/></td>
                 <td><g:formatDate date="${b?.instrumentDate}" format="M/d/yyyy"/></td>
                 <td><g:formatDate date="${b?.mailDate}" format="M/d/yyyy"/></td>
-                <td><g:formatDate date="${b?.printingServicesDate}" format="M/d/yyyy"/></td>
+                <td><g:formatDate date="${b?.calledCampusCourierDate}" format="M/d/yyyy"/></td>
                 <td><g:formatDate date="${b?.trackingReturnDate}" format="M/d/yyyy"/></td>
                 <td><g:link action="edit" id="${b.id}">edit</g:link></td>
               </tr>

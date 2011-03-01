@@ -7,6 +7,7 @@
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'report.label', default: 'Report')}" />
         <title>Create a Report</title>
+        <g:javascript src="reports.js" />
     </head>
     <body>
         <div class="nav">

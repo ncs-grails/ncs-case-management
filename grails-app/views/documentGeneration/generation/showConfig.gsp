@@ -6,7 +6,10 @@
 <g:set var="entityName"
 	value="${message(code: 'batchCreationConfig.label', default: 'Mailings')}" />
 <title><g:message code="default.list.label" args="[entityName]" /></title>
+	<g:javascript src="showConfig.js"/>
+        <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'showConfig.css')}" />
 </head>
+
 <body>
 <div class="nav"><span class="menuButton"><a class="home"
 	href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
@@ -29,10 +32,9 @@ ${batchCreationConfigInstance?.name}
 
 <fieldset class="maroonBorder"><legend
 	style="margin-left: 0.5em;">Recently Generated Batches</legend>
-<div class="list"><g:form method="post"
-	controller="documentGeneration">
-	<g:hiddenField name="batchCreationConfig.id"
-		value="${batchCreationConfigInstance?.id}" />
+<div class="list">
+  <g:form method="post" controller="documentGeneration">
+	<g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
 	<table class="batchList">
 		<thead>
@@ -60,8 +62,7 @@ ${batchCreationConfigInstance?.name}
 			<g:each in="${batchInstanceList}" status="i" var="batchInstance">
 
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-					<td><g:radio id="batchId-${batchInstance.id}" name="batch.id"
-						value="${batchInstance.id}" /></td>
+					<td><g:radio id="batchId-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
 
 					<td><label for="batchId-${batchInstance.id}">
 					${batchInstance.id}
@@ -90,14 +91,16 @@ ${batchCreationConfigInstance?.name}
 	</table>
 
 	<!-- Reprint Button -->
-	<g:actionSubmit action="printDetails" value="Reprint Document(s)" />
+	<g:actionSubmit action="printDetails" id="printDetails" value="Reprint Document(s)" />
 	<!-- Batch Report Button -->
-	<g:actionSubmit action="batchReport" value="View Batch Report" />
-</g:form></div>
+	<g:actionSubmit action="batchReport" id="batchReport" value="View Batch Report" />
+  </g:form>
+</div>
+  
 </fieldset>
 <fieldset class="maroonBorder"><legend
-	style="margin-left: 0.5em;">Generate a New Batch</legend> <g:form
-	action="generation">
+	style="margin-left: 0.5em;">Generate a New Batch</legend> 
+    <g:form action="generation">
 	<g:hiddenField name="id" value="${batchCreationConfigInstance?.id}" />
 	<p><!-- Max Items to Generate --> <g:radio id="useMaxPieces-false"
 		name="useMaxPieces" value="false" checked="${!useMaxPieces}" /> <label
@@ -112,28 +115,24 @@ ${batchCreationConfigInstance?.name}
 			value="${batchCreationConfigInstance?.autoSetMailDate}" /> <label
 			for="autoSetMailDate">
 		${message(code: 'batchCreationConfig.autoSetMailDate.label', default: 'Set Mail Date')}:</label>
-		<g:datePicker name="mailDate" value="${params.mailDate}"
-			precision="day" /></p>
+		<g:datePicker name="mailDate" value="${params.mailDate}" precision="day" /></p>
 	</g:if>
 
-	<p><!-- Mail Date --> <label for="instrumentDate">Date on
-	Instrument:</label> <g:datePicker name="instrumentDate"
-		value="${params.instrumentDate}" precision="day" /></p>
+	<p><!-- Mail Date --> <label for="instrumentDate">Date on Instrument:</label> 
+	<g:datePicker name="instrumentDate" value="${params.instrumentDate}" precision="day" /></p>
 
 	<!-- Go Button -->
 	<g:if test="${batchCreationConfigInstance?.automaticSelection}">
-		<g:submitButton name="autoGenerate"
-			value="Generate New Batch Automatically" />
+		<g:submitButton name="autoGenerate" value="Generate New Batch Automatically" />
 	</g:if>
 	<g:if test="${batchCreationConfigInstance?.optionalSelection}">
-		<g:submitButton name="optionalGenerate"
-			value="Generate New Batch by Selection" />
+		<g:submitButton name="optionalGenerate" value="Generate New Batch by Selection" />
 	</g:if>
 	<g:if test="${batchCreationConfigInstance?.manualSelection}">
-		<g:submitButton name="manualGenerateAction"
-			value="Generate New Batch Manually" />
+		<g:submitButton name="manualGenerateAction" value="Generate New Batch Manually" />
 	</g:if>
-</g:form></fieldset>
+    </g:form>
+</fieldset>
 </div>
 </body>
 </html>

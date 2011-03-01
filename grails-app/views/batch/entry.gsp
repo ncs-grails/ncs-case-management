@@ -23,15 +23,15 @@
 <!-- Mail Date Entry Form -->
 <g:form name="batchIdForm" action="entry">
 
-	<div><label for="id">Scan in batch report here: </label> <g:textField
-		style="border-style: solid; border-width: thin; margin: 1px;" value=""
-		name="id" id="id" /> <g:hiddenField name="referenceDate"
-		value="date.struct" /> <g:hiddenField name="referenceDate_day"
-		value="${formatDate(date:referenceDate, format:'d')}" /> <g:hiddenField
-		name="referenceDate_month"
-		value="${formatDate(date:referenceDate, format:'M')}" /> <g:hiddenField
-		name="referenceDate_year"
-		value="${formatDate(date:referenceDate, format:'yyyy')}" /></div>
+	<div><label for="id">Scan in batch report here: </label> 
+          
+          <g:textField style="border-style: solid; border-width: thin; margin: 1px;" value="" name="id" />
+          <g:hiddenField name="referenceDate" value="date.struct" />
+          <g:hiddenField name="referenceDate_day" value="${formatDate(date:referenceDate, format:'d')}" />
+          <g:hiddenField name="referenceDate_month" value="${formatDate(date:referenceDate, format:'M')}" />
+          <g:hiddenField name="referenceDate_year" value="${formatDate(date:referenceDate, format:'yyyy')}" />
+        </div>
+
 </g:form>
 
 <g:form name="mailDateForm" action="entry">
@@ -52,6 +52,7 @@
 	<g:if test="${ ! sentBatchInstanceList }">
 		<li>None</li>
 	</g:if>
+        
 	<g:each var="b" in="${sentBatchInstanceList}">
 		<li>
 		${b.id} - ${b.primaryInstrument.study} ${b.primaryInstrument} generated on <g:formatDate

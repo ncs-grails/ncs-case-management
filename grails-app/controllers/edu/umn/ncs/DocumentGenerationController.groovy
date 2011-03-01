@@ -175,7 +175,7 @@ class DocumentGenerationController {
     // display details for printing the batch
     def printDetails = {
 
-        // println "This is what we got for print details: \n ${params}"
+        println "printDetails params: \n ${params}"
         
         def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
         def batchInstance = Batch.read(params?.batch?.id)
@@ -322,7 +322,6 @@ class DocumentGenerationController {
                     }
                     order("id", "desc")
                 }
-
                 
                     /*def batchInstanceList = batchCreationConfigInstance?.batches
                         .findAll{it.master == null }
@@ -428,6 +427,7 @@ class DocumentGenerationController {
         }
         autoGenerate{
             action {
+                
                 // ** automatically generate documents **
                 def batchInstance = null
                 def batchCreationConfigInstance = BatchCreationConfig.read(params?.id)

@@ -91,10 +91,10 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                  <label for="printingServicesDate"><g:message code="batch.printingServicesDate.label" default="Printing Services Date" /></label>
+                                  <label for="calledCampusCourierDate"><g:message code="batch.calledCampusCourierDate.label" default="Campus Courier Date" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'printingServicesDate', 'errors')}">
-                                    <g:datePicker name="printingServicesDate" precision="day" value="${batchInstance?.printingServicesDate}" default="none" noSelection="['null': '']" years="${yearRange}" />
+                                <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'calledCampusCourierDate', 'errors')}">
+                                    <g:datePicker name="calledCampusCourierDate" precision="day" value="${batchInstance?.calledCampusCourierDate}" default="none" noSelection="['null': '']" years="${yearRange}" />
                                 </td>
                             </tr>
 

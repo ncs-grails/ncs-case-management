@@ -123,13 +123,12 @@ class BatchController {
 
     def listByDate = {
 
-        //println "Batch:listByDate:params::${params}"
-
         def referenceDate = params?.referenceDate
         def midnight = new LocalTime(0, 0)
 
         if (!referenceDate) {
             referenceDate = new LocalDate()
+			referenceDate = referenceDate.minusDays(referenceDate.dayOfMonth - 1)
         } else {
             referenceDate = new LocalDate(referenceDate)
         }
@@ -142,16 +141,13 @@ class BatchController {
         def c = Batch.createCriteria()
 
         //All batches for the passed date month that do not have mail date
-        def unsentBatchInstanceList = c.list{
-            and {
-                //isNull("mailDate")
-                between("dateCreated", startDate, endDate)
-            }
+        def batchInstanceList = c.list{
+            between("dateCreated", startDate, endDate)
         }
-		//println "Returning ${unsentBatchInstanceList}"
+
         [ referenceDate: startDate, 
             endDate: endDate,
-            unsentBatchInstanceList: unsentBatchInstanceList]
+            batchInstanceList: batchInstanceList]
     }
 
     def edit = {
@@ -188,8 +184,8 @@ class BatchController {
 
             // check date order here
 
-            if (params.printingServicesDate && params.printingServicesDate < batchInstance.dateCreated) {
-                batchInstance.errors.rejectValue("printingServicesDate", "batch.printingServicesDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Printing Services Date must come after date generated")
+            if (params.calledCampusCourierDate && params.calledCampusCourierDate < batchInstance.dateCreated) {
+                batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
                     render(view: "edit", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
@@ -226,7 +222,7 @@ class BatchController {
             }
 
             if (params.mailDate && params.trackingReturnDate && params.mailDate > params.trackingReturnDate) {
-                batchInstance.errors.rejectValue("trackingReturnDate", "batch.printingServicesDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
+                batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
                     render(view: "edit", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,

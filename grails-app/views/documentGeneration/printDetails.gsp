@@ -3,22 +3,23 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Auto Document Generation - National Children's Study</title>
-<meta name="layout" content="ncs" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Auto Document Generation - National Children's Study</title>
+  <meta name="layout" content="ncs" />
+    <g:javascript src="documentGeneration.js"/>
 </head>
 <body>
 <div class="nav"><span class="menuButton"><a class="home"
 	href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
-<span class="menuButton"><g:link class="show" action="generation"
-	event="return">Back to Document Generation</g:link></span></div>
+  <span class="menuButton">
+    <g:link class="show" action="generation" event="return">Back to Document Generation</g:link>
+  </span>
+</div>
 <div class="body">
 
 <h1>Batch Details</h1>
 
-<h2>
-${batchCreationConfigInstance?.name}
-</h2>
+<h2>${batchCreationConfigInstance?.name}</h2>
 
 <fieldset class="maroonBorder"><legend class="m1">Data
 Sources To Save...</legend> <g:each var="ds"
@@ -45,10 +46,8 @@ Sources To Save...</legend> <g:each var="ds"
 </fieldset>
 
 
-<div class="buttons"><span class="button"><g:link
-	controller="documentGeneration" action="batchReport"
-	id="${batchInstance?.id}">Open the batch report...</g:link></span></div>
-
+<div class="buttons"><span class="button">
+    <g:link controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link></span></div>
 </div>
 </body>
 </html>

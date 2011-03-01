@@ -34,7 +34,6 @@
 <g:javascript src="jquery/jquery.ui.js" />
 <g:javascript src="jquery/jquery.tablesorter.min.js" />
 <g:javascript src="jquery/jquery.tools.min.js" />
-<g:javascript src="reports.js" />
 
 <style type="text/css">
 #main_wrapper {

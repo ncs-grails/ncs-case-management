@@ -123,7 +123,7 @@ ${batchInstance?.trackingDocumentSent}
 	${b.format}
 	</span></div>
 	<div class="batchId nowrap">Batch ID: <span
-		class="batch-id fixedFont">B${b.id} </span> <!-- TODO: --> <span
+		class="batch-id fixedFont b">B${b.id} </span> <!-- TODO: --> <span
 		class="batch-id-barcode barcode"> <img
 		src="${createLink(controller:'barcode', action:'png', id:'B' + b.id)}" />
 	</span></div>
@@ -204,7 +204,7 @@ ${batchInstance?.trackingDocumentSent}
 <div id="reportGenerated">Report Generated: <span id="now">
 ${new Date()}
 </span></div>
-<p style="font-size: 1.5em; font-weight: bold; font-style: italic;">
+<p style="font-size: 1.3em; font-weight: bold; font-style: italic;">
 * Please fill in mail date and fax this to me when completed at (612)
 625-4363</p>
 </div>
