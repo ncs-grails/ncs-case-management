@@ -50,7 +50,69 @@ class BatchController {
             batchInstanceList: batchInstanceList,
             customizable: true]
     }
+	
+	def sendNorcAlert = {
+		emailService.sendNorcAlert()
+		
+		redirect(controller:"mainMenu", action:"index")
+	}
 
+	def norcAlert = {
+		def referenceDate = params.referenceDate
+		def midnight = new LocalTime(0, 0)
+
+		if ( ! referenceDate ) {
+			referenceDate = new LocalDate()
+		} else {
+			referenceDate = new LocalDate(referenceDate)
+		}
+
+		// get the time range for yesterday (or whatever reference date)
+		def dateRange = getFullDayRange(params?.referenceDate)
+
+		
+		def now = new Date()
+		// query the batches
+		def c = Batch.createCriteria()
+		// finding all mailed batches
+		
+		def ninetyDaysAgo = now - 90
+		
+		// Find all batches generated in the last 90 days that
+		// are ready to ship to NORC
+		def batchInstancePotentialList = c.list{
+			and {
+				gt("dateCreated", ninetyDaysAgo)
+				or {
+					isNotNull("mailDate")
+					isNotNull("addressAndMailingDate")
+					lt("instrumentDate", dateRange.endDate)
+				}
+			}
+		}
+
+		// remove the ones we already told them about
+		def batchInstanceList = []
+		
+		if (batchInstancePotentialList) {
+			batchInstancePotentialList.each{ b ->
+				def batchLinkInstance = BatchLink.findByBatch(b)
+				if (batchLinkInstance && ! batchLinkInstance.dateNorcNotified) {
+					// removing batch...
+					batchInstanceList.add(b)
+				} else {
+				
+				}
+			}
+		}
+
+		// pass the model to the view
+		[ referenceDate: dateRange.startDate,
+			batchInstanceList: batchInstanceList,
+			customizable: true ]
+	}
+
+	
     def entry = {
         // reference date
         def referenceDate = params?.referenceDate
@@ -254,5 +316,33 @@ class BatchController {
         }
     }
 
+	// used to get the full time range for a day when a java.util.Date is
+	// passed.  Example:
+	// Jan 3rd, 2011 2:34 PM ->
+	//     [startDate: "Jan 3rd, 2011 12:00 AM", endDate: "Jan 4th, 2011 12:00 AM" ]
+	private def getFullDayRange = { referenceDate ->
 
+		// default day is "Yesterday"
+
+		// Some start/end date voodoo
+
+		if ( referenceDate ) {
+			referenceDate = new LocalDate(referenceDate)
+		} else {
+			referenceDate = new LocalDate()
+			referenceDate = referenceDate.minusDays(1)
+		}
+
+		// we need a midnight time (for later on)
+		def midnight = new LocalTime(0, 0)
+
+		// get the midnight "LocalDate" and change it to a java.util.Date
+		def startDate = referenceDate.toDateTime(midnight).toCalendar().getTime()
+		// get the midnight + 1 "LocalDate" and change it to a java.util.Date
+		def endDate = referenceDate.plusDays(1).toDateTime(midnight).toCalendar().getTime()
+
+		// return the start and end Dates as a map.
+		return [ startDate: startDate
+			, endDate: endDate ]
+	}
 }

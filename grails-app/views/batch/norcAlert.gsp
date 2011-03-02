@@ -4,8 +4,10 @@
 <title>NORC Posting Mailing Alert - National Children's Study</title>
 </head>
 <body>
-<h1 style="color: maroon;">NCS Production Report for: <g:formatDate
+<h1 style="color: maroon;">NORC Posting Mailing Alert: <g:formatDate
 	date="${referenceDate}" format="MM/dd/yyyy" /></h1>
+
+<h2 style="color:red;">Note: This will only alert you of new batches, not updates to existing batches.</h2>
 <hr />
 
 <g:if test="${customizable}">
@@ -37,6 +39,7 @@
 	</span> <span class="b" id="primaryInstrument">
 	${batchInstance?.primaryInstrument?.name}
 	</span></h2>
+	<h3>Batch ID #: ${ batchInstance.id }</h3>
 	<div class="clear"></div>
 
 	<div class="dataitem">Date Run: <span class="b"><g:formatDate

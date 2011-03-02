@@ -16,9 +16,21 @@ class ProductionReportJob {
 	}
 
     def execute() {
+		def keepTrying = true
+		def attempt = 0
 		def now = new Date()
         println "Sending Production Report @ ${now}"
-
-		emailService.sendProductionReport()
+		
+		while ( keepTrying && (attempt < 5) ) {
+			try {
+				// execute task
+				emailService.sendProductionReport()
+				keepTrying = false
+			} catch (Exception e) {
+				println "Error Occurred! Retrying in 10 seconds."
+				Thread.sleep(10000)
+				attempt++
+			}
+		}
     }
 }

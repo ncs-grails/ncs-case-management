@@ -3,6 +3,7 @@ package edu.umn.ncs
 import org.joda.time.*
 import org.joda.time.contrib.hibernate.*
 
+// Sends out Email Alerts
 class EmailService {
 
     static transactional = true
@@ -12,23 +13,17 @@ class EmailService {
 	def sendProductionReport = { params ->
 
 		// println "sendProductionReport:params::${params}"
-
+		
 		def recipients = [ 'ajz@cccs.umn.edu'
 			, 'dmd@cccs.umn.edu'
 			, 'front_dis@cccs.umn.edu'
 			, 'sup_dis@cccs.umn.edu' ]
 
-
+		// recipients = [ 'ajz@cccs.umn.edu' ]
+		
 		def dateRange = getFullDayRange(params?.referenceDate)
 
-		if ( ! verifyDataSource() ) {
-			mailService.sendMail {
-				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
-				from "info@ncs.umn.edu"
-				subject "FAILED! NCS Production Report for ${referenceDate}"
-				body "Failed to send NCS Production Report.  Doh!"
-			}
-		} else {
+		try {
 			// query the batches
 			def c = Batch.createCriteria()
 			def batchInstanceList = c.list{
@@ -51,11 +46,17 @@ class EmailService {
 			} else {
 				mailService.sendMail {
 					to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
-					from "info@ncs.umn.edu"
+					from "help@ncs.umn.edu"
 					subject "NCS Production Report for ${referenceDate}"
 					body "No batches generated, nothing to send!"
 				}
-
+			}
+		} catch ( Exception ex ) {
+			mailService.sendMail {
+				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+				from "help@ncs.umn.edu"
+				subject "FAILED! NCS Production Report for ${referenceDate}"
+				body "Failed to send NCS Production Report.  Doh!"
 			}
 		}
 	}
@@ -68,77 +69,79 @@ class EmailService {
 			, 'Barron-Martin@norc.org'
 			, 'Sokolowski-John@norc.uchicago.edu' ]
 
-		recipients = [ 'ajz@cccs.umn.edu' ]
+		//recipients = [ 'ajz@cccs.umn.edu' ]
 
 		// get the time range for yesterday (or whatever reference date)
 		def dateRange = getFullDayRange(params?.referenceDate)
 
 		// If we can't talk to the DB server
-		if ( ! verifyDataSource() ) {
-			mailService.sendMail {
-				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
-				from "info@ncs.umn.edu"
-				subject "FAILED! Alert to NORC of Data Posting"
-				body "Failed to send Alert to NORC of Data Posting.  Doh!"
-			}
-			// disable it for now
-			// disable it for now
-			// disable it for now
-			// disable it for now
-			// disable it for now
-		} else {
-
-			def now = new Date()
+		try {
 			// query the batches
-			def c = BatchLink.createCriteria()
+			def c = Batch.createCriteria()
 			// finding all mailed batches
-			def batchInstanceList = c.list{
+			def now = new Date()
+			def ninetyDaysAgo = now - 90
+			
+			// Find all batches generated in the last 90 days that
+			// are ready to ship to NORC
+			def batchInstancePotentialList = c.list{
 				and {
-					isNull("dateNorcNotified")
-					batch {
-						or {
-							isNotNull("mailDate")
-							isNotNull("addressAndMailingDate")
-							lt("instrumentDate", dateRange.endDate)
-						}
+					gt("dateCreated", ninetyDaysAgo)
+					or {
+						isNotNull("mailDate")
+						isNotNull("addressAndMailingDate")
+						lt("instrumentDate", dateRange.endDate)
 					}
 				}
 			}
-
+	
+			// remove the ones we already told them about
+			def batchInstanceList = []
+			
+			if (batchInstancePotentialList) {
+				batchInstancePotentialList.each{ b ->
+					def batchLinkInstance = BatchLink.findByBatch(b)
+					if (batchLinkInstance && ! batchLinkInstance.dateNorcNotified) {
+						// removing batch...
+						batchInstanceList.add(b)
+					} else {
+					
+					}
+				}
+			}
+			
 			if (batchInstanceList) {
+				
+				// Mark the batches as "notified"
+				batchInstanceList.each{ b ->
+					def batchLinkInstance = BatchLink.findByBatch(b)
+					if ( ! batchLinkInstance ) {
+						// println "Creating Batch Link for BID: ${b.id}"
+						batchLinkInstance = new BatchLink(batch: b)
+					} else {
+						// println "Batch Link found for BID: ${b.id}"
+						batchLinkInstance = BatchLink.get(batchLinkInstance.id)
+					}
+					batchLinkInstance.dateNorcNotified = now
+					batchLinkInstance.save(flush:true)
+				}
+				
 				mailService.sendMail {
 					to recipients.toArray()
-					from "info@ncs.umn.edu"
+					from "help@ncs.umn.edu"
 					subject "Alert to NORC of Data Posting"
 					body( view:"/batch/norcAlert",
 						model:[ batchInstanceList: batchInstanceList])
 				}
 			}
-		}
-		
-	}
-
-	// used to kick-start the MySQL connection if it timed out
-	private def verifyDataSource = {
-		// kick start the data source if it's sleeping
-		def keepTrying = true
-		def attempt = 0
-		def connected = false
-
-		while ( keepTrying && (attempt < 5) ) {
-			try {
-				def b = Batch.read(1)
-				if ( b || !b ) {
-					keepTrying = false
-					connected = true
-				}
-			} catch (Exception e) {
-				Thread.sleep(3000)
-				attempt++
+		} catch (Exception ex) {
+			mailService.sendMail {
+				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+				from "help@ncs.umn.edu"
+				subject "FAILED! Alert to NORC of Data Posting"
+				body "Failed to send Alert to NORC of Data Posting.  Doh!\n${ex}"
 			}
 		}
-
-		return connected
 	}
 
 	// used to get the full time range for a day when a java.util.Date is
