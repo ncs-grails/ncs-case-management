@@ -274,10 +274,56 @@ class ReportController {
 			params.remove('controller')
 			params.remove('name')
 			
-			def options = birtReportService.getRenderOption(request, 'html')
-			def result = birtReportService.runAndRender(reportName, params, options)
-			render(contentType:"text/html", text:"${result}")
+			def reportParams = birtReportService.getReportParams(reportName)			
+			if (reportParams) {
+				redirect(action: "birtReportParams", id: reportInstance.id)
+			}
+			else {
+				def options = birtReportService.getRenderOption(request, 'html')
+				def result = birtReportService.runAndRender(reportName, params, options)
+				render(contentType:"text/html", text:"${result}")	
+			}
 		}
+    }
+	
+	def birtReportParams = {
+		def reportInstance = Report.get(params.id)
+		String reportName = reportInstance.designedName
+		def reportParams = birtReportService.getReportParams(reportName)
+		
+		if (reportInstance) {
+			return [reportInstance: reportInstance, reportParams: reportParams ]			
+		}
+		else {
+			flash.message = "Sorry, report not found."
+			redirect(action: "list")
+		}		
+	}	
+	
+	def showBirtReport = {
+		def reportInstance = Report.get(params.id)
+		String reportName = reportInstance.designedName
+		def reportParams = birtReportService.getReportParams(reportName)
+		if (reportParams) {
+			/* println "Report Parameters: ${reportParams}"
+			reportParams.each {
+				println "Param name: ${it.name}"
+				println "Param promptText: ${it.promptText}"
+				println "List Entries:"
+				it.listEntries.each { e ->
+					println "    ${e.label} with value = ${e.value}"
+				}
+			} */
+			params.remove('showBirtReport')
+		}
+		params.remove('id')
+		params.remove('action')
+		params.remove('controller')
+		// println "Report params for ${reportName} are ${params}"
+		def options = birtReportService.getRenderOption(request, 'html')
+		def result = birtReportService.runAndRender(reportName, params, options)
+		render(contentType:"text/html", text:"${result}")
+
     }
 	
 	def exportReportToFile = {
