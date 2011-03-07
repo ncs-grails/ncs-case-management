@@ -242,7 +242,16 @@ class ReportController {
 		def reportInstance = Report.get(params.id)
 		if (reportInstance) {
 			try {
+				// Check for designed report and delete if found
+				def designedName = reportInstance.designedName
 				reportInstance.delete(flush: true)
+				if (designedName) {
+					def f = new File("/var/lib/webreports/${designedName}.rptdesign")
+					if (f) {
+						f.delete()
+					}
+				}
+
 				flash.message = "Report deleted"
 				redirect(action: "list")
 			}
