@@ -288,9 +288,10 @@ class ReportController {
 				redirect(action: "birtReportParams", id: reportInstance.id)
 			}
 			else {
-				def options = birtReportService.getRenderOption(request, 'html')
-				def result = birtReportService.runAndRender(reportName, params, options)
-				render(contentType:"text/html", text:"${result}")	
+				// def options = birtReportService.getRenderOption(request, 'html')
+				// def result = birtReportService.runAndRender(reportName, params, options)
+				// render(contentType:"text/html", text:"${result}")	
+				redirect(action: "showBirtReport", id: reportInstance.id)
 			}
 		}
     }
@@ -301,7 +302,8 @@ class ReportController {
 		def reportParams = birtReportService.getReportParams(reportName)
 		
 		if (reportInstance) {
-			return [reportInstance: reportInstance, reportParams: reportParams ]			
+			def format = params.format
+			return [reportInstance: reportInstance, reportParams: reportParams, format:format ]				
 		}
 		else {
 			flash.message = "Sorry, report not found."
@@ -311,10 +313,12 @@ class ReportController {
 	
 	def showBirtReport = {
 		def reportInstance = Report.get(params.id)
+		def format = params.format
+		// println "Output format ${format}"
 		String reportName = reportInstance.designedName
-		def reportParams = birtReportService.getReportParams(reportName)
-		if (reportParams) {
-			/* println "Report Parameters: ${reportParams}"
+		// def reportParams = birtReportService.getReportParams(reportName)
+		/* if (reportParams) {
+			 println "Report Parameters: ${reportParams}"
 			reportParams.each {
 				println "Param name: ${it.name}"
 				println "Param promptText: ${it.promptText}"
@@ -322,9 +326,10 @@ class ReportController {
 				it.listEntries.each { e ->
 					println "    ${e.label} with value = ${e.value}"
 				}
-			} */
+			} 
 			params.remove('showBirtReport')
-		}
+		} */
+		params.remove('showBirtReport')
 		params.remove('id')
 		params.remove('action')
 		params.remove('controller')
@@ -332,10 +337,9 @@ class ReportController {
 		def options = birtReportService.getRenderOption(request, 'html')
 		def result = birtReportService.runAndRender(reportName, params, options)
 		render(contentType:"text/html", text:"${result}")
-
     }
 	
-	def exportReportToFile = {
+	def exportBirtReport = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'report.label', default: 'Report'), params.id])}"
@@ -343,18 +347,44 @@ class ReportController {
 		}
 		else {
 			String reportName = reportInstance.designedName
+			def reportParams = birtReportService.getReportParams(reportName)			
+			if (reportParams) {
+				redirect(action: "birtReportParams", id: reportInstance.id, params:[format:'pdf'])
+			}
+			else {				
+				redirect(action: "exportBirtReportToFile", id: reportInstance.id, params:[format:params.format])
+			}
+		}
+    }
+	
+	def exportBirtReportToFile = {
+		def reportInstance = Report.get(params.id)
+		if (!reportInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'report.label', default: 'Report'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			String reportName = reportInstance.designedName
+			// def reportParams = birtReportService.getReportParams(reportName)			
+			params.remove('showBirtReport')
+			params.remove('exportBirtReportToFile')
+			params.remove('id')
+			params.remove('action')
+			params.remove('controller')
 			def type = params['format']
-			//println "File type: ${type}"
+			// println "File type: ${type}"
 			String reportExt = ""
 			
 			// PDF Generation
 			if (type == 'pdf') {
+				// println "Generating PDF..."
 				reportExt = type
 				def options = birtReportService.getRenderOption(request, 'pdf')
 				def result = birtReportService.runAndRender(reportName, params, options)
 				response.setHeader("Content-disposition", "attachment; filename=" + reportName + "." + reportExt)
 				response.contentType = 'application/pdf'
 				response.outputStream << result.toByteArray()
+				response.outputStream.flush()
 			}
 		}
 		return false				

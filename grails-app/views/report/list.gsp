@@ -68,7 +68,7 @@
 					            <g:link action="showReport" id="${reportInstance.id}" target="_blank">View</g:link>
 							</td>
 							
-                            <td><g:if test="${reportInstance.useQuery}">NA</g:if><g:else><g:link action="exportReportToFile" id="${reportInstance.id}" params="[format:'pdf']">PDF</g:link></g:else></td>
+                            <td><g:if test="${reportInstance.useQuery}">NA</g:if><g:else><g:link action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">PDF</g:link></g:else></td>
                         
                         </tr>
                     </g:each>
