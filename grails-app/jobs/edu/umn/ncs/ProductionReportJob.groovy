@@ -11,7 +11,7 @@ class ProductionReportJob {
 		// run at 12:30 AM
 		// Seconds Minutes Hours DayOfMonth Month DayOfWeek [ Year ]
 		// WARNING: the name must be UNIQUE throughout your app
-		cron name: 'cronTrigger', cronExpression: "0 30 0 * * ?"
+		cron name: 'cronProdReptTrigger', cronExpression: "0 30 0 * * ?"
 		
 	}
 

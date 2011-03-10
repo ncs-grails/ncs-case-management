@@ -193,4 +193,10 @@ class LoginController {
         response.setIntHeader ('Expires', -1) //prevents caching at the proxy server
         response.addHeader('cache-Control', 'private') //IE5.x only
     }
+	
+	def refresh = {
+		def config = authenticateService.securityConfig.security
+		
+		redirect(controller:'login', action:'index')
+	}
 }
