@@ -10,9 +10,27 @@ class EmailService {
 	
 	def mailService
 
+	def sendAaronNote = {
+		
+		def recipients = [ 'ajz@umn.edu' ]
+		
+		def referenceDate = new Date()
+		
+		println "Sending to Aaron"
+
+		mailService.sendMail {
+			to recipients.toArray()
+			from "info@ncs.umn.edu"
+			subject "The current time is ${referenceDate}"
+			body "NCS Here. \n The current time is ${referenceDate}"
+		}
+
+	}
+	
 	def sendProductionReport = { params ->
 
 		// println "sendProductionReport:params::${params}"
+		def referenceDate = new Date()
 		
 		def recipients = [ 'ajz@cccs.umn.edu'
 			, 'dmd@cccs.umn.edu'
@@ -45,7 +63,7 @@ class EmailService {
 				}
 			} else {
 				mailService.sendMail {
-					to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+					to "ajz@umn.edu", "ngp@umn.edu"
 					from "help@ncs.umn.edu"
 					subject "NCS Production Report for ${referenceDate}"
 					body "No batches generated, nothing to send!"
@@ -53,7 +71,7 @@ class EmailService {
 			}
 		} catch ( Exception ex ) {
 			mailService.sendMail {
-				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+				to "ajz@umn.edu", "ngp@umn.edu"
 				from "help@ncs.umn.edu"
 				subject "FAILED! NCS Production Report for ${referenceDate}"
 				body "Failed to send NCS Production Report.  Doh!"
@@ -64,7 +82,7 @@ class EmailService {
 	def sendNorcAlert = { params ->
 
 		// who gets the email...
-		def recipients = [ 'ajz@cccs.umn.edu'
+		def recipients = [ 'ajz@umn.edu'
 			, 'msg@cccs.umn.edu'
 			, 'Barron-Martin@norc.org'
 			, 'Sokolowski-John@norc.uchicago.edu' ]
@@ -73,7 +91,7 @@ class EmailService {
 
 		// get the time range for yesterday (or whatever reference date)
 		def dateRange = getFullDayRange(params?.referenceDate)
-
+		
 		// If we can't talk to the DB server
 		try {
 			// query the batches
@@ -136,7 +154,7 @@ class EmailService {
 			}
 		} catch (Exception ex) {
 			mailService.sendMail {
-				to "ajz@cccs.umn.edu", "ngp@cccs.umn.edu"
+				to "ajz@umn.edu", "ngp@umn.edu"
 				from "help@ncs.umn.edu"
 				subject "FAILED! Alert to NORC of Data Posting"
 				body "Failed to send Alert to NORC of Data Posting.  Doh!\n${ex}"
