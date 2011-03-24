@@ -9,7 +9,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 
-@Secured(['ROLE_NCS_IT'])
+@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 class ReportController {
     def dataSource      // inject the Spring-Bean dataSource
 	def birtReportService
@@ -162,6 +162,53 @@ class ReportController {
                     rg.name
                 ORDER BY b.id, ds.segment_id
             """*/
+		}
+    }
+	
+	def exportReportByQueryToFile = {
+		def reportInstance = Report.get(params.id)
+		if (!reportInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'report.label', default: 'Report'), params.id])}"
+			redirect(action: "list")
+		}
+		else {
+			def db = new Sql(dataSource)
+			String query = reportInstance?.query
+			//println "QUERY:  << ${query} >>"
+			def results = db.rows(query)
+	
+			// Get the column headers from keys
+			def headerList = []
+			if (results) {
+				headerList = results[0].collect { it.key }
+			}
+			
+			String reportName = reportInstance.designedName
+			def type = params['format']
+			// println "File type: ${type}"
+			String reportExt = ""
+			
+			// CSV Generation
+			if (type == 'csv') {
+				// println "Generating CSV..."
+				reportExt = type
+				response.setHeader("Content-disposition", "attachment; filename=${reportName}.${reportExt}")
+				response.contentType = "text/csv"
+				def outs = response.outputStream
+				def dataRow = []
+				// Add the column headers 
+				outs << headerList.join(";")
+				outs << "\n"
+				// Add the data
+				results.each { row ->
+					dataRow = row.collect { it.value }
+					// println "        Data Row: ${dataRow}"
+					outs <<	dataRow.join(";")
+					outs << "\n"
+				}
+				outs.flush()
+				outs.close()
+			}
 		}
     }
 	
@@ -335,8 +382,14 @@ class ReportController {
 		params.remove('controller')
 		// println "Report params for ${reportName} are ${params}"
 		def options = birtReportService.getRenderOption(request, 'html')
-		def result = birtReportService.runAndRender(reportName, params, options)
-		render(contentType:"text/html", text:"${result}")
+		try {
+			def result = birtReportService.runAndRender(reportName, params, options)
+			render(contentType:"text/html", text:"${result}")
+		}
+		catch (Exception ex) {
+			flash.message = "Sorry, ${reportName} report could not be loaded. ERROR: ${ex}"
+			redirect(action: "list")
+		}
     }
 	
 	def exportBirtReport = {
@@ -349,7 +402,7 @@ class ReportController {
 			String reportName = reportInstance.designedName
 			def reportParams = birtReportService.getReportParams(reportName)			
 			if (reportParams) {
-				redirect(action: "birtReportParams", id: reportInstance.id, params:[format:'pdf'])
+				redirect(action: "birtReportParams", id: reportInstance.id, params:[format:params.format])
 			}
 			else {				
 				redirect(action: "exportBirtReportToFile", id: reportInstance.id, params:[format:params.format])
@@ -374,17 +427,72 @@ class ReportController {
 			def type = params['format']
 			// println "File type: ${type}"
 			String reportExt = ""
-			
+			def paramName = null
+			def paramOptions = []
+			def paramValue = null
+			def paramType = null
+			// println "Report params: ${params}"
 			// PDF Generation
 			if (type == 'pdf') {
 				// println "Generating PDF..."
+				// Concatenate selected parameter values to export file name
+				def reportParams = birtReportService.getReportParams(reportName)		// Get BIRT report parameters
+				def fileName = reportName
+				if (reportParams) {
+					// println "    BIRT Parameters ${reportParams}"
+					reportParams.each {
+						paramName = it.name
+						paramType = it.type
+						// println "        Current BIRT Parameter ${paramName} of type ${paramType}"
+						// println "        --Options: ${paramOptions}"
+						// Get selected value for this parameter
+						paramValue = getConvertedValue(params["${paramName}"],paramType)
+						// println "        Selected value is: ${paramValue}"
+						// Get parameter value/label pairs
+						paramOptions = it.listEntries
+						
+						paramOptions.each { m ->
+							// println "        Comparing entry value " + m["value"] + " to selected value ${paramValue}"
+							if (m["value"] == paramValue) {
+								fileName += "-" + m["label"].replaceAll(' ', '_').toLowerCase()
+								// println "    Updating filename to ${fileName}" 
+							}
+						}
+					}
+				}
+	
 				reportExt = type
 				def options = birtReportService.getRenderOption(request, 'pdf')
-				def result = birtReportService.runAndRender(reportName, params, options)
-				response.setHeader("Content-disposition", "attachment; filename=" + reportName + "." + reportExt)
-				response.contentType = 'application/pdf'
-				response.outputStream << result.toByteArray()
-				response.outputStream.flush()
+				try {
+					def result = birtReportService.runAndRender(reportName, params, options)					
+					response.setHeader("Content-disposition", "attachment; filename=" + fileName + "." + reportExt)
+					response.contentType = 'application/pdf'
+					response.outputStream << result.toByteArray()
+					response.outputStream.flush()
+				}
+				catch (Exception ex) {
+					flash.message = "Sorry, ${reportName} report could not be loaded. ERROR: ${ex}"
+					redirect(action: "list")
+				}
+			}
+			
+			// Excel Generation
+			if (type == 'xls') {
+				// println "Generating Excel..."
+				// reportExt = type
+				reportExt = 'xml'
+				def options = birtReportService.getRenderOption(request, 'xls')
+				try {
+					def result = birtReportService.runAndRender(reportName, params, options)					
+					response.setHeader("Content-disposition", "attachment; filename=" + reportName + "." + reportExt)
+					response.contentType = 'application/xls'
+					response.outputStream << result.toByteArray()
+					response.outputStream.flush()
+				}
+				catch (Exception ex) {
+					flash.message = "Sorry, ${reportName} report could not be loaded. ERROR: ${ex}"
+					redirect(action: "list")
+				}
 			}
 		}
 		return false				
@@ -408,4 +516,32 @@ class ReportController {
 		}
 		return null
 	}
+	
+	def getConvertedValue = { val, type ->
+		def convertedValue = null
+		switch ( type ) {
+			case 1:			// Boolean
+				convertedValue = val.toBoolean()
+				break
+			case 2:			// Date
+				convertedValue = new Date().parse("yyyy-MM-dd hh:mm:ss", val)
+				break
+			case 3:			// Datetime
+				convertedValue = new Date().parse("yyyy-MM-dd hh:mm:ss", val)
+				break
+			case 4:			// Decimal
+				convertedValue = val.toBigDecimal()
+				break
+			case 5:			// Float
+				convertedValue = val.toFloat()
+				break
+			case 6:			// Integer
+				convertedValue = val.toInteger()
+				break
+
+			default:		// String
+				convertedValue = val
+		}
+    }
+	
 }

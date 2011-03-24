@@ -69,9 +69,23 @@
                     	</g:else>
                     
                         <tr class="prop">
+                            <td valign="top" class="name"><g:message code="report.underConstruction.label" default="Under Construction" /></td>
+                            
+                            <td valign="top" class="value"><g:formatBoolean boolean="${reportInstance?.underConstruction}" /></td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
                             <td valign="top" class="name"><g:message code="report.enabled.label" default="Enabled" /></td>
                             
                             <td valign="top" class="value"><g:formatBoolean boolean="${reportInstance?.enabled}" /></td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="report.adminsOnly.label" default="Admins Only" /></td>
+                            
+                            <td valign="top" class="value"><g:formatBoolean boolean="${reportInstance?.adminsOnly}" /></td>
                             
                         </tr>
                     

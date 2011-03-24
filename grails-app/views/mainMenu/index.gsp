@@ -26,13 +26,21 @@
 	font-size: 1.1em;
 	margin-bottom: 10px;
 }
-
+.homePagePanel .panelBody h2 {
+	font-size: 1.1em;
+	margin-bottom: 10px;
+	font-weight:bold;
+}
 .homePagePanel .panelBody {
 	background: url(images/leftnav_midstretch.png) repeat-y top;
 	margin: 0px;
 	padding: 15px;
 }
-
+.homePagePanel-big .panelBody {
+	background: url(images/leftnav_midstretch_680x1.png) repeat-y top;
+	margin: 0px;
+	padding: 15px;
+}
 .homePagePanel .panelBtm {
 	background: url(images/leftnav_btm.png) no-repeat top;
 	height: 20px;
@@ -62,6 +70,20 @@ h2 {
 	class="create" controller="logout" action="index">Logout</g:link></span></div>
 
 <div id="nav">
+<g:ifAnyGranted role="ROLE_NCS_IT">
+	<div class="homePagePanel">
+	<div class="panelTop"></div>
+	<div class="panelBody">
+		<h2>Report Administration</h2>
+		<ul>
+			<li><g:link controller="report">Report List</g:link></li>
+			<li></span><g:link controller="report" action="create">Create a Report</g:link></li>
+		</ul>
+	</div>
+	<div class="panelBtm"></div>
+	</div>
+</g:ifAnyGranted>
+
 <div class="homePagePanel">
 <div class="panelTop"></div>
 <div class="panelBody">
@@ -143,23 +165,31 @@ documents and tracking the location of study participants.</p>
 			<dd>
 				Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 			</dd>
-
-			<g:ifAnyGranted role="ROLE_NCS_IT">
-				<dt><g:link controller="report">Report Administration</g:link></dt>
-				<dd>
-					List of created reports (Admins only)
-				</dd>
-				<dt><g:link controller="report" action="create">Create a Report</g:link></dt>
-				<dd>
-					Upload a BIRT report or create a SQL only report (Admins Only)
-				</dd>
-			</g:ifAnyGranted>
 			
 			<g:each var="reportInstance" in="${Report.list()}">
 				<g:if test="${reportInstance?.enabled}">
 					<g:if test="${reportInstance?.adminsOnly}">
 						<g:ifAnyGranted role="ROLE_NCS_IT">
-							<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link></dt>
+							<dt>
+								<g:if test="${reportInstance?.underConstruction}">
+									<img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />
+								</g:if>
+								<g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link>
+								<g:if test="${reportInstance.useQuery}">
+									<g:pdfLink url="/localNcsPdf/exportReportByQueryToPdf/${reportInstance.id}" filename="${reportInstance?.title.replaceAll(' ','_') + '.pdf'}" icon="true"></g:pdfLink>
+									<g:link controller="report" action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']">
+										<img src="${resource(dir:'images',file:'csv_icon.gif')}" class="export-csv-img" title="CSV" alt="CSV" />
+									</g:link>
+								</g:if>
+								<g:else>
+									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">
+										<img src="${resource(dir:'images',file:'pdf_16x16.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
+									</g:link>
+									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']">
+										<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
+									</g:link>
+								</g:else>
+							</dt>
 							<dd>
 								<g:if test="${reportInstance?.subtitle}">
 									${reportInstance?.subtitle}
@@ -171,10 +201,30 @@ documents and tracking the location of study participants.</p>
 						</g:ifAnyGranted>		
 					</g:if>
 					<g:else>
-						<dt><g:if test="${reportInstance?.underConstruction}"><img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" /></g:if>  <g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link></dt>
+						<dt>
+							<g:if test="${reportInstance?.underConstruction}">
+								<img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />
+							</g:if>
+							<g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link>
+							<g:if test="${reportInstance.useQuery}">
+								<g:link controller="report" action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']">
+									<img src="${resource(dir:'images',file:'csv_icon.gif')}" class="export-csv-img" title="CSV" alt="CSV" />
+								</g:link>
+							</g:if>
+							<g:else>
+								<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">
+									<img src="${resource(dir:'images',file:'pdf_16x16.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
+								</g:link>
+								<g:ifAnyGranted role="ROLE_NCS_IT">
+									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']">
+										<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
+									</g:link>
+								</g:ifAnyGranted>		
+							</g:else>
+						</dt>
 						<dd>
 							<g:if test="${reportInstance?.subtitle}">
-								${reportInstance?.subtitle}
+								${reportInstance?.subtitle} 
 							</g:if>
 							<g:else>
 								${reportInstance?.description}
@@ -184,6 +234,21 @@ documents and tracking the location of study participants.</p>
 				</g:if>
 			</g:each>
         </dl>
+
+		<%--<dl class="menu highlight-box">
+			<g:ifAnyGranted role="ROLE_NCS_IT">
+			<h2>Report Administration (admins only)</h2>
+				<dt><g:link controller="report">Report List</g:link></dt>
+				<dd>
+					List of created reports
+				</dd>
+				<dt><g:link controller="report" action="create">Create a Report</g:link></dt>
+				<dd>
+					Upload a BIRT report or create a SQL only report
+				</dd>
+			</g:ifAnyGranted>
+       </dl> --%>
+        
       </div>
     </div>
   </body>

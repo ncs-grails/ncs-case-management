@@ -234,7 +234,20 @@ a.csv {
 dl.menu dd {
 	padding: 0.5em;
 }
-
+.highlight-box {
+	padding: 1.0em;
+	margin: 2.0em 0;
+	-moz-border-radius: 0.25em;
+	-webkit-border-radius: 0.25em;
+	border-radius: 0.25em;
+	border-width: thin;
+	border-style: solid;
+	border-color: #7A0019;	
+}
+.highlight-box h2 {
+	padding:0 0 0.8em 0;
+	margin:0;
+}
 #auth_links {
 	text-align: left;
 	float: left;

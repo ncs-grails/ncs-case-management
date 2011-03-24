@@ -15,8 +15,8 @@
 			<span class="filter-list"><input type="text" name="filter" value="" id="filter" /></span>
         </div>
         <div class="body">
-        	<g:if test="${reportInstance?.underConstruction}"><span><img src="${resource(dir:'images',file:'under_construction_icon-red_50x42.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />  UNDER CONSTRUCTION</span></g:if> 
-            <h1>${reportInstance?.study?.name} ${reportInstance?.title} Report</h1>
+        	<g:if test="${reportInstance?.underConstruction}"><span class="under-construction"><img src="${resource(dir:'images',file:'under_construction_icon-red_50x42.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />  UNDER CONSTRUCTION</span></g:if> 
+            <h1>${reportInstance?.study?.name} ${reportInstance?.title} Report <g:link action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']"><img src="${resource(dir:'images',file:'csv_17x16.gif')}" class="export-img" title="CSV" alt="CSV" /></g:link></h1>
             <h3>${reportInstance?.subtitle}</h3>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>

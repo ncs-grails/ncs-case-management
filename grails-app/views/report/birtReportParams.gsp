@@ -15,7 +15,6 @@
         </div>
         <div class="body">
             <h1>${reportInstance.title}</h1>
-            <h3>Please select parameter values:</h3>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -31,28 +30,29 @@
 	                <g:hiddenField name="id" value="${reportInstance.id}" />
 	                <g:hiddenField name="format" value="${format}" />
 	                <div class="dialog">
-	                    <table>
-	                        <tbody>
-	                        	<g:each var="reportParamInstance" in="${reportParams}" >
-		                            <tr class="prop">
-		                                <td valign="top" class="name label-column">
-		                                    <label for="promptText">${reportParamInstance?.promptText}</label>
-		                                </td>
-		                                <td valign="top" class="value">
-		                                    <g:select
-		                                   		name="${reportParamInstance.name}"
-		                                   		from="${reportParamInstance.listEntries}"
-		                                   		optionValue="label"
-		                                   		optionKey="value"
-		                                   		value="" />
-		                                </td>
-		                            </tr>
-								</g:each>
-	                        </tbody>
-	                    </table>
+                       	<g:each var="reportParamInstance" in="${reportParams}" >
+		                	<div class="parameter-row">
+								<div class="parameter-box lefty">
+		                            <span>${reportParamInstance?.promptText}...</span>
+								</div>	                	
+								<div class="parameter-box lefty">
+	                                <g:select
+	                               		name="${reportParamInstance.name}"
+	                               		from="${reportParamInstance.listEntries}"
+	                               		optionValue="label"
+	                               		optionKey="value"
+	                               		value="" />
+								</div>	                	
+		                	</div>
+						</g:each>
 	                </div>
-	                <div class="buttons">
-	                    <span class="button"><g:submitButton name="exportBirtReportToFile" class="list" value="View PDF" /></span>
+	                <div class="buttons full-width lefty">
+	                	<g:if test="${format=='pdf'}">
+	                    	<span class="button"><g:submitButton name="exportBirtReportToFile" class="list" value="View PDF" /></span>
+						</g:if>
+	                	<g:if test="${format=='xls'}">
+		                    <span class="button"><g:submitButton name="exportBirtReportToFile" class="list" value="Excel" /></span>
+						</g:if>
 	                </div>
 	            </g:form>
 	        </g:if>
@@ -60,27 +60,23 @@
 	            <g:form action="showBirtReport">
 	                <g:hiddenField name="id" value="${reportInstance.id}" />
 	                <div class="dialog">
-	                    <table>
-	                        <tbody>
-	                        	<g:each var="reportParamInstance" in="${reportParams}" >
-		                            <tr class="prop">
-		                                <td valign="top" class="name label-column">
-		                                    <label for="promptText">${reportParamInstance?.promptText}</label>
-		                                </td>
-		                                <td valign="top" class="value">
-		                                    <g:select
-		                                   		name="${reportParamInstance.name}"
-		                                   		from="${reportParamInstance.listEntries}"
-		                                   		optionValue="label"
-		                                   		optionKey="value"
-		                                   		value="" />
-		                                </td>
-		                            </tr>
-								</g:each>
-	                        </tbody>
-	                    </table>
+                       	<g:each var="reportParamInstance" in="${reportParams}" >
+		                	<div class="parameter-row">
+								<div class="parameter-box lefty">
+		                            <span>${reportParamInstance?.promptText}...</span>
+								</div>	                	
+								<div class="parameter-box lefty">
+	                                <g:select
+	                               		name="${reportParamInstance.name}"
+	                               		from="${reportParamInstance.listEntries}"
+	                               		optionValue="label"
+	                               		optionKey="value"
+	                               		value="" />
+								</div>	                	
+		                	</div>
+						</g:each>
 	                </div>
-	                <div class="buttons">
+	                <div class="buttons full-width lefty">
 	                    <span class="button"><g:submitButton name="showBirtReport" class="list" value="View Report" /></span>
 	                </div>
 	            </g:form>

@@ -75,7 +75,46 @@ table.tablesorter thead tr .header:hover {
 td.label-column {
 	min-width:13em;
 }
+span.actions {
+    white-space:nowrap;
+}
+span.under-construction {
+	color:red;
+    font-weight: bold;
+}
+/* PARAMS SELECTION */
+.parameter-row {
+	float:left;
+	padding: 1.5em 0;
+	width:930px;
+}
+.parameter-box {
+	min-width:20em;
+	max-width:48%;
+}
+.parameter-box span {
+	float:left;
+	padding-top:0.4em;
+}
+.lefty {
+	float:left;
+}
+.full-width {
+	width:100%;
+}
 /* IMAGES */
 .under-construction-img {
 	padding:1.0em 0 0 0.5em;	
+}
+.export-csv-img {
+	height:16px;
+	vertical-align:text-top;
+	padding-left:0.5em;
+}
+.export-img {
+	vertical-align:text-top;
+	padding-left:0.5em;
+}
+.export-img:hover {
+	height:18px;
 }

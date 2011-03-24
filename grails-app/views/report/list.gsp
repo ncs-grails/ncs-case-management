@@ -68,7 +68,16 @@
 					            <g:link action="showReport" id="${reportInstance.id}" target="_blank">View</g:link>
 							</td>
 							
-                            <td><g:if test="${reportInstance.useQuery}">NA</g:if><g:else><g:link action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">PDF</g:link></g:else></td>
+                            <td>
+                            	<span class="actions">
+                            		<g:if test="${reportInstance.useQuery}">
+                            			<g:link action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']"><img src="${resource(dir:'images',file:'csv_17x16.gif')}" class="export-img" title="CSV" alt="CSV" /></g:link>                            			
+                            		</g:if>
+                            		<g:else>
+                            			<g:link action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']"><img src="${resource(dir:'images',file:'pdf_16x16.png')}" class="export-img" title="PDF" alt="PDF" /></g:link> <g:link action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']"><img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Excel" alt="Excel" /></g:link>
+                            		</g:else>
+                            	</span>
+                            </td>
                         
                         </tr>
                     </g:each>

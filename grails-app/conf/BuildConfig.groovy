@@ -28,6 +28,11 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
+		// Exclude dependencies to resolve conflicts with pdf and renderer plugin
+		compile("org.xhtmlrenderer:core-renderer:R8") {
+			excludes 'xml-apis', 'xmlParserAPIs'
+		}
+
         // runtime 'mysql:mysql-connector-java:5.1.5'
     }
 }
