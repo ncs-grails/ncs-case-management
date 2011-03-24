@@ -1,4 +1,3 @@
-package edu.umn.ncs
 import groovy.sql.Sql
 
 class PingDatabaseJob {
@@ -12,7 +11,7 @@ class PingDatabaseJob {
 			// run every two minutes
 			// Seconds Minutes Hours DayOfMonth Month DayOfWeek [ Year ]
 			// WARNING: the name must be UNIQUE throughout your app
-			cron name: 'cronPingTrigger', cronExpression: "0 */10 * * * ?"
+			cron name:'cronPingDatabaseTrigger', cronExpression:'0 */10 * * * ?'
 		}
 	
 		def execute() {

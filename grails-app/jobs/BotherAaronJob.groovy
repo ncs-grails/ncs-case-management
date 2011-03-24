@@ -1,5 +1,3 @@
-package edu.umn.ncs
-
 class BotherAaronJob {
 	
     def emailService
@@ -12,7 +10,7 @@ class BotherAaronJob {
 
 		// Seconds Minutes Hours DayOfMonth Month DayOfWeek [ Year ]
 		// WARNING: the name must be UNIQUE throughout your app
-		cron name: 'cronAaronTrigger', cronExpression: "0 0 * * * ?"
+		cron name:'cronBotherAaronTrigger', cronExpression:'0 0 * * * ?'
 	}
 	
     def execute() {
