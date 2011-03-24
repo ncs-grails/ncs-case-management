@@ -1,3 +1,5 @@
+package edu.umn.ncs
+
 class AlertNorcJob {
 
 	def emailService
@@ -15,7 +17,7 @@ class AlertNorcJob {
 
     def execute() {
 		def now = new Date()
-        println "Sending NORC Alert @ ${now}"
 		emailService.sendNorcAlert()
+        println "Sent NORC Alert @ ${now}"
     }
 }

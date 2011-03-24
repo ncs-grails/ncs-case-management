@@ -1,3 +1,5 @@
+package edu.umn.ncs
+
 class ProductionReportJob {
 
 	def emailService
@@ -6,16 +8,16 @@ class ProductionReportJob {
 
 		// http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html
 
-		// run at 12:30 AM
+		// run at 12:45 AM
 		// Seconds Minutes Hours DayOfMonth Month DayOfWeek [ Year ]
 		// WARNING: the name must be UNIQUE throughout your app
-		cron name:'cronProductionReportTrigger', cronExpression:'0 30 0 * * ?'
+		cron name:'cronProductionReportTrigger', cronExpression:'0 45 0 * * ?'
 		
 	}
 
     def execute() {
 		def now = new Date()
-        println "Sending Production Report @ ${now}"
 		emailService.sendProductionReport()
+        println "Sent Production Report @ ${now}"
     }
 }

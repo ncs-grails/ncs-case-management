@@ -10,23 +10,6 @@ class EmailService {
 	
 	def mailService
 
-	def sendAaronNote = {
-		
-		def recipients = [ 'ajz@umn.edu' ]
-		
-		def referenceDate = new Date()
-		
-		println "Sending to Aaron"
-
-		mailService.sendMail {
-			to recipients.toArray()
-			from "info@ncs.umn.edu"
-			subject "The current time is ${referenceDate}"
-			body "NCS Here. \n The current time is ${referenceDate}"
-		}
-
-	}
-	
 	def sendProductionReport = { params ->
 
 		// println "sendProductionReport:params::${params}"

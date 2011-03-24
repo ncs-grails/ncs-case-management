@@ -1,3 +1,5 @@
+package edu.umn.ncs
+
 import groovy.sql.Sql
 
 class PingDatabaseJob {
