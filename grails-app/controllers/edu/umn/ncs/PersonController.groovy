@@ -3,7 +3,7 @@ package edu.umn.ncs
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_DOCGEN'])
-class PeopleController {
+class PersonController {
 
     def index = { }
 }

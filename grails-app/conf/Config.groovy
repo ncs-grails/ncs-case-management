@@ -112,11 +112,7 @@ springcache {
     }
 }
 
-grails {
-	mail {
-		host = "mail.cccs.umn.edu"
-	}
-}
+grails.mail.host = "mail.cccs.umn.edu"
 
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {

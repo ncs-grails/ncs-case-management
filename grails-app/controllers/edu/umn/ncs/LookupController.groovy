@@ -43,10 +43,4 @@ class LookupController {
 		[ searchString:searchString, results: results ]
 	}
 
-
-	// these might be better off in the dwellingUnit Controller
-	def showDwellingUnit = {}
-
-	def showPerson = {}
-
 }

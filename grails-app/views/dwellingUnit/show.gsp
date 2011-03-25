@@ -31,11 +31,30 @@ Info</legend> <g:if test="${dwellingUnitLinkInstance}">
 </g:if></fieldset>
 
 <fieldset class="maroonBorder"><legend class="m1">Items
-Generated</legend> <g:if test="${ ! trackedItemInstanceList}">
+Generated</legend>
+<g:if test="${ ! trackedItemInstanceList}">
 		  No Items found
-		</g:if> <g:each var="i" in="${trackedItemInstanceList}">
-	<p>Item: ${i.id}, this needs more stuff...</p>
-</g:each></fieldset>
+		</g:if>
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Instrument</th>
+				<th>Generated</th>
+			</tr>
+		</thead>
+		<tbody>
+			<g:each var="i" in="${trackedItemInstanceList}">
+			<tr>
+				<td>${i.id}</td>
+				<td>${i.batch.primaryInstrument}</td>
+				<td>${i.batch.dateCreated}</td>
+			</tr>
+			</g:each>
+		</tbody>
+	</table>
+
+</fieldset>
 </div>
 </body>
 </html>

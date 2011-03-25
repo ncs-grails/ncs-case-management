@@ -2,7 +2,7 @@ package edu.umn.ncs
 
 import grails.test.*
 
-class PeopleControllerTests extends ControllerUnitTestCase {
+class PersonControllerTests extends ControllerUnitTestCase {
     protected void setUp() {
         super.setUp()
     }
