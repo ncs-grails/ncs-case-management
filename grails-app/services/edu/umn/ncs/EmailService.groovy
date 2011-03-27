@@ -38,7 +38,7 @@ class EmailService {
 			if (batchInstanceList) {
 				mailService.sendMail {
 					to recipients.toArray()
-					from "info@ncs.umn.edu"
+					from "help@ncs.umn.edu"
 					subject "NCS Production Report for ${referenceDate}"
 					body( view:"/batch/nightlyReport",
 						model:[ referenceDate: dateRange.startDate,
