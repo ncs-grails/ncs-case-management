@@ -5,7 +5,7 @@ class SearchService {
 
     static transactional = true
 
-	private boolean debug = true
+	private boolean debug = false
 
 	@Cacheable("lookupCache")
     def query(String queryString) {
@@ -27,13 +27,40 @@ class SearchService {
 			println "SearchService:query:queryString::${queryString}"
 		}
 
+		
+		if ( numericPattern.matcher(queryString).matches()) {
+			if (debug) {
+				println "looking for an ID ${queryString}..."
+			}
+
+			def dwellingUnitInstance = DwellingUnit.read(queryString)
+			
+			if (dwellingUnitInstance) {
+				results.add([matchType:'Dwelling Unit ID',
+					controller: 'dwellingUnit',
+					description: dwellingUnitInstance.address.address,
+					action: 'show',
+					id: dwellingUnitInstance.id ])
+			}
+			
+			def trackedItemInstance = TrackedItem.read(queryString)
+			
+			if (trackedItemInstance) {
+				results.add([matchType:'Tracked Item ID',
+					controller: 'trackedItem',
+					description: "${trackedItemInstance.batch.primaryInstrument}",
+					action: 'show',
+					id: trackedItemInstance.id ])
+			}
+		}
+		
 		// if the query is an ID
 		if ( norcMailingPattern.matcher(queryString).matches() ) {
 			if (debug) {
 				println "looking for NORC Mailing Pattern ${queryString}..."
 			}
 
-			// let's search throught he IDs
+			// let's search through the IDs
 			def norcProjectId = queryString[0..3]
             def norcDocId = queryString[5..14]
             def norcSuId = queryString[16..17]

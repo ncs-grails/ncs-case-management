@@ -268,3 +268,9 @@ dl.menu dd {
 	color: #333;
 	padding-left: 25px;
 }
+
+.menuButton a.lookup {
+	background: url(../images/magnifying-glass-gray_16x16.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
