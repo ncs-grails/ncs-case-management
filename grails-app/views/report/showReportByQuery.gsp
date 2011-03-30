@@ -16,7 +16,7 @@
         </div>
         <div class="body">
         	<g:if test="${reportInstance?.underConstruction}"><span class="under-construction"><img src="${resource(dir:'images',file:'under_construction_icon-red_50x42.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />  UNDER CONSTRUCTION</span></g:if> 
-            <h1>${reportInstance?.study?.name} ${reportInstance?.title} Report <g:link action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']"><img src="${resource(dir:'images',file:'csv_17x16.gif')}" class="export-img" title="CSV" alt="CSV" /></g:link></h1>
+            <h1>${reportInstance?.study?.name} ${reportInstance?.title} Report <g:pdfLink pdfController="localNcsPdf" pdfAction="exportReportByQueryToPdf" pdfId="${reportInstance.id}" filename="${reportInstance?.title.replaceAll(' ','_') + '.pdf'}" icon="true"></g:pdfLink> <g:link action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']"><img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img valign-middle" title="CSV" alt="CSV" /></g:link></h1>
             <h3>${reportInstance?.subtitle}</h3>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -60,6 +60,7 @@
                     
                     </tbody>
                 </table>
+                <label class="total-count">Showing <em>${recordList.size()}</em> rows</label>
             </div>
             <g:ifAnyGranted role="ROLE_NCS_IT">
 	            <div class="buttons">

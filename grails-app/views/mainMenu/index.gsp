@@ -176,14 +176,14 @@ documents and tracking the location of study participants.</p>
 								</g:if>
 								<g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link>
 								<g:if test="${reportInstance.useQuery}">
-									<g:pdfLink url="/localNcsPdf/exportReportByQueryToPdf/${reportInstance.id}" filename="${reportInstance?.title.replaceAll(' ','_') + '.pdf'}" icon="true"></g:pdfLink>
+									<g:pdfLink pdfController="localNcsPdf" pdfAction="exportReportByQueryToPdf" pdfId="${reportInstance.id}" filename="${reportInstance?.title.replaceAll(' ','_') + '.pdf'}" icon="true"></g:pdfLink>
 									<g:link controller="report" action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']">
-										<img src="${resource(dir:'images',file:'csv_icon.gif')}" class="export-csv-img" title="CSV" alt="CSV" />
+										<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-csv-img" title="CSV" alt="CSV" />
 									</g:link>
 								</g:if>
 								<g:else>
 									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">
-										<img src="${resource(dir:'images',file:'pdf_16x16.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
+										<img src="${resource(dir:'images',file:'pdf_button.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
 									</g:link>
 									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']">
 										<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
@@ -207,13 +207,14 @@ documents and tracking the location of study participants.</p>
 							</g:if>
 							<g:link controller="report" action="showReport" id="${reportInstance.id}" target="_blank">${reportInstance?.title}</g:link>
 							<g:if test="${reportInstance.useQuery}">
+									<g:pdfLink pdfController="localNcsPdf" pdfAction="exportReportByQueryToPdf" pdfId="${reportInstance.id}" filename="${reportInstance?.title.replaceAll(' ','_') + '.pdf'}" icon="true"></g:pdfLink>
 								<g:link controller="report" action="exportReportByQueryToFile" id="${reportInstance.id}" params="[format:'csv']">
-									<img src="${resource(dir:'images',file:'csv_icon.gif')}" class="export-csv-img" title="CSV" alt="CSV" />
+									<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-csv-img" title="CSV" alt="CSV" />
 								</g:link>
 							</g:if>
 							<g:else>
 								<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">
-									<img src="${resource(dir:'images',file:'pdf_16x16.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
+									<img src="${resource(dir:'images',file:'pdf_button.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
 								</g:link>
 								<g:ifAnyGranted role="ROLE_NCS_IT">
 									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']">

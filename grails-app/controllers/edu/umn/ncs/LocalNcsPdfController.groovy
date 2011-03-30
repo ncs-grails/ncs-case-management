@@ -19,11 +19,15 @@ class LocalNcsPdfController {
 			def results = db.rows(query)
 	
 			def headerList = []
+			def columnList = []
 			if (results) {
-				headerList = results[0].collect { it.key }
+				columnList = results[0].collect { it.key }
+				headerList = results[0].collect { col ->
+					col.key.replaceAll('_', ' ').replaceAll(/\w+/, { it[0].toUpperCase() + ((it.size() > 1) ? it[1..-1] : '') })
+				}
 			}
 	
-			[ reportInstance: reportInstance, headerList: headerList, recordList: results ]
+			[ reportInstance: reportInstance, headerList: headerList, columnList: columnList, recordList: results ]
 		}
 	}
 }

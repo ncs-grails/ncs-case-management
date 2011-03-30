@@ -1,6 +1,12 @@
 /* CSS for printed PDF */
 
+table th {
+	padding: 0.3em 0.5em;
+	background-color: #ccc;
+}
+/* Page layout */
 @page {
-    size: 8.5in 11in;  /* width height */
+    size: auto landscape;  /* width height */
     margin: 0.25in;
 }
+

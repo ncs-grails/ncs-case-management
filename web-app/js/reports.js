@@ -54,6 +54,8 @@ $(document).ready(function(){
     // Filter table lists
     $('#filter').keyup(function(event) {
         //if esc is pressed or nothing is entered
+    	var rowCount = $('tbody tr').length;
+    	//alert("Row count is " + rowCount);
         if (event.keyCode == 27 || $(this).val() == '') {
           //if esc is pressed we want to clear the value of search box
           $(this).val('');
@@ -61,13 +63,27 @@ $(document).ready(function(){
           //we want each row to be visible because if nothing
           //is entered then all rows are matched.
           $('tbody tr').removeClass('visible').show().addClass('visible');
-          $('.total-count').show();
+          //$('.total-count').show();
         }
 
         //if there is text, lets filter
         else {
           filter('tbody tr', $(this).val());
-          $('.total-count').hide();
+          // Update the row count
+          rowCount = 0;
+          $('tbody tr').each(function(){
+        	 if ($(this).hasClass('visible')) {
+        		 rowCount += 1;
+        	 } 
+          });
+          // $('.total-count').hide();
+        }
+        // Set the row count display
+        if (rowCount == 1) {
+          $('.total-count').html('Showing ' + rowCount + ' row');        	  
+        }
+        else {
+          $('.total-count').html('Showing ' + rowCount + ' rows');        	          	  
         }
 
         //reapply zebra rows

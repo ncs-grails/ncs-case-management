@@ -3,6 +3,7 @@ package edu.umn.ncs
 import java.io.File;
 
 import groovy.sql.Sql
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
@@ -183,7 +184,7 @@ class ReportController {
 				headerList = results[0].collect { it.key }
 			}
 			
-			String reportName = reportInstance.designedName
+			String reportName = reportInstance.title.replaceAll(" ","_")
 			def type = params['format']
 			// println "File type: ${type}"
 			String reportExt = ""
@@ -209,6 +210,7 @@ class ReportController {
 				outs.flush()
 				outs.close()
 			}
+			
 		}
     }
 	

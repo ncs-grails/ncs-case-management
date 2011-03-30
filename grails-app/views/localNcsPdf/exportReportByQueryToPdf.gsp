@@ -1,3 +1,4 @@
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -21,8 +22,7 @@
                     <tbody>
 	                    <g:each in="${recordList}" status="i" var="recordInstance">
 	                        <tr>
-	                        	<g:each var="headerInstance" in="${headerList}" >
-	                        		
+	                        	<g:each var="headerInstance" in="${columnList}" >	                        		
 									<td>
 										<g:if test="${headerInstance.toLowerCase().contains('date')}">
 											<g:if test="${headerInstance.toLowerCase().contains('updated_by')}">
