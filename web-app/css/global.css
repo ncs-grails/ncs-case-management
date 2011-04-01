@@ -274,3 +274,71 @@ dl.menu dd {
 	color: #333;
 	padding-left: 25px;
 }
+/* MAIN PAGE */
+.title-bar {
+	background-color:#ffe264; /*#ffcc33;*/
+	padding: 0.5em 0 1.3em 0;
+}
+.title-bar h1 {	
+}
+.container {
+	float:left;
+	border: 0;
+	padding: 0;
+	margin:0;
+	background-color:#ffe264; /*#aaa;*/	
+	padding-bottom: 0.8em;
+}
+.menu-box {
+	float:left;
+	width:320px;
+}
+.menu-box ul {
+	list-style:none;
+	padding:0;
+}
+.menu-box li {
+	padding:0.4em 1.0em;
+	color:#777; /*#8e62b1;*/
+	font: 0.95em verdana, arial, sans-serif;
+	border-bottom: 1px solid #ffef89;
+}
+.menu-box li:hover {
+	background:#ffcc33 url(../images/yellow-arrow_20x48.png) right center no-repeat; /*#ccc;*/
+	cursor:pointer;	
+	color:#333; /*#795497;*/
+}
+.menu-box li.selected {
+	background:#ffef89 url(../images/yellow-arrow_20x48.png) right center no-repeat;
+	/*background:#ffef89;*/
+	color:#444; /*#532a74; /*#ac84cc;*/
+}
+.content-box {
+	float:left;
+	width:620px;
+	min-height:380px;
+	background-color:#ffef89; /*#ddd;*/
+}
+.content {
+	padding:0.5em 1.0em;
+	font-size: 0.8em;
+}
+.content h1 {
+	font-size:1.0em;
+}
+.content a {
+	color:#7a001e;
+	font: 1.1em verdana, arial, sans-serif;
+	font-weight:normal;
+	border-bottom: 2px solid #ffef89;
+}
+.content a:hover {
+	border-bottom: 2px solid #ffcc33;
+}
+.menu dd {
+	color:#444;
+	font: 0.8em arial, sans-serif;
+}
+.top-border-light {
+	border-top: 1px solid #ffef89;
+}

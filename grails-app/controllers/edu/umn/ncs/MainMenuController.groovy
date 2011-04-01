@@ -14,4 +14,7 @@ class MainMenuController {
         def roles = principal.getAuthorities()//get authorities
         [ username: username, roles: roles ]
     }
+	
+	def indexDev = { }
+	
 }
