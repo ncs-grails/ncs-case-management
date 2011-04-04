@@ -253,7 +253,7 @@ class ReportController {
 			if (!reportInstance?.useQuery){
 				// Handle uploaded file
 				def uploadedFile = request.getFile('reportFile')
-				if (!uploadedFile.empty) {
+				if (uploadedFile && !uploadedFile.empty) {
 					// Upload the file to server
 					def newFile = "/var/lib/webreports/${uploadedFile.originalFilename}"
 					// Check to see if file exists
