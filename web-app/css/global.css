@@ -276,7 +276,7 @@ dl.menu dd {
 }
 /* MAIN PAGE */
 .title-bar {
-	background-color:#ffe264; /*#ffcc33;*/
+	background-color:#f6f6f6; /*#ffe264; /*#ffcc33;*/
 	padding: 0.5em 0 1.3em 0;
 }
 .title-bar h1 {	
@@ -286,7 +286,7 @@ dl.menu dd {
 	border: 0;
 	padding: 0;
 	margin:0;
-	background-color:#ffe264; /*#aaa;*/	
+	background-color:#f6f6f6; /*#ffe264; /*#aaa;*/	
 	padding-bottom: 0.8em;
 }
 .menu-box {
@@ -301,27 +301,33 @@ dl.menu dd {
 	padding:0.4em 1.0em;
 	color:#666; /*#8e62b1;*/
 	font: 0.95em verdana, arial, sans-serif;
-	border-bottom: 1px solid #ffef89;
+	/*border-bottom: 1px solid #ffef89;*/
+	border-bottom: 1px solid #ddd;
+	/*border-right:1px solid #ddd;*/
 }
 .menu-box li:hover {
-	background:#ffcc33 url(../images/yellow-arrow_20x48.png) right center no-repeat; /*#ccc;*/
+	/*background:#ffcc33 url(../images/yellow-arrow_20x48.png) right center no-repeat; /*#ccc;*/
+	background:#ddd url(../images/grey-arrow_20x48.png) right center no-repeat; /*#ccc;*/
 	cursor:pointer;	
 	color:#333; /*#795497;*/
 }
 .menu-box li.selected {
-	background:#ffef89 url(../images/yellow-arrow_20x48.png) right center no-repeat;
+	/*background:#ffef89 url(../images/yellow-arrow_20x48.png) right center no-repeat;*/
+	background:#fff url(../images/grey-arrow_20x48.png) right center no-repeat;
 	/*background:#ffef89;*/
 	color:#444; /*#532a74; /*#ac84cc;*/
+	/*border-right:1px solid #fff;*/
 }
 .content-box {
 	float:left;
 	width:620px;
-	min-height:380px;
-	background-color:#ffef89; /*#ddd;*/
+	min-height:340px;
+	background-color:#fff; /*#ffef89; /*#ddd;*/
 }
 .content {
 	padding:0.5em 1.0em;
 	font-size: 0.8em;
+	border-top: 1px solid #ddd;
 }
 .content h1 {
 	font-size:1.0em;
@@ -330,13 +336,14 @@ dl.menu dd {
 	color:#7a001e;
 	font: 1.1em verdana, arial, sans-serif;
 	font-weight:normal;
-	border-bottom: 2px solid #ffef89;
+	border-bottom: 2px solid #ddd;	/*#ffef89;*/
 }
 .content a:hover {
 	border-bottom: 2px solid #ffcc33;
 }
 .content a.image-link {
-	border-bottom: 2px solid #ffef89;
+	/*border-bottom: 2px solid #ffef89;*/
+	border-bottom: 2px solid #fff;
 }	
 .content a.image-link img {
 	vertical-align:middle;
@@ -346,5 +353,6 @@ dl.menu dd {
 	font: 0.8em arial, sans-serif;
 }
 .top-border-light {
-	border-top: 1px solid #ffef89;
+	/*border-top: 1px solid #ffef89;*/
+	border-top: 1px solid #ddd;
 }

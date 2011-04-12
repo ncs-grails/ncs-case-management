@@ -98,7 +98,7 @@
 							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 						</dd>
 						
-						<g:each var="reportInstance" in="${Report.list()}">
+						<g:each var="reportInstance" in="${Report.list().sort{ it.title }}">
 							<g:if test="${reportInstance?.enabled}">
 								<g:if test="${reportInstance?.adminsOnly}">
 									<g:ifAnyGranted role="ROLE_NCS_IT">
