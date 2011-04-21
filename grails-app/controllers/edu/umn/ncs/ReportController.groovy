@@ -13,7 +13,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 @Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 class ReportController {
     def dataSource      // inject the Spring-Bean dataSource
-	def birtReportService
+    def birtReportService
 	
     def index = { 
         redirect(action: "list", params: params)

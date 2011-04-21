@@ -373,7 +373,7 @@ class BootStrap {
                  * 1265 3RD ST E             |           |          | SAINT PAUL | MN         | 55106 | 5778 |
                  * 1528 BREDA AVE            |           |          | SAINT PAUL | MN         | 55108 | 2610 |
                  */
-
+/*
                 def myAddressList = [
                     ['1636 BREDA AVE', 'SAINT PAUL', 'MN', '55108', '2701'],
                     ['WYOMING ST E', 'SAINT PAUL', 'MN', '55107', '3240'],
@@ -459,6 +459,7 @@ class BootStrap {
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2010,11,19), quota: 2356)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,2), quota: 2978)
                 new MailingSchedule(instrumnet:advLtr, checkpointDate: new Date(2011,0,9), quota: 3669)
+                */
 
             }
             test {

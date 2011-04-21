@@ -65,7 +65,7 @@
                 <td><g:formatDate date="${b?.mailDate}" format="M/d/yyyy"/></td>
                 <td><g:formatDate date="${b?.calledCampusCourierDate}" format="M/d/yyyy"/></td>
                 <td><g:formatDate date="${b?.trackingReturnDate}" format="M/d/yyyy"/></td>
-                <td><g:link action="edit" id="${b.id}">edit</g:link></td>
+                <td><g:link action="editDates" id="${b.id}">edit</g:link></td>
               </tr>
             </g:each>
             </tbody>

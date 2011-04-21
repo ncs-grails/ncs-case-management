@@ -5,14 +5,18 @@ import org.joda.time.contrib.hibernate.*
 
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugin.springcache.annotations.Cacheable
 
 @Secured(['ROLE_NCS_DOCGEN'])
 class BatchController {
 
+    private boolean debug = true
+
     def emailService
+    def authenticateService
 
     def index = { 
-        redirect(action:'listByDate',params:params)
+        redirect(action:'list',params:params)
     }
 
     def sendNightlyReport = {
@@ -180,9 +184,156 @@ class BatchController {
     }
 
     def list = {
-        redirect(action:'listByDate',params:params)
-    }
+        
+        def username = authenticateService?.principal()?.getUsername()
+        def q = params?.q
+        def searchedId = 0L
 
+       if (q) {
+            if (q.isLong()) {
+                searchedId = Long.parseLong(q)
+            }
+        }
+
+        def batchInstanceList = []
+        def batchRecentList = []
+        def aboutSixMonthAgo = (new Date()) - 180
+
+        // Find recently generated batches
+        def c = Batch.createCriteria()
+        batchRecentList = c.listDistinct{
+            eq('batchRunBy', username)
+            gt('dateCreated', aboutSixMonthAgo)
+        }
+
+        if (q){
+            c = Batch.createCriteria()
+            batchInstanceList = c.listDistinct{
+                or {
+                    eq('id', searchedId)
+                    instruments {
+                        and {
+                            eq('isPrimary', true)
+                            instrument {
+                                ilike('name', "%${q}%")
+                                ilike('nickName', "%${q}%")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        [batchInstanceList:batchInstanceList,
+            batchRecentList:batchRecentList]
+    }
+	
+	def show = {
+		println "params --> ${params}"
+		def batchInstance = Batch.read(params.id)
+		if (!batchInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+			redirect(action: "list")
+		} else {
+			[batchInstance: batchInstance]
+		}
+	}
+
+	def edit = {
+
+		def batchInstance = Batch.read(params.id)
+		
+		def dayPrior = batchInstance.dateCreated - 1
+		def dayAfter = batchInstance.dateCreated + 1
+		
+		// List of batches to choose for master batch
+		def masterBatchList = []
+		def c = Batch.createCriteria()
+		def batchInstanceList = c.listDistinct {
+			and {
+				gt("dateCreated", dayPrior)
+				lt("dateCreated", dayAfter)
+			}
+		}
+		
+		batchInstanceList.each{ b ->
+			def batchInfo = [
+					id:b.id, 
+					name:"Batch ID ${b.id}: ${b.primaryInstrument.name}"
+					]
+			masterBatchList.add(batchInfo)
+		}
+		
+
+		
+		if (!batchInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+			redirect(action: "list")
+		} else {
+
+			def itemsList = []
+			/* Check the batch items: created for dwelling Units, persons or households */
+			batchInstanceList.items.each{i ->
+				def itemsInfo = [
+					dwellingUnit: i?.dwellingUnit?.id,
+					household: i?.household?.id,
+					person: i?.person?.id
+				]
+				itemsList.add(itemsInfo)
+			}
+		
+			[batchInstance: batchInstance, itemsList: itemsList]
+		}
+	}
+
+	def addItem = {
+
+		
+		def batchInstance = Batch.read(params?.id)
+		
+		def dwellingUnitId = params?.dwellingUnit?.id
+		def personId = params?.person?.id
+		def householdId = params?.household?.id
+		
+		def bcq = new BatchCreationQueue()
+		
+		if (dwellingUnitId) {
+			def dwellingUnit = DwellingUnit.read(dwellingUnitId)
+			if (dwellingUnit) {
+				bcq.dwellingUnit = dwellingUnit
+			}
+		}
+		
+		if (personId){
+			def person = Person.read(personId)
+			if (person){
+				bcq.person = person
+			} 
+		}
+		
+		if (householdId){
+			def household = household.read(householdId)
+			if (household){
+				bcq.household = household
+			} 
+		}
+
+		
+		if (!bcq.validate()) {
+			flash.message = "Valid DwellingUnit, Person or Household ID Required."
+			println "flash.message = Valid DwellingUnit, Person or Household ID Required."
+		} else {
+			def trackedItemInstance = new TrackedItem(person: bcq.person,
+												dwellingUnit: bcq.dwellingUnit,
+												household: bcq.household)
+			if (trackedItemInstance) {
+				println "Ready to add to the batch."	
+			}
+		}
+
+		redirect(action: "edit", id: batchInstance.id)
+	}
+
+	
     def listByDate = {
 
         def referenceDate = params?.referenceDate
@@ -212,7 +363,7 @@ class BatchController {
             batchInstanceList: batchInstanceList]
     }
 
-    def edit = {
+    def editDates = {
         def batchInstance = Batch.get(params.id)
         if (!batchInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
@@ -248,7 +399,7 @@ class BatchController {
 
             if (params.calledCampusCourierDate && params.calledCampusCourierDate < batchInstance.dateCreated) {
                 batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
-                    render(view: "edit", model: [ batchInstance: batchInstance,
+                    render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])
@@ -257,7 +408,7 @@ class BatchController {
 
             if (params.addressAndMailingDate && params.addressAndMailingDate < batchInstance.dateCreated){
                 batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
-                    render(view: "edit", model: [batchInstance: batchInstance,
+                    render(view: "editDates", model: [batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])
@@ -266,7 +417,7 @@ class BatchController {
 
             if (params.mailDate && params.mailDate < batchInstance.dateCreated) {
                 batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Mailing Date must come after date generated")
-                    render(view: "edit", model: [ batchInstance: batchInstance,
+                    render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])
@@ -276,7 +427,7 @@ class BatchController {
 
             if (params.trackingReturnDate && params.trackingReturnDate < batchInstance.dateCreated) {
                 batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after date generated")
-                    render(view: "edit", model: [ batchInstance: batchInstance,
+                    render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])
@@ -285,7 +436,7 @@ class BatchController {
 
             if (params.mailDate && params.trackingReturnDate && params.mailDate > params.trackingReturnDate) {
                 batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
-                    render(view: "edit", model: [ batchInstance: batchInstance,
+                    render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
                         referenceDateYear: referenceDateYear,
                         yearRange: yearRange])
@@ -297,17 +448,17 @@ class BatchController {
                 if (batchInstance.version > version) {
 
                     batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
-                    render(view: "edit", model: [batchInstance: batchInstance])
+                    render(view: "editDates", model: [batchInstance: batchInstance])
                     return
                 }
             }
             batchInstance.properties = params
             if (!batchInstance.hasErrors() && batchInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
-                redirect(action: "edit", id: batchInstance.id)
+                redirect(action: "editDates", id: batchInstance.id)
             }
             else {
-                render(view: "edit", model: [batchInstance: batchInstance])
+                render(view: "editDates", model: [batchInstance: batchInstance])
             }
         }
         else {

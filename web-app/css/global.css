@@ -356,3 +356,49 @@ dl.menu dd {
 	/*border-top: 1px solid #ffef89;*/
 	border-top: 1px solid #ddd;
 }
+
+ul.list li{
+	list-style:none;
+	background: url(../images/bullet.gif) left center no-repeat;
+	padding: 2px 0 2px 12px;
+	vertical-align: middle;
+}
+
+div.manageBatch {
+	overflow:hidden;
+	width:756px;
+}
+
+table.scroll tbody {
+	display: block;
+	height: 262px;
+	overflow: auto;
+	width: 756px;
+}
+
+table.scroll th {
+	width: 200px;
+	padding: 2px 6px;
+}
+
+table.scroll tr {
+	display: block;
+}
+
+table.scroll td {
+	width: 200px;
+	border-bottom: none;
+	border-left: none;
+	
+	border-top: 1px solid #DDD;
+	padding: 2px 3px 3px 15px;	
+}
+
+.buttons input.create {
+	background: url(../images/skin/database_add.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+
+
+

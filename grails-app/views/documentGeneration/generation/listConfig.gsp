@@ -18,14 +18,18 @@
 	<div class="message">
 	${flash.message}
 	</div>
-</g:if> <g:form action="generation">
+</g:if>
+
+<g:form action="generation">
+
 	<div id="searchForm"><g:textField name="q" value="${params.q}" />
 	<g:submitButton name="search" value="Search" /></div>
 
-</g:form> <g:if test="${batchCreationConfigInstanceList.size() > 0}">
-	<fieldset class="maroonBorder"><legend>Search
-	Results</legend>
+</g:form>
 
+<g:if test="${batchCreationConfigInstanceList.size() > 0}">
+	<fieldset class="maroonBorder">
+          <legend>Search Results</legend>
 
 	<div class="list">
 	<table>

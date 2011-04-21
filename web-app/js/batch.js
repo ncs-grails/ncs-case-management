@@ -11,5 +11,9 @@ $(document).ready(function(){
 	$('select[name^="referenceDate_"]').change(function(){
             $('form[name="mailDateForm"]').submit();
 	});
+	
+	function checkItems(dwellingUnit) {
+		alert(dwellingUnit);
+	}
 
 });

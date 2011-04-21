@@ -49,6 +49,8 @@
 							in the system so that they can be properly tracked</dd>
 							<dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
 							<dd>Manage mailing dates and quota for the instrument.</dd>
+							<dt><g:link controller="batch" action="list">Batch Management</</g:link></dt>
+							<dd>Manage batch attributes and items.</dd>							
 						</dl>				
 					</div>
 				</g:ifAnyGranted>

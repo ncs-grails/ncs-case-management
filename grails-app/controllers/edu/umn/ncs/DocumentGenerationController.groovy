@@ -8,7 +8,6 @@ import java.util.regex.Pattern
 @Secured(['ROLE_NCS_DOCGEN'])
 class DocumentGenerationController {
     def documentGenerationService
-    def reportService
     def authenticateService
 
     def ngp = {
@@ -265,21 +264,24 @@ class DocumentGenerationController {
                     criteria = BatchCreationConfig.createCriteria()
 
                     batchCreationConfigInstanceList = criteria.listDistinct{
-                        or {
-                            ilike('name', "%${q}%")
-                            instrument {
-                                or {
-                                    study {
-                                        or {
-                                            ilike('name', "%${q}%")
-                                            ilike('fullName', "%${q}%")
-                                        }
-                                    }
-                                    ilike('name', "%${q}%")
-                                    ilike('nickName', "%${q}%")
-                                }
-                            }
-                        }
+						and {
+							eq('active', true)
+								or {
+									ilike('name', "%${q}%")
+									instrument {
+										or {
+											study {
+												or {
+													ilike('name', "%${q}%")
+													ilike('fullName', "%${q}%")
+												}
+											}
+											ilike('name', "%${q}%")
+											ilike('nickName', "%${q}%")
+										}
+									}
+								}
+							}
                     }
                 }
 
