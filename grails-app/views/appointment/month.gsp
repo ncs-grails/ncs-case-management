@@ -35,13 +35,13 @@
                     <tbody>
 						<g:each var="w" in="${weeks}">
 						<tr>
-							<g:each var="d" in "${w.days}">
+							<g:each var="d" in="${w?.days}">
 							<td>
 								<div class="dayOfMonth">${d.dayOfMonth}</div>
 								<ul class="appointmentList">
-									<g:each var="a" in "${d.appointments}">
+									<g:each var="a" in="${d?.appointments}">
 									<li>
-										<g:formatDate date="${a.startTime}" format="h:mm" /> - ${a.type}<br/>
+										<g:formatDate date="${a?.startTime}" format="h:mm" /> - ${a?.type}<br/>
 										${a.person?.lastName}
 										${a.dwellingUnit?.address}
 									</li>

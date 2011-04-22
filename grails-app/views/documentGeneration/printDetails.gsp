@@ -21,9 +21,9 @@
 
 <h2>${batchCreationConfigInstance?.name}</h2>
 
-<fieldset class="maroonBorder"><legend class="m1">Data
-Sources To Save...</legend> <g:each var="ds"
-	in="${batchCreationConfigInstance?.documents}">
+<fieldset class="maroonBorder">
+	<legend class="m1">Data Sources To Save...</legend>
+	<g:each var="ds" in="${batchCreationConfigInstance?.documents}">
 	<g:if test="${ds.mergeSourceFile != null}">
 		<p>Right-Click and choose "Save Link As..."</p>
 		<g:link action="downloadDataset" class="csv"

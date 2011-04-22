@@ -59,8 +59,8 @@
 </ul>
 
 
-<!-- Form goes here --> <g:each var="d"
-	in="${batchCreationConfigInstance.documents}">
+	<!-- Form goes here -->
+	<g:each var="d" in="${batchCreationConfigInstance.documents}">
 	<div id="dtabs-${d.id}"><g:form method="post"
 		controller="batchCreationDocument">
 		<g:hiddenField name="id" value="${d?.id}" />
@@ -136,7 +136,8 @@
 </g:form></div>
 </div>
 </div>
-<!-- /Documents --> <!-- Items -->
+<!-- /Documents -->
+<!-- Items -->
 <div class="dialog">
 <div id="itemtabs">
 <ul>
@@ -150,8 +151,8 @@
 	</g:if>
 </ul>
 
-<!-- Form goes here --> <g:each var="i"
-	in="${batchCreationConfigInstance.subItems}">
+	<!-- Form goes here -->
+	<g:each var="i" in="${batchCreationConfigInstance.subItems}">
 	<div id="itabs-${i.id}"><g:form method="post"
 		controller="batchCreationItem">
 		<g:hiddenField name="i_id" value="${i?.id}" />
