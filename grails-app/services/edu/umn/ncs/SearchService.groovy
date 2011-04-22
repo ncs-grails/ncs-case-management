@@ -1,5 +1,5 @@
 package edu.umn.ncs
-import grails.plugin.springcache.annotations.Cacheable
+//import grails.plugin.springcache.annotations.Cacheable
 
 class SearchService {
 
@@ -7,7 +7,7 @@ class SearchService {
 
 	private boolean debug = false
 
-	@Cacheable("lookupCache")
+	//@Cacheable("lookupCache")
     def query(String queryString) {
 
 		def results = []
@@ -162,32 +162,41 @@ class SearchService {
 						description: dwellingUnitInstance.address.address,
 						id: dwellingUnitInstance.id ])
 			}
-
-
-			/*
-			 * This worked, but I wanted to speed it up, so it's now a criteria
-			 * builder.
-			 *
-
-			// Find the address using a case-insensitive LIKE
-			def streetAddressInstanceList = StreetAddress.findAllByAddressIlike("${queryString}%")
-
-			streetAddressInstanceList.eachWithIndex { address, i ->
-
-				// see if the address is associated with a dwelling unit
-				def dwellingUnitInstance = DwellingUnit.findByAddress(address)
-
-				if (dwellingUnitInstance && i < 10 ) {
-
-					// we found a dwelling unit by address
-					results.add([matchType: 'Street Address',
-							controller: 'dwellingUnit',
-							action: 'show',
-							description: dwellingUnitInstance.address.address,
-							id: dwellingUnitInstance.id ])
-				}
+		}
+		
+		if (alphaPattern.matcher(queryString).matches()) {
+			def c = Person.createCriteria()
+			
+			def personInstanceList = c.list{
+				ilike("lastName", "${queryString}%")
+				maxResults(20)
 			}
-			*/
+			
+			personInstanceList.each { personInstance ->
+				
+				// we found a dwelling unit by address
+				results.add([matchType: 'Person, first name',
+						controller: 'person',
+						action: 'show',
+						description: personInstance.fullName,
+						id: personInstance.id ])
+			}
+
+			c = Person.createCriteria()
+			personInstanceList = c.list{
+				ilike("firstName", "${queryString}%")
+				maxResults(20)
+			}
+			
+			personInstanceList.each { personInstance ->
+				
+				// we found a dwelling unit by address
+				results.add([matchType: 'Person, last name',
+						controller: 'person',
+						action: 'show',
+						description: personInstance.fullName,
+						id: personInstance.id ])
+			}
 
 		}
 

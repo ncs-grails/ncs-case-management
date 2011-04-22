@@ -67,8 +67,14 @@
 
 						<dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
 						<dd>Enter mail dates for generated batches</dd>
+
 						<dt><g:link controller="receiptItems" action="index">Receipt Items</g:link></dt>
 						<dd>Receipt documents</dd>
+
+						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<dt><g:link controller="appointment">Appointment Entry</g:link></dt>
+						<dd>Enter Appointment Dates and Times for study subjects.</dd>
+						</g:ifAnyGranted>
 					</dl>
 				</div>
 
@@ -79,7 +85,7 @@
 						about them</dd>
 						
 						<dt><a href="https://secure.ncs.umn.edu/ncs-segment-lookup" target="_blank">Address Lookup</a></dt>
-						<dd>Search by address (opens in a new tab)</dd>
+						<dd>Look up the recruitment eligibility of an address (opens in a new tab)</dd>
 					</dl>
 				</div>
 								

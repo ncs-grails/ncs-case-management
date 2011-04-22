@@ -277,6 +277,73 @@ class BootStrap {
                 questionnaireIncentive: false).save()
         }
 
+		//
+		// APPOINTMENTS
+		//
+		
+		// IncentiveType
+		def visaGiftCard = IncentiveType.findByName("Visa Gift Card")
+		if (! visaGiftCard) {
+			visaGiftCard = new IncentiveType(name: "Visa Gift Card").save()
+		}
+		
+		// AppointmentDetailType
+		// TODO: add AppointmentDetailType list
+		
+		def confirmed = AppointmentResultCategory.findByName("Confirmed")
+		if ( ! confirmed ) {
+			confirmed = new AppointmentResultCategory(name:"Confirmed").save()
+		}
+		def cancelled = AppointmentResultCategory.findByName("Cancelled")
+		if ( ! cancelled ) {
+			cancelled = new AppointmentResultCategory(name:"Cancelled").save()
+		}
+		def superceded = AppointmentResultCategory.findByName("Superceded")
+		if ( ! superceded ) {
+			superceded = new AppointmentResultCategory(name:"Superceded").save()
+		}
+
+		
+		// AppointmentResult
+		def confirmedAppt = AppointmentResult.findByName("Confirmed")
+		if ( ! confirmedAppt ) {
+			confirmedAppt = new AppointmentResult(name:"Confirmed", category:confirmed , allowBillable: true).save()
+		}
+		def confirmedApptRetReq = AppointmentResult.findByName("Return Visit Required")
+		if ( ! confirmedApptRetReq ) {
+			confirmedApptRetReq = new AppointmentResult(name:"Return Visit Required", category:confirmed , allowBillable: true).save()
+		}
+		def noShow = AppointmentResult.findByName("No Show")
+		if ( ! noShow ) {
+			noShow = new AppointmentResult(name:"No Show", category:cancelled , allowBillable: false).save()
+		}
+		def cancelAppt = AppointmentResult.findByName("Cancel")
+		if ( ! cancelAppt ) {
+			cancelAppt = new AppointmentResult(name:"Cancel", category:cancelled , allowBillable: false).save()
+		}
+		def reschedRequest = AppointmentResult.findByName("Reschedule Request")
+		if ( ! reschedRequest ) {
+			reschedRequest = new AppointmentResult(name:"Reschedule Request", category:superceded , allowBillable: false).save()
+		}
+
+		// AppointmentType
+		def highIntensityConsent = AppointmentType.findByName("High Intensity Consent")
+		if ( ! highIntensityConsent ) {
+			highIntensityConsent = new AppointmentType(name:"High Intensity Consent").save()
+		}
+		
+		// AppointmentLocation
+		def atHome = AppointmentLocation.findByName("Subject's Residence")
+		if ( ! atHome ) {
+			atHome = new AppointmentLocation(name:"Subject's Residence")
+			if (! atHome.save() ) {
+				println "Failed to save location."
+				atHome.errors.each{
+					println it
+				}
+			}
+		}
+		
 
         if (site == "umn") {
             // Create Address for Screening Center Locations
@@ -473,6 +540,9 @@ class BootStrap {
                 word.substring(0,1).toUpperCase() + word.substring(1, word.size())
             }.join(' ')
         }
+		
+		def env = System.getenv()
+		println "\nBrowse to https://${env['USERNAME']}.healthstudies.umn.edu:8443/ncs-case-management/\n"
 
     }
     def destroy = {
