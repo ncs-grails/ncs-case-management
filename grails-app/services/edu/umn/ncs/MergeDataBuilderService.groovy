@@ -231,9 +231,17 @@ class MergeDataBuilderService {
 			def trackedItemInstance = TrackedItem.read(record.itemId)
 			def appointmentInstance = Appointment.findByLetter(trackedItemInstance)
 			record.appointmentDate = appointmentInstance.startTime
+			record.appointmentType = appointment.type
+			record.appointmentResult = appointment.result
+			record.appointmentLocation = appointment.location
+			record.appointmentBillable = appointment.billable
+			record.appointmentParentAppointment = appointment.parentAppointment
+			record.appointmentScheduledBy = appointment.scheduledBy
+			record.appointmentGenerateLetter = appointment.generateLetter
 			// TODO: ...
 			
 		}
+		dataSet
 	}
 	
     def addCustomData() {
