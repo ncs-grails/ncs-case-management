@@ -7,7 +7,7 @@ import groovy.sql.Sql
  *
  *   https://svn.cccs.umn.edu/svn/VisualStudio/2008.CS.NET/_general/DocumentGeneration/Objects/clsDocGen.cs
  *
- * NOTE, the aformationed code is not open source, but this link is left in here
+ * NOTE, the afformentioned code is not open source, but this link is left in here
  * for historical reference */
 class DocumentGenerationService {
 
@@ -583,7 +583,19 @@ class DocumentGenerationService {
                         def sql = new Sql(dataSource)
                         if (sql) {
                             try {
-                                sql.execute(batchCreationConfigInstance.postGenerationQuery)
+								
+								def pgsParams = [:]
+								// Replace :mailDate with actual mail date
+								if (batchCreationConfigInstance.postGenerationQuery.contains(':batchId')) {
+									pgsParams.batchId = masterBatch.id
+								}
+			
+								if (pgsParams) {
+									sql.execute(batchCreationConfigInstance.postGenerationQuery, pgsParams)
+								} else {
+									sql.execute(batchCreationConfigInstance.postGenerationQuery)
+								}
+								
                             } catch (Exception ex) {
                                 // TODO: catch error and report to someone who can fix it!
                                 println "Invalid Post-Generation Query (or error somwhere along those lines...)"
@@ -598,7 +610,7 @@ class DocumentGenerationService {
         return masterBatch
     }
 
-    def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
+    def addAppointmentData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
 
         // the stuff to write to the file
         def mergeSourceContents = new StringBuffer()
@@ -613,7 +625,9 @@ class DocumentGenerationService {
                 outputData = mergeDataBuilderService.addPersonData(outputData)
             } else if (it.code == "norc") {
                 outputData = mergeDataBuilderService.addNORCData(outputData)
-            }
+            } else if (it.code == "appointment") {
+				outputData = mergeDataBuilderService.addAppointmentData(outputData)
+			}
         }
 
         outputData = outputData.sort{ it.itemId }

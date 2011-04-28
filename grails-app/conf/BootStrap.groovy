@@ -127,6 +127,11 @@ class BootStrap {
             personData = new DataSetType(name:"Person", code:'person').save()
         }
 
+		def appointmentData = DataSetType.findByCode("appointment")
+		if (! appointment) {
+			appointment = new DataSetType(name:"Appointment Data", code:'appointment').save()
+		}
+
         def customData = DataSetType.findByCode("custom")
         if (! customData) {
             customData = new DataSetType(name:"Custom", code:'custom').save()

@@ -144,6 +144,11 @@
 			<locationURI>GRAILS_ROOT/1.3.5/projects/ncs-case-management/plugins/mail-1.0-SNAPSHOT/src/groovy</locationURI>
 		</link>
 		<link>
+			<name>ncs-appointment-0.1-grails-app-domain</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/1.3.5/projects/ncs-case-management/plugins/ncs-appointment-0.1/grails-app/domain</locationURI>
+		</link>
+		<link>
 			<name>ncs-norc-link-0.4-grails-app-domain</name>
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.5/projects/ncs-case-management/plugins/ncs-norc-link-0.4/grails-app/domain</locationURI>

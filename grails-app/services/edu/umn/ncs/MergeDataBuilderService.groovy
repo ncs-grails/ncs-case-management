@@ -2,6 +2,14 @@ package edu.umn.ncs
 
 class MergeDataBuilderService {
 
+	/*
+	 * 
+	 * NOTE: when you add a new service method here, you'll need to:
+	 *    add a new "else if" to DocumentGenerationService.addAppointmentData()
+	 *    add a new DataSetType to the grails-app\conf\BootStrap.groovy code.
+	 *    
+	 */
+	
     static transactional = true
 
     def getBaseData(Batch batchInstance) {
@@ -217,6 +225,17 @@ class MergeDataBuilderService {
         }
         dataSet
     }
+	
+	def addAppointmentData() {
+		dataSet.collect{record ->
+			def trackedItemInstance = TrackedItem.read(record.itemId)
+			def appointmentInstance = Appointment.findByLetter(trackedItemInstance)
+			record.appointmentDate = appointmentInstance.startTime
+			// TODO: ...
+			
+		}
+	}
+	
     def addCustomData() {
 
     }
