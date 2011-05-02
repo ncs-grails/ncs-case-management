@@ -610,7 +610,7 @@ class DocumentGenerationService {
         return masterBatch
     }
 
-    def addAppointmentData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
+    def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
 
         // the stuff to write to the file
         def mergeSourceContents = new StringBuffer()

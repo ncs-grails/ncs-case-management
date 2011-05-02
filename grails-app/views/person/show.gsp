@@ -28,9 +28,9 @@
 			<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
 				<h2>Address: ${pa.id}</h2>
 				<p>
-				${pa.address.address}<br />
-				${pa.address.cityStateZip}<br />
-				${pa.address.country?.name}
+				${pa.streetAddress.address}<br />
+				${pa.streetAddress.cityStateZip}<br />
+				${pa.streetAddress.country?.name}
 				</p>
 			</fieldset>
 		</g:each>
