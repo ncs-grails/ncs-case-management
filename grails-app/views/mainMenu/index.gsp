@@ -12,7 +12,7 @@
 	</div>
 	
 	<div class="title-bar">
-		<h1>Welcome to the National Children's Study - Dev</h1>
+		<h1>Welcome to the National Children's Study</h1>
 		
 		<p>This application is available for generating and tracking study
 		documents and tracking the location of study participants.</p>
