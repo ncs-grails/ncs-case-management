@@ -52,7 +52,7 @@
 <ul>
 	<g:each var="d" in="${batchCreationConfigInstance.documents}">
 		<li><a href="#dtabs-${d.id}">
-		${new File(d.documentLocation).name}
+		${new File(d.documentLocation.replace('\\','/') ).name}
 		</a></li>
 	</g:each>
 	<li><a href="#dtabs-new">New</a></li>

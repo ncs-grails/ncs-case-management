@@ -11,11 +11,15 @@ class MergeDataBuilderService {
 	 */
 	
     static transactional = true
+	
+	def debug = false
 
     def getBaseData(Batch batchInstance) {
         // this will be a list of map items.
         def dataSet = []
 
+		if (debug) { println "MergeDataBuilderService:getBaseData:: called." }
+		
         // loop through the items in the batch
         // Not sure if I mapped right: eventDesc, childSID
         // Did not map: documentTitle, instructions, reason, comments
@@ -46,6 +50,8 @@ class MergeDataBuilderService {
                 resultName: item?.result?.result?.name,
                 resultDate: item?.result?.receivedDate
             ]
+			
+			if (debug) { println "MergeDataBuilderService:getBaseData::record.itemId = ${record.itemId}" }
 
             if (item.dwellingUnit) {
                 record.dwellingUnitId = item.dwellingUnit.id
@@ -60,7 +66,19 @@ class MergeDataBuilderService {
                 record.firstName = item.person?.firstName
                 record.lastName = item.person?.lastName
                 record.gender = item.person?.gender?.name
-                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender?.id == 1) ? "Dear Mr. " + record.lastName : (record.gender?.id == 2) ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
+				if (record.lastName == null) {
+					record.salutation ="To whom it may concern"
+				} else if (record.title == null && item.person?.gender?.id == 1) {
+					record.salutation ="Dear Mr. ${record.lastName}"
+				} else if (record.title == null && item.person?.gender?.id == 2) {
+					record.salutation ="Dear Ms. ${record.lastName}"
+				} else if (record.title == null) {
+					record.salutation ="To whom it may concern"
+				} else if (record.title.size() < 4) {
+					record.salutation ="Dear ${record.title}. ${record.lastName}"
+				} else {
+					record.salutation ="Dear ${record.title} ${record.lastName}"
+				}
             }
 
             def comments = TrackedItemComment.findByItemAndSubject(item, 'general')
@@ -161,29 +179,36 @@ class MergeDataBuilderService {
 
     def addPersonData(dataSet) {
         
+		Study studyInstance = null
+		
+		if (dataSet) {
+			studyInstance = Study.read(dataSet[0]?.studyId)
+		}
+		
         dataSet.collect{ record ->
             def personInstance = Person.read(record.personId)
             if (personInstance) {
-                record.subjectId = Subject.findByPerson(personInstance)?.subjectId
-                record.selectionDate = Subject.findByPerson(personInstance)?.selectionDate
+				def subjectInstance = Subject.findByPersonAndStudy(personInstance, studyInstance)
+				
+                record.subjectId = subjectInstance?.subjectId
+                record.selectionDate = subjectInstance?.selectionDate
                 record.fullName = personInstance?.fullName
                 record.title = personInstance?.title
                 record.firstName = personInstance?.firstName
                 record.lastName = personInstance?.lastName
                 record.gender = personInstance?.gender?.name
-                record.salutation = (record.lastName == null) ? "To whom it may concern" : (record.title == null) ? (record.gender == "male") ? "Dear Mr. " + record.lastName : (record.gender == "female") ? "Dear Ms. " + record.lastName : "To whom it may concern" : (record.title.size() < 4) ? "Dear " + record.title + ". " + record.lastName : "Dear " + record.title + " " + record.lastName
-                record.address = personInstance?.bestAddress?.address
-                record.address2 = personInstance?.bestAddress?.address2
-                record.zipCode =  personInstance?.bestAddress?.zipCode
-                record.country = personInstance?.bestAddress?.country?.name
-                record.cityStateZip = personInstance?.bestAddress?.cityStateZip
+                record.address = personInstance?.bestAddress?.streetAddress?.address
+                record.address2 = personInstance?.bestAddress?.streetAddress?.address2
+                record.zipCode =  personInstance?.bestAddress?.streetAddress?.zipCode
+                record.country = personInstance?.bestAddress?.streetAddress?.country?.name
+                record.cityStateZip = personInstance?.bestAddress?.streetAddress?.cityStateZip
                 record.primaryPhone = personInstance?.primaryPhone?.phoneNumber?.prettyPhone
                 record.primaryPhoneType = personInstance?.primaryPhone?.phoneType?.name
                 record.primaryEmail = personInstance?.primaryEmail?.emailAddress?.emailAddress
                 record.primaryEmailType = personInstance?.primaryEmail?.emailType?.name
                 record.birthDate = personInstance?.birthDate
                 record.deathDate = personInstance?.deathDate
-                record.enrollmentType = Subject.findByPerson(personInstance?.enrollment?.name)
+                record.enrollmentType = subjectInstance?.enrollment
                 
             }
         }
@@ -226,26 +251,33 @@ class MergeDataBuilderService {
         dataSet
     }
 	
-	def addAppointmentData() {
+	def addAppointmentData(dataSet) {
 		dataSet.collect{record ->
 			def trackedItemInstance = TrackedItem.read(record.itemId)
 			def appointmentInstance = Appointment.findByLetter(trackedItemInstance)
-			record.appointmentDate = appointmentInstance.startTime
-			record.appointmentType = appointment.type
-			record.appointmentResult = appointment.result
-			record.appointmentLocation = appointment.location
-			record.appointmentBillable = appointment.billable
-			record.appointmentParentAppointment = appointment.parentAppointment
-			record.appointmentScheduledBy = appointment.scheduledBy
-			record.appointmentGenerateLetter = appointment.generateLetter
-			// TODO: ...
-			
+			if ( appointmentInstance ) {
+				if (debug) { println "Found Appointment." }
+				record.appointmentDate = appointmentInstance.startTime
+				record.appointmentType = appointmentInstance.type
+				record.appointmentResult = appointmentInstance.result
+				record.appointmentLocation = appointmentInstance.location
+				record.appointmentBillable = appointmentInstance.billable
+				record.appointmentParentAppointmentTime = appointmentInstance.parentAppointment?.startTime
+				record.appointmentScheduledBy = appointmentInstance.scheduledBy
+				// TODO: Add Incentive Information
+			} else {
+				println "Couldn't find appointment using letter ID ${record.itemId}."
+			}
 		}
 		dataSet
 	}
 	
-    def addCustomData() {
-
+    def addCustomData(dataSet) {
+		dataSet.collect{record ->
+			def trackedItemInstance = TrackedItem.read(record.itemId)
+			def personInstance = trackedItemInstance.person
+		}
+		dataSet
     }
 
 }

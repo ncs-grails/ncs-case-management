@@ -16,6 +16,8 @@ class DocumentGenerationService {
     def mergeDataBuilderService
 
     def appName = 'ncs-case-management'
+	
+	def debug = false
     
     // Loads an existing mailing into the print queue
     def reQueueMailing(Batch batchInstance, String username) {
@@ -73,7 +75,7 @@ class DocumentGenerationService {
          *
          **/
 
-        //println "${params}"
+        if (debug) { println "${params}" }
 
         // We'll use these later...
         def attachmentOf = BatchCreationItemRelation.findByName('attachment')
@@ -84,7 +86,7 @@ class DocumentGenerationService {
         def instructions = null
         def comments = null       
 
-        //println "generateMailing params --> ${params}"
+        if (debug) { println "generateMailing params --> ${params}" }
         if (!params.mailDate) {
             params.mailDate = null
         }
@@ -189,13 +191,21 @@ class DocumentGenerationService {
                                 def bcq = new BatchCreationQueue()
 
                                 if (row.containsKey('person')) {
-                                    bcq.person = Person.get(row.person)
+                                    bcq.person = Person.read(row.person)
+									if (debug) { println "Person found: ${bcq.person}" }
+                                } else if (row.containsKey('person_id')) {
+                                    bcq.person = Person.read(row.person_id)
+									if (debug) { println "Person.id found: ${bcq.person}" }
                                 }
                                 if (row.containsKey('household')) {
-                                    bcq.household = Household.get(row.household)
+                                    bcq.household = Household.read(row.household)
+                                } else if (row.containsKey('household_id')) {
+                                    bcq.household = Household.read(row.household)
                                 }
                                 if (row.containsKey('dwelling_unit')) {
-                                    bcq.dwellingUnit = DwellingUnit.get(row.dwelling_unit)
+                                    bcq.dwellingUnit = DwellingUnit.read(row.dwelling_unit)
+                                } else if (row.containsKey('dwelling_unit_id')) {
+                                    bcq.dwellingUnit = DwellingUnit.read(row.dwelling_unit_id)
                                 }
                                 bcq.username = username
 
@@ -204,7 +214,9 @@ class DocumentGenerationService {
                                     println "invalid selection list row: ${row}, expected [person, household, or dwelling_unit]"
                                     //throw new DocumentGenerationException("invalid selection list row: ${row}, expected [person, household, or dwelling_unit]")
                                     validSelectionList = false
-                                }
+                                } else {
+									if (debug) { println "valid record found..." }
+								}
                             }
                         } else {
                             println "Error: no results returned!"
@@ -418,15 +430,21 @@ class DocumentGenerationService {
 
                             def bcq = new BatchCreationQueue()
 
-                            if (row.containsKey('person')) {
-                                bcq.person = Person.get(row.person)
-                            }
-                            if (row.containsKey('household')) {
-                                bcq.household = Household.get(row.household)
-                            }
-                            if (row.containsKey('dwelling_unit')) {
-                                bcq.dwellingUnit = DwellingUnit.get(row.dwelling_unit)
-                            }
+							if (row.containsKey('person')) {
+								bcq.person = Person.read(row.person)
+							} else if (row.containsKey('person_id')) {
+								bcq.person = Person.read(row.person_id)
+							}
+							if (row.containsKey('household')) {
+								bcq.household = Household.read(row.household)
+							} else if (row.containsKey('household_id')) {
+								bcq.household = Household.read(row.household)
+							}
+							if (row.containsKey('dwelling_unit')) {
+								bcq.dwellingUnit = DwellingUnit.read(row.dwelling_unit)
+							} else if (row.containsKey('dwelling_unit_id')) {
+								bcq.dwellingUnit = DwellingUnit.read(row.dwelling_unit_id)
+							}
                             bcq.username = username
 
 
@@ -558,7 +576,9 @@ class DocumentGenerationService {
 
                                     trackedItemList.add(trackedItem)
                                 }
-                            }
+                            } else {
+								println "Invalid Batch Creation Queue Record"
+							}
                         }
 
                         batchInfoList.sort{it.sortOrder}.each{ b ->
@@ -591,6 +611,7 @@ class DocumentGenerationService {
 								}
 			
 								if (pgsParams) {
+									
 									sql.execute(batchCreationConfigInstance.postGenerationQuery, pgsParams)
 								} else {
 									sql.execute(batchCreationConfigInstance.postGenerationQuery)
@@ -603,7 +624,9 @@ class DocumentGenerationService {
                             }
                         }
                     }
-                } //  if (validSelectionList && !emptySelectionList)
+                } else {
+					println "Invalid Selection List, or selection query returns empty dataset."
+				} //  if (validSelectionList && !emptySelectionList)
             } // if (dataSource)
         }
 
@@ -619,6 +642,9 @@ class DocumentGenerationService {
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
         batchCreationDocumentInstance.dataSets.each{
+			if (debug) {
+				println "Dataset type: ${it.code}"
+			}
             if (it.code == "dwelling") {
                 outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
             } else if (it.code == "person") {
@@ -627,25 +653,19 @@ class DocumentGenerationService {
                 outputData = mergeDataBuilderService.addNORCData(outputData)
             } else if (it.code == "appointment") {
 				outputData = mergeDataBuilderService.addAppointmentData(outputData)
+			} else {
+				println "Uknown Data Set Type: ${it.code}!"
 			}
         }
 
         outputData = outputData.sort{ it.itemId }
 
-        def recNo = 1
+        def recNo = 0
         outputData.each{
-            it.recordNumber = recNo
             recNo++
+            it.recordNumber = recNo
         }
 
-        // Does not update recNo correctly for Tracking documents. Not Fixed
-        /*
-        outputData.each{
-            println "${it.address} -> ${it.recordNumber}"
-        }
-        */
-
-        recNo--
         //adding pieces+tracking documents
         outputData.each{
             it.piecesPlusTracking = recNo
