@@ -247,6 +247,15 @@ class MergeDataBuilderService {
             } else {
                 record.norcSuId = ""
             }
+			
+
+			if (record.norcDocId && record.norcProjectId && record.norcSuId) {
+				record.norcMailingId = "${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}"
+				record.norcMailingBarcode = "*${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}*"
+			} else {
+				record.norcMailingId = ""
+				record.norcMailingBarcode = ""
+			}
         }
         dataSet
     }

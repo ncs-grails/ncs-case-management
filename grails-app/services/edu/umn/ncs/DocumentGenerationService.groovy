@@ -1,5 +1,4 @@
 package edu.umn.ncs
-import javax.sql.DataSource
 import groovy.sql.Sql
 
 /* This class is based on the C# class written by Aaron J. Zirbes @ umn.edu
@@ -12,7 +11,7 @@ import groovy.sql.Sql
 class DocumentGenerationService {
 
     static transactional = true
-    DataSource dataSource
+    def dataSource
     def mergeDataBuilderService
 
     def appName = 'ncs-case-management'
