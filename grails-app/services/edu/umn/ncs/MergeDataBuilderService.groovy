@@ -248,6 +248,15 @@ class MergeDataBuilderService {
                 record.norcSuId = ""
             }
 			
+			def personInstance = Person.read(record.personId)
+			if (personInstance) {
+				def personLinkInstance = PersonLink.findByPerson(personInstance)
+				if (personLinkInstance) {
+					record.norcSuId = personLinkInstance?.norcSuId
+				}
+			} else {
+				record.norcSuId = ""
+			}
 
 			if (record.norcDocId && record.norcProjectId && record.norcSuId) {
 				record.norcMailingId = "${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}"
