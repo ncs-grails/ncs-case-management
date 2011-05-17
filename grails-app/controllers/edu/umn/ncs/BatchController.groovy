@@ -228,7 +228,6 @@ class BatchController {
     }
 	
 	def show = {
-		println "params --> ${params}"
 		def batchInstance = Batch.read(params.id)
 		if (!batchInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
@@ -270,67 +269,129 @@ class BatchController {
 			redirect(action: "list")
 		} else {
 
-			def itemsList = []
+			
 			/* Check the batch items: created for dwelling Units, persons or households */
-			batchInstanceList.items.each{i ->
-				def itemsInfo = [
-					dwellingUnit: i?.dwellingUnit?.id,
-					household: i?.household?.id,
-					person: i?.person?.id
-				]
-				itemsList.add(itemsInfo)
-			}
-		
-			[batchInstance: batchInstance, itemsList: itemsList]
+			
+			def validItems = [
+				dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
+				person: batchInstance.items.find{it.person != null},
+				household: batchInstance.items.find{it.household != null}
+			]
+			
+			[batchInstance: batchInstance, validItems: validItems]
 		}
 	}
 
-	def addItem = {
-
+	
+	def deleteItem = {
 		
-		def batchInstance = Batch.read(params?.id)
-		
-		def dwellingUnitId = params?.dwellingUnit?.id
-		def personId = params?.person?.id
-		def householdId = params?.household?.id
-		
-		def bcq = new BatchCreationQueue()
-		
-		if (dwellingUnitId) {
-			def dwellingUnit = DwellingUnit.read(dwellingUnitId)
-			if (dwellingUnit) {
-				bcq.dwellingUnit = dwellingUnit
+		def trackedItemInstance = TrackedItem.read(params.id)
+		def batchInstance = null
+		def validItems = null
+	
+		if (trackedItemInstance) {
+			batchInstance = Batch.read(trackedItemInstance?.batch?.id)
+			if (batchInstance){
+				validItems = [
+					dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
+					person: batchInstance.items.find{it.person != null},
+					household: batchInstance.items.find{it.household != null}
+				]
 			}
-		}
-		
-		if (personId){
-			def person = Person.read(personId)
-			if (person){
-				bcq.person = person
-			} 
-		}
-		
-		if (householdId){
-			def household = household.read(householdId)
-			if (household){
-				bcq.household = household
-			} 
-		}
-
-		
-		if (!bcq.validate()) {
-			flash.message = "Valid DwellingUnit, Person or Household ID Required."
-			println "flash.message = Valid DwellingUnit, Person or Household ID Required."
+			
+			try {
+				trackedItemInstance.delete(flush: true)
+				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
+				render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+			}catch(org.springframework.dao.DataIntegrityViolationException e){
+				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
+			}
+			
+			render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
 		} else {
-			def trackedItemInstance = new TrackedItem(person: bcq.person,
-												dwellingUnit: bcq.dwellingUnit,
-												household: bcq.household)
-			if (trackedItemInstance) {
-				println "Ready to add to the batch."	
-			}
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
+			redirect(action: "list")
 		}
+	}
+	
+	def addItem = {
+		
+		def batchInstance = Batch.read(params.id)
+		
+		if (batchInstance) {
+			
+			def validItems = [
+				dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
+				person: batchInstance.items.find{it.person != null},
+				household: batchInstance.items.find{it.household != null}
+			]
+			
+			if (params.version){
+				def version = params.version.toLong()
+				if (batchInstance.version > version) {
+					batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
+					render(view: "edit", model: [batchInstance: batchInstance])
+					return
+				}
+			}
 
-		redirect(action: "edit", id: batchInstance.id)
+			
+			// Checking if this is a valid Dwelling Unit , Person or Household
+			def dwellingUnitId = params?.dwellingUnit?.id
+			def personId = params?.person?.id
+			def householdId = params?.household?.id
+			
+			def username = authenticateService?.principal()?.getUsername()
+			
+			def bcq = new BatchCreationQueue()
+			
+			if (dwellingUnitId) {
+				def dwellingUnit = DwellingUnit.read(dwellingUnitId)
+				if (dwellingUnit) {
+					bcq.dwellingUnit = dwellingUnit
+				}
+			} else if (personId){
+				def person = Person.read(personId)
+				if (person){
+					bcq.person = person
+				}
+			} else if (householdId){
+				def household = Household.read(householdId)
+				if (household){
+					bcq.household = household
+				}
+			}
+	
+			bcq.username = username
+			if (!bcq.validate()) {
+				
+				bcq.errors.each{ e->
+					e.fieldErrors.each{fe -> println "! Rejected'${fe.rejectedValue}' for field '${fe.field}'\n"}
+				}
+				flash.message = "Valid DwellingUnit, Person or Household ID Required."
+			} else {
+				batchInstance.properties = params
+			
+				def trackedItemInstance = new TrackedItem(person: bcq.person,
+													dwellingUnit: bcq.dwellingUnit,
+													household: bcq.household)
+				batchInstance.updatedBy = username
+				batchInstance.addToItems(trackedItemInstance)
+				
+				if (!batchInstance.hasErrors() && batchInstance.save(flush:true)){
+					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
+				} else {
+					batchInstance.errors.each{e ->
+						e.fieldErrors.each{fe -> println "! Saving Batch. Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
+					}
+				}
+				render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+			}
+			render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+		} else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+			redirect(action: "list")
+		}
 	}
 
 	

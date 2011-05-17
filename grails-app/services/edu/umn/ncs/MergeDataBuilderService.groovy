@@ -135,7 +135,11 @@ class MergeDataBuilderService {
                 address2: it.address?.address2,
                 zipCode: it.address?.zipCode,
                 country: it.address?.country?.name,
-                cityStateZip: it.address?.cityStateZip
+                cityStateZip: it.address?.cityStateZip,
+				city: it.address?.city,
+				state: it.address?.state,
+				zipCode: it.address?.zipCode,
+				zip4: it.address?.zip4
 
             ]
 
@@ -168,6 +172,10 @@ class MergeDataBuilderService {
                 record.zipCode =  dwellingUnitInstance?.address?.zipCode
                 record.country = dwellingUnitInstance?.address?.country?.name
                 record.cityStateZip =  dwellingUnitInstance?.address?.cityStateZip
+				record.city = dwellingUnitInstance?.address?.city
+				record.state = dwellingUnitInstance?.address?.state
+				record.zipCode = dwellingUnitInstance?.address?.zipCode
+				record.zip4 = dwellingUnitInstance?.address?.zip4
             }
         }
 
@@ -199,9 +207,12 @@ class MergeDataBuilderService {
                 record.gender = personInstance?.gender?.name
                 record.address = personInstance?.bestAddress?.streetAddress?.address
                 record.address2 = personInstance?.bestAddress?.streetAddress?.address2
-                record.zipCode =  personInstance?.bestAddress?.streetAddress?.zipCode
-                record.country = personInstance?.bestAddress?.streetAddress?.country?.name
                 record.cityStateZip = personInstance?.bestAddress?.streetAddress?.cityStateZip
+				record.city = personInstance?.bestAddress?.streetAddress?.city
+				record.state = personInstance?.bestAddress?.streetAddress?.state
+                record.zipCode =  personInstance?.bestAddress?.streetAddress?.zipCode
+				record.zip4 = personInstance?.bestAddress?.streetAddress?.zip4
+                record.country = personInstance?.bestAddress?.streetAddress?.country?.name
                 record.primaryPhone = personInstance?.primaryPhone?.phoneNumber?.prettyPhone
                 record.primaryPhoneType = personInstance?.primaryPhone?.phoneType?.name
                 record.primaryEmail = personInstance?.primaryEmail?.emailAddress?.emailAddress

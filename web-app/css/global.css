@@ -399,6 +399,15 @@ table.scroll td {
 	color: #333;
 	padding-left: 25px;
 }
+.buttons a.delete {
+	background: transparent url(../images/skin/database_delete.png) 5px 50%
+		no-repeat;
+	padding-left: 28px;
+}
+
+.buttons a.del {
+	background-image: url(../images/skin/sorted_desc.gif);
+}
 
 
 

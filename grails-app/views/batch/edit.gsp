@@ -25,12 +25,21 @@
                 <g:renderErrors bean="${batchInstance}" as="list" />
             </div>
             </g:hasErrors>
-            <g:form method="post" >
+            <g:form method="post" name="editBatch">
                 <g:hiddenField name="id" value="${batchInstance?.id}" />
                 <g:hiddenField name="version" value="${batchInstance?.version}" />
                 <div class="dialog">
                     <table>
                         <tbody>
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="format"><g:message code="batch.dateCreated.label" default="Date Created" /></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <label><g:formatDate date="${batchInstance?.dateCreated}" format="M/d/yyyy"/></label>
+                                </td>
+                            </tr>                        
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -152,7 +161,7 @@
                                   <label for="updatedBy"><g:message code="batch.updatedBy.label" default="Updated By" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'updatedBy', 'errors')}">
-                                    <g:textField name="updatedBy" maxlength="16" value="${batchInstance?.updatedBy}" />
+                                    <label>${batchInstance?.updatedBy}</label>
                                 </td>
                             </tr>
                         
@@ -195,7 +204,7 @@
 										<th>Remove</th>
 									</thead>
 									<tbody>
-										<g:each in="${batchInstance.items}" status="s" var="i">
+										<g:each in="${batchInstance.items.sort{it?.id}}" status="s" var="i">
 											<tr class="${(s % 2) == 0 ? 'even' : 'odd'}">
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i?.id?.encodeAsHTML()}</g:link></td>
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.dwellingUnit?.id?.encodeAsHTML()}</g:link></td>
@@ -203,7 +212,10 @@
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.household?.id?.encodeAsHTML()}</g:link></td>
 									            <td>
 									                <div class="buttons">
-									                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
+									                    <span class="button">
+									                    	<!-- <g:actionSubmit class="delete" action="deleteItem" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /> -->
+									                    	<g:link class="delete" action="deleteItem" id="${i.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete</g:link>
+									                    </span>
 									                </div>
 									            </td>												
 											</tr>
@@ -230,7 +242,10 @@
 									<label for="household.id">Household:</label>
 									<g:textField name="household.id" size="10" />
 								</span>		
-									<span style="margin-left:5px;" class="buttons"><g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return checkItems(${itemsList?.dwellingUnit});" /></span>
+									<span style="margin-left:5px;" class="buttons">
+										<g:actionSubmit name="addItemTest" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
+										<!--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" />-->
+									</span>
 							</div>
 
                                 </td>

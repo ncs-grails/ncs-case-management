@@ -174,8 +174,6 @@ class DocumentGenerationController {
     // display details for printing the batch
     def printDetails = {
 
-        println "printDetails params: \n ${params}"
-        
         def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
         def batchInstance = Batch.read(params?.batch?.id)
 

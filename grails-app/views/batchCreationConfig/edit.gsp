@@ -160,33 +160,34 @@
 		<div class="prop"><span class="name"> <label
 			for="instrument"><g:message
 			code="batchCreationItem.instrument.label" default="Instrument" /></label> </span> <span
-			class="value"> <g:select name="instrument.id"
+			class="value"> 
+			<g:select name="instrument.id"
 			from="${unusedInstruments + [i.instrument]}" optionKey="id"
-			value="${i.instrument?.id}" /> </span></div>
+			value="${i.instrument?.id}" noSelection="['null': '']"/> </span></div>
 
 		<div class="prop"><span class="name"> <label for="format"><g:message
 			code="batchCreationItem.format.label" default="Format" /></label> </span> <span
 			class="value"> <g:select name="format.id"
 			from="${instrumentFormatInstanceList}" optionKey="id"
-			value="${i.format?.id}" /> </span></div>
+			value="${i.format?.id}" noSelection="['null': '']"/> </span></div>
 
 		<div class="prop"><span class="name"> <label
 			for="direction"><g:message
 			code="batchCreationItem.direction.label" default="Direction" /></label> </span> <span
 			class="value"> <g:select name="direction.id"
 			from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id"
-			value="${i.direction?.id}" /> </span></div>
+			value="${i.direction?.id}" noSelection="['null': '']"/> </span></div>
 
 		<div class="prop"><span class="name"> <label
 			for="relation.id"><g:message
 			code="BatchCreationItemRelation.label" default="Relation:" /></label> </span> <span
 			class="value"> <g:select name="relation.id"
 			from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id"
-			value="${i.relation?.id}" /> </span> <label for="parentInstrument"><g:message
+			value="${i.relation?.id}" noSelection="['null': '']"/> </span> <label for="parentInstrument"><g:message
 			code="batchCreationItem.childOf.label" default="of" /></label> <span
 			class="value"> <g:select name="parentInstrument.id"
 			from="${attachableInstruments - [i.instrument]}" optionKey="id"
-			value="${i.parentInstrument?.id}" /> </span></div>
+			value="${i.parentInstrument?.id}" noSelection="['null': '']"/> </span></div>
 
 		<g:actionSubmit action="update" value="Save" />
 		<g:actionSubmit action="delete" value="Remove" />
@@ -201,19 +202,19 @@
 			for="instrument"><g:message
 			code="batchCreationItem.instrument.label" default="Instrument" /></label> </span> <span
 			class="value"> <g:select name="instrument.id"
-			from="${unusedInstruments}" optionKey="id" value="" /> </span></div>
+			from="${unusedInstruments}" optionKey="id" value="" noSelection="['null': '']"/> </span></div>
 
 		<div class="prop"><span class="name"> <label for="format"><g:message
 			code="batchCreationItem.format.label" default="Format" /></label> </span> <span
 			class="value"> <g:select name="format.id"
-			from="${instrumentFormatInstanceList}" optionKey="id" value="" /> </span>
+			from="${instrumentFormatInstanceList}" optionKey="id" value="" noSelection="['null': '']"/> </span>
 		</div>
 
 		<div class="prop"><span class="name"> <label
 			for="direction"><g:message
 			code="batchCreationItem.direction.label" default="Direction" /></label> </span> <span
 			class="value"> <g:select name="direction.id"
-			from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id" value="" />
+			from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id" value="" noSelection="['null': '']"/>
 		</span></div>
 
 
@@ -221,11 +222,11 @@
 			for="relation.id"><g:message
 			code="BatchCreationItemRelation.label" default="Relation:" /></label> </span> <span
 			class="value"> <g:select name="relation.id"
-			from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id" />
+			from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id" noSelection="['null': '']"/>
 		</span> <label for="parentInstrument"><g:message
 			code="batchCreationItem.childOf.label" default="of" /></label> <span
 			class="value"> <g:select name="parentInstrument.id"
-			from="${attachableInstruments}" optionKey="id" /> </span></div>
+			from="${attachableInstruments}" optionKey="id" noSelection="['null': '']"/> </span></div>
 
 		<g:actionSubmit controller="batchCreationItem" action="save"
 			value="Add" />
