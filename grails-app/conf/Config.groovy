@@ -89,7 +89,8 @@ log4j = {
            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
            'org.springframework',
            'org.hibernate',
-           'net.sf.ehcache.hibernate'
+           'net.sf.ehcache.hibernate',
+		   'org.springframework.security'
 
     warn   'org.mortbay.log'
 }

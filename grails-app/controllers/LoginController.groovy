@@ -1,3 +1,4 @@
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 import org.codehaus.groovy.grails.plugins.springsecurity.RedirectUtils
 import org.grails.plugins.springsecurity.service.AuthenticateService
 
@@ -6,12 +7,11 @@ import org.springframework.security.DisabledException
 import org.springframework.security.context.SecurityContextHolder as SCH
 import org.springframework.security.ui.AbstractProcessingFilter
 import org.springframework.security.ui.webapp.AuthenticationProcessingFilter
+import org.springframework.security.ui.savedrequest.SavedRequest
 
 import edu.umn.auth.UmnCookieAuthenticationProvider
 
-/**
- * Login Controller (Example).
- */
+@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
 class LoginController {
 
     /**
@@ -61,7 +61,22 @@ class LoginController {
         String postUrl
         def config = authenticateService.securityConfig.security
         if (config.useUmnCookie) {
-			def rurl = request.requestURL.toString()
+			// This is created by Spring Security...
+			// SavedRequest:
+			// http://static.springsource.org/spring-security/site/docs/2.0.x/apidocs/org/springframework/security/ui/savedrequest/SavedRequest.html
+			// HttpSession:
+			// http://download.oracle.com/javaee/1.4/api/javax/servlet/http/HttpSession.html
+			SavedRequest savedRequestInstance = session.getAttribute('SPRING_SECURITY_SAVED_REQUEST_KEY')
+			
+			// default to root of application
+			def rurl = g.createLink(absolute:true, controller:"mainMenu")
+			// println "Default URL: ${rurl}"
+			if (savedRequestInstance) {
+				// pull some stuff from Spring Security (such as the original URL)
+				rurl = savedRequestInstance.fullRequestUrl
+				//println "Full URL: ${rurl}"
+			}
+
 			if (!rurl.contains('.umn.edu')) {
 				render 'UMN Cookie Auth does not work without a *.umn.edu address.'
 	            return

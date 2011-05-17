@@ -5,7 +5,20 @@ security {
 
 	useRequestMapDomainClass = false
 	useControllerAnnotations = true
-
+	
+	// Much Safer!!!
+	controllerAnnotationStaticRules = [
+		'/console/**': ['ROLE_NCS_IT'], 
+		'/logout/**':['IS_AUTHENTICATED_FULLY'], 
+		'/plugins/**':['IS_AUTHENTICATED_FULLY'], 
+		'/css/**':['IS_AUTHENTICATED_FULLY'], 
+		'/images/**':['IS_AUTHENTICATED_FULLY'], 
+		'/js/**':['IS_AUTHENTICATED_FULLY'], 
+		'/reports/**':['IS_AUTHENTICATED_FULLY'], 
+		'/reportimages/**':['IS_AUTHENTICATED_FULLY']
+		]
+	controllerAnnotationsRejectIfNoRule = true
+	
 	forceHttps = true
 	channelConfig.secure = ['/**']
 

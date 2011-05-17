@@ -1,8 +1,9 @@
 package edu.umn.ncs
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_IT'])
 class MailingScheduleController {
-    @Secured(['ROLE_NCS_DOCGEN'])
+	
     def index = { 
         redirect(action:list, params:params)
     }
@@ -37,48 +38,51 @@ class MailingScheduleController {
 
         // list only the schedule for the instrument selected
         // order by checkpointDate
-        def mailingScheduleList = MailingSchedule.findAllByInstrument(instrumentInstance).sort{ it.checkpointDate }
+        def mailingScheduleList
 
-        // figure out the max checkpoint date
-        def c = MailingSchedule.createCriteria()
-        def results = c.list{
-            instrument {
-                eq("id", instrumentInstance.id)
-            }
-            order("checkpointDate", "desc")
-        }
-
-        // set the default date to the week after the last one entered.
-        if (results) {
-            // grab the first one in the list, add 7 days.
-            mailingScheduleInstance.checkpointDate = results[0].checkpointDate + 7
-
-            // find out what the last cumulative quota was
-            def endCount = results[0].quota
-
-            // guess the number
-            if (results.size() > 1) {
-                //
-                def prevCount = results[1].quota
-
-                mailingScheduleInstance.quota = endCount + (endCount - prevCount)
-            } else {
-                // only one in the list, assume the next batch is the same size
-                mailingScheduleInstance.quota = endCount * 2
-            }
-        } else {
-
-            mailingScheduleInstance.checkpointDate = new Date() + 1
-            mailingScheduleInstance.quota = 0
-        }
-
-
+		if (instrumentInstance) {
+			
+			mailingScheduleList = MailingSchedule.findAllByInstrument(instrumentInstance).sort{ it.checkpointDate }
+			
+	        // figure out the max checkpoint date
+	        def c = MailingSchedule.createCriteria()
+	        def results = c.list{
+	            instrument {
+	                eq("id", instrumentInstance.id)
+	            }
+	            order("checkpointDate", "desc")
+	        }
+	
+	        // set the default date to the week after the last one entered.
+	        if (results) {
+	            // grab the first one in the list, add 7 days.
+	            mailingScheduleInstance.checkpointDate = results[0].checkpointDate + 7
+	
+	            // find out what the last cumulative quota was
+	            def endCount = results[0].quota
+	
+	            // guess the number
+	            if (results.size() > 1) {
+	                //
+	                def prevCount = results[1].quota
+	
+	                mailingScheduleInstance.quota = endCount + (endCount - prevCount)
+	            } else {
+	                // only one in the list, assume the next batch is the same size
+	                mailingScheduleInstance.quota = endCount * 2
+	            }
+	        } else {
+	
+	            mailingScheduleInstance.checkpointDate = new Date() + 1
+	            mailingScheduleInstance.quota = 0
+	        }
+		}
         
         return [mailingScheduleInstanceList: mailingScheduleList, 
             instrumentInstanceList: instrumentInstanceList,
             instrumentInstance: instrumentInstance,
             mailingScheduleInstance: mailingScheduleInstance,
-            mailingScheduleInstanceTotal: mailingScheduleList.count()]
+            mailingScheduleInstanceTotal: mailingScheduleList?.count()]
 
     }
 
