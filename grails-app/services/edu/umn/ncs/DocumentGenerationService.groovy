@@ -640,6 +640,7 @@ class DocumentGenerationService {
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
+		
         batchCreationDocumentInstance.dataSets.each{
 			if (debug) {
 				println "Dataset type: ${it.code}"
@@ -658,9 +659,15 @@ class DocumentGenerationService {
         }
 
         outputData = outputData.sort{ it.itemId }
-
+		
+		
+		
         def recNo = 0
         outputData.each{
+			
+			//println "NORC SU ID: ${it?.norcSuId}"
+			
+			
             recNo++
             it.recordNumber = recNo
         }

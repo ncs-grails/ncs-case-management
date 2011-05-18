@@ -250,13 +250,13 @@ class MergeDataBuilderService {
             }
 
             def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)
+			record.norcSuId = ""
+			
             if (dwellingUnitInstance) {
                 def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
                 if (dwellingUnitLinkInstance) {
                     record.norcSuId = dwellingUnitLinkInstance?.norcSuId
                 } 
-            } else {
-                record.norcSuId = ""
             }
 			
 			def personInstance = Person.read(record.personId)
@@ -264,10 +264,10 @@ class MergeDataBuilderService {
 				def personLinkInstance = PersonLink.findByPerson(personInstance)
 				if (personLinkInstance) {
 					record.norcSuId = personLinkInstance?.norcSuId
+				} else {
+					record.norcSuId = ""
 				}
-			} else {
-				record.norcSuId = ""
-			}
+        	}
 
 			if (record.norcDocId && record.norcProjectId && record.norcSuId) {
 				record.norcMailingId = "${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}"
@@ -277,6 +277,7 @@ class MergeDataBuilderService {
 				record.norcMailingBarcode = ""
 			}
         }
+		
         dataSet
     }
 	
