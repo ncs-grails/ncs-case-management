@@ -37,7 +37,6 @@ class LogoutController {
 				}
 			}
         } else {
-            // TODO  put any pre-logout code here
             redirect uri:'/j_spring_security_logout'
         }
     }

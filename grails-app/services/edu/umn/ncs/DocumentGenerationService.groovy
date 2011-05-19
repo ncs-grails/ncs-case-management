@@ -141,14 +141,6 @@ class DocumentGenerationService {
                                             WHERE (username = ?)"""
                         results = sql.rows(selectionQuery, [params.username])
 
-                        // TODO:
-                        // We can assume all of the columns are there
-                        // because we'll put them in a table that will have
-                        // the correct columns!
-
-                        // ... we could do some null checks in the table though...
-                        // The class is: BatchCreationQueue (table = batch_creation_queue)
-
                     }
                 } else {
 

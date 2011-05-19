@@ -10,23 +10,6 @@ class DocumentGenerationController {
     def documentGenerationService
     def authenticateService
 
-    def ngp = {
-        render "${authenticateService?.principal()?.username}"
-    }
-     // this is for testing, TODO: DELETE ME!
-    def testGenerate = {
-        def username = authenticateService?.principal()?.getUsername()
-        
-        def batchCreationConfigInstance = BatchCreationConfig.read(1)
-        def docGenParams = [manual: false,
-            username:username,
-            config:batchCreationConfigInstance]
-
-        def batchInstance = documentGenerationService.generateMailing(docGenParams)
-        [batchCreationConfigInstance:batchCreationConfigInstance,
-            batchInstance:batchInstance]
-    }
-
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
         //println "params in downloadDataset --> ${params}"

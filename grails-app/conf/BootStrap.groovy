@@ -5,8 +5,6 @@ class BootStrap {
     def init = { servletContext ->
 
         // This will be done on the MySQL side using an identy seed
-        // TODO: Min Batch.id should be 10,000
-        // TODO: Min TrackedItem.id should be 1,000,000
         
         // Global BootStrap
 
@@ -292,9 +290,7 @@ class BootStrap {
 			visaGiftCard = new IncentiveType(name: "Visa Gift Card").save()
 		}
 		
-		// AppointmentDetailType
-		// TODO: add AppointmentDetailType list
-		
+		// AppointmentResultCategory
 		def confirmed = AppointmentResultCategory.findByName("Confirmed")
 		if ( ! confirmed ) {
 			confirmed = new AppointmentResultCategory(name:"Confirmed").save()

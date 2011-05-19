@@ -120,6 +120,8 @@ class BatchController {
     def entry = {
         // reference date
         def referenceDate = params?.referenceDate
+		def username = authenticateService?.principal()?.getUsername()
+		
 
         // look for batch ID
         def batchId = params.id
@@ -136,7 +138,8 @@ class BatchController {
                     if (batchInstance) {
                         // update batch mail date
                         batchInstance.mailDate = referenceDate
-                        // TODO: we should probably update the provenance fields here
+						batchInstance.lastUpdated = new Date()
+						batchInstance.updatedBy = username
                         batchInstance.save(flush:true)
                         flash.message = "${batchInstance.primaryInstrument.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated."
 
