@@ -19,7 +19,8 @@ class SearchService {
 		def alphaNumericPattern = ~/[ a-zA-Z0-9\-#%&]*/
 
 		def norcMailingPattern = ~/[0-9]{4}-[0-9]{10}-[0-9]{2}/
-		def norcSuPattern = ~/[0-9]{10}/
+		def norcMailIdPattern = ~/[0-9]{10}/
+		def norcSuPattern = ~/[0-9]{8}/
 
 		def streetAddressPattern = ~/[0-9]{1,7}[ a-zA-Z0-9\-#%&]*/
 
@@ -33,6 +34,16 @@ class SearchService {
 				println "looking for an ID ${queryString}..."
 			}
 
+			def personInstance = Person.read(queryString)
+			
+			if (personInstance) {
+				results.add([matchType:'Person ID',
+					controller: 'person',
+					description: personInstance.fullName,
+					action: 'show',
+					id: personInstance.id ])
+			}
+
 			def dwellingUnitInstance = DwellingUnit.read(queryString)
 			
 			if (dwellingUnitInstance) {
@@ -42,7 +53,7 @@ class SearchService {
 					action: 'show',
 					id: dwellingUnitInstance.id ])
 			}
-			
+
 			def trackedItemInstance = TrackedItem.read(queryString)
 			
 			if (trackedItemInstance) {
@@ -117,20 +128,10 @@ class SearchService {
 		}
 
 		// 0061674400
-		if ( norcSuPattern.matcher(queryString).matches() ) {
-
-			if (debug) {
-				println "looking for NORC SU ID pattern ${queryString}..."
-			}
-
+		if ( norcMailIdPattern.matcher(queryString).matches() ) {
 			// we found a norc SU ID... maybe.
 			def dwellingUnitLinkInstance = DwellingUnitLink.findByNorcSuId(queryString)
-
 			if ( dwellingUnitLinkInstance ) {
-
-				if (debug) {
-					println "found dwelling unit for NORC SU ID pattern ${queryString}..."
-				}
 				def dwellingUnitInstance = dwellingUnitLinkInstance.dwellingUnit
 				
 				// we found a NORC mailing barcode
@@ -139,6 +140,35 @@ class SearchService {
 						action: 'show',
 						description: dwellingUnitInstance.address.address,
 						id: dwellingUnitInstance.id ])
+			}
+		}
+		
+		
+		// 61674400
+		if ( norcSuPattern.matcher(queryString).matches() ) {
+			// we found a norc SU ID... maybe.
+			def dwellingUnitLinkInstance = DwellingUnitLink.findByNorcSuId('00' + queryString)
+
+			if ( dwellingUnitLinkInstance ) {
+				def dwellingUnitInstance = dwellingUnitLinkInstance.dwellingUnit
+				
+				// we found a NORC mailing barcode
+				results.add([matchType: 'NORC Mailing ID',
+						controller: 'dwellingUnit',
+						action: 'show',
+						description: dwellingUnitInstance.address.address,
+						id: dwellingUnitInstance.id ])
+			}
+			def personLinkInstance = PersonLink.findByNorcSuId(queryString)
+			if ( personLinkInstance ) {
+				def personInstance = personLinkInstance.person
+				
+				// we found a NORC mailing barcode
+				results.add([matchType: 'NORC Mailing ID',
+						controller: 'person',
+						action: 'show',
+						description: personInstance.fullName,
+						id: personInstance.id ])
 			}
 		}
 

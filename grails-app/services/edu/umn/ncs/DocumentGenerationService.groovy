@@ -610,6 +610,7 @@ class DocumentGenerationService {
 								
                             } catch (Exception ex) {
                                 // TODO: catch error and report to someone who can fix it!
+								// emailService.sendErrorReport(message, ip, username)
                                 println "Invalid Post-Generation Query (or error somwhere along those lines...)"
                                 println "The query was: ${batchCreationConfigInstance.postGenerationQuery}"
                             }

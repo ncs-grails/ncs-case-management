@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-			<title>Auto Document Generation - National Children's Study</title>
+			<title>Lookup - National Children's Study</title>
 		<meta name="layout" content="ncs" />
 	</head>
 	<body>
@@ -24,6 +24,13 @@
 			</p>
 		</fieldset>
 
+		
+		<!-- Appointments -->
+		<fieldset class="maroonBorder">
+			<legend class="m1">Appointments</legend>
+			<g:include controller="appointment" action="list" params="${[ person: [id: personInstance.id ] ] }" />
+		</fieldset>
+
 		<g:each var="pa" in="${personInstance.streetAddresses}">
 			<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
 				<h2>Address: ${pa.id}</h2>
@@ -43,13 +50,27 @@
 		</fieldset>
 		
 		<fieldset class="maroonBorder">
-		<legend class="m1">Dwelling Unit(s)</legend>
-		<g:if test="${false}">
-				  TODO
+		<legend class="m1">Household(s)</legend>
+		<g:if test="${householdInstanceList}">
+			<g:each var="hh" in="${householdInstanceList}">
+				<fieldset class="maroonBorder">
+				<legend class="m1">
+					${hh.dwelling.address.address}, 
+					<g:link controller="dwellingUnit" action="show" id="${hh.dwelling.id}">
+					Dwelling Unit ID: ${hh.dwelling.id}
+				</g:link></legend>
+				<h3>Members</h3>
+				<ul>
+				<g:each var="p" in="${hh.people}">
+					<li><g:link controller="person" action="show" id="${p.id}">${p.fullName}</g:link></li>
+				</g:each>
+				</ul>
+				</fieldset>
+			</g:each>
 		</g:if>
 		<g:else>None</g:else>
 		</fieldset>
-		
+
 		<fieldset class="maroonBorder">
 			<legend class="m1">Items Generated</legend>
 			<g:if test="${ ! trackedItemInstanceList}">

@@ -26,7 +26,9 @@
             
            	<fieldset class="maroonBorder">
             <g:if test="${personInstance}">
-            	<legend>${ personInstance.fullName }'s Appointments</legend>
+            	<legend>
+            	<g:link controller="person" action="show" id="${personInstance.id}">${ personInstance.fullName }</g:link>'s Appointments
+            	</legend>
             	<g:include action="list" params="${ ['person.id': personInstance?.id ] }" />
             </g:if>
             <g:else>

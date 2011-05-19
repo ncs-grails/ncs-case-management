@@ -1,42 +1,54 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Auto Document Generation - National Children's Study</title>
-<meta name="layout" content="ncs" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Lookup - National Children's Study</title>
+	<meta name="layout" content="ncs" />
 </head>
 <body>
-<div class="nav">
-<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
-<span class="menuButton"><g:link class="lookup" controller="lookup">Lookup</g:link></span>
-</div>
-<div class="body">
+	<div class="nav">
+	<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
+	<span class="menuButton"><g:link class="lookup" controller="lookup">Lookup</g:link></span>
+	</div>
+	<div class="body">
 
-<h1>Dwelling Unit Details</h1>
+		<h1>Dwelling Unit Details</h1>
 
-<fieldset class="maroonBorder"><legend class="m1">Dwelling
-Unit: ${dwellingUnitInstance.id}</legend>
-<p>
-${dwellingUnitInstance.address.address}<br />
-${dwellingUnitInstance.address.cityStateZip}<br />
-${dwellingUnitInstance.address.country?.name}
-</p>
-</fieldset>
+		<fieldset class="maroonBorder"><legend class="m1">Dwelling
+		Unit: ${dwellingUnitInstance.id}</legend>
+		<p>
+		${dwellingUnitInstance.address.address}<br />
+		${dwellingUnitInstance.address.cityStateZip}<br />
+		${dwellingUnitInstance.address.country?.name}
+		</p>
+		</fieldset>
+		
+		<fieldset class="maroonBorder">
+		<legend class="m1">Norc Info</legend>
+		<g:if test="${dwellingUnitLinkInstance}">
+				  NORC SU ID: ${dwellingUnitLinkInstance.norcSuId}
+		</g:if></fieldset>
 
-<fieldset class="maroonBorder">
-<legend class="m1">Norc Info</legend>
-<g:if test="${dwellingUnitLinkInstance}">
-		  NORC SU ID: ${dwellingUnitLinkInstance.norcSuId}
-</g:if></fieldset>
-
-<fieldset class="maroonBorder">
-<legend class="m1">People</legend>
-<g:if test="${false}">
-		  TODO
-</g:if>
-<g:else>None</g:else>
-</fieldset>
-
+		<fieldset class="maroonBorder">
+		<legend class="m1">Household(s)</legend>
+		<g:if test="${householdInstanceList}">
+			<g:each var="hh" in="${householdInstanceList}">
+				<fieldset class="maroonBorder">
+				<legend class="m1">
+					# ${hh.id} 
+				</legend>
+				<h3>Members</h3>
+				<ul>
+				<g:each var="p" in="${hh.people}">
+					<li><g:link controller="person" action="show" id="${p.id}">${p.fullName}</g:link></li>
+				</g:each>
+				</ul>
+				</fieldset>
+			</g:each>
+		</g:if>
+		<g:else>None</g:else>
+		</fieldset>
+		
 <fieldset class="maroonBorder">
 	<legend class="m1">Items Generated</legend>
 	<g:if test="${ ! trackedItemInstanceList}">

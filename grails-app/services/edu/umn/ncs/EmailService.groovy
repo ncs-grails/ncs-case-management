@@ -145,6 +145,21 @@ class EmailService {
 		}
 	}
 
+	def sendErrorReport = { errorMessage, remoteAddr, username ->
+		def recipients = ['help@ncs.umn.edu']
+		def now = new Date()
+						
+		mailService.sendMail {
+			to recipients.toArray()
+			from "help@ncs.umn.edu"
+			subject "Error Report "
+			body( view:"/errorReport",
+				model:[ errorMessage: errorMessage, now: now, 
+					remoteAddr: remoteAddr, username: username])
+		}
+	}
+	
+	
 	// used to get the full time range for a day when a java.util.Date is
 	// passed.  Example:
 	// Jan 3rd, 2011 2:34 PM ->

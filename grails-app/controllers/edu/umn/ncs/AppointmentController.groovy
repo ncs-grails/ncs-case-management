@@ -19,16 +19,19 @@ class AppointmentController {
 
     def list = {
 		def personInstance = Person.read(params?.person?.id)
-		def appointmentInstanceList = Appointment.findAllByPerson(personInstance)
-		
-        [appointmentInstanceList: appointmentInstanceList]
+		def appointmentInstanceList = null
+		if (personInstance) {
+			appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+		} else {
+			flash.message "couldn't find person: ${params?.person?.id}"
+		}
+
+        [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList]
     }
 	
 	// TODO: This is not done, but should be finished later on
 	def calendar = {
 		// There is no "calendar.gsp", only "month.gsp, week.gsp, and day.gsp)
-		
-		
 		def format = "month"
 		if (params?.format == "week") { format = "week" }
 		if (params?.format == "day") { format = "day" }
@@ -36,29 +39,53 @@ class AppointmentController {
 		def refDate = new Date()
 		if (params.refDate) { refDate = params.refDate }
 
-		def startDate
-		def endDate 
-
-		def now = new LocalDate(refDate.time)
-		def midnight = new LocalTime(0, 0)
-		def endOfDay = new LocalTime(11, 59, 59)
+		/* monthInfo stuff
+		 *   referenceDate
+		 *   dayOfWeek
+		 *   firstOfWeek
+		 *   lastOfWeek
+		 *   firstCalendarDate
+		 *   firstWeekdayOfMonth
+		 *   firstOfMonth
+		 *   lastOfmonth
+		 */
+		def monthInfo = getMonthInfo(refDate) 
 		
-		if (format == "day") {		
-			startDate = now.toDateTime(midnight).toCalendar().time
-			endDate = now.toDateTime(endOfDay).toCalendar().time
-		} else if (format == "week") {
-			// TODO: Fix
-			startDate = now.toDateTime(midnight).toCalendar().time
-			endDate = now.addDays(6).toDateTime(endOfDay).toCalendar().time
+		def startDate
+		def endDate
+		def weeks = []
+		
+		if (format == "week") {
+			startDate = monthInfo.firstOfWeek
+			endDate = monthInfo.lastOfWeek
 		} else {
-			// format == "month"
-			def firstDayOfMonth = now.minusDays(now.dayOfMonth - 1)
-			def endOfMonth = now.minusDays(now.dayOfMonth).plusMonths(1)
-			
-			startDate = firstDayOfMonth.toDateTime(midnight).toCalendar().time
-			endDate = endOfMonth.toDateTime(endOfDay).toCalendar().time
+			startDate = monthInfo.firstCalendarDate
+			endDate = monthInfo.lastOfMonth
 		}
 		
+		def cursorDate = startDate
+		
+		/*
+		println "cursorDate: ${cursorDate}"
+		println "startDate: ${startDate}"
+		println "endDate: ${endDate}"
+		*/
+		
+		while (cursorDate <= endDate) {
+			// add all days to week
+			def daysOfWeek = []
+			(1..7).each{
+				def day = [:]
+				def cursorLocalDate = new LocalDate(cursorDate.time)
+				day.dayOfMonth = cursorLocalDate.dayOfMonth
+				day.date = cursorDate
+				day.appointments = []
+				daysOfWeek.add(day)
+				
+				cursorDate++
+			}
+			weeks.add([days:daysOfWeek])
+		}
 		
 		def c = Appointment.createCriteria()
 		def appointmentInstanceList = c.list{
@@ -69,7 +96,9 @@ class AppointmentController {
 			order("startTime")
 		}
 		
-		def model = [ appointmentInstanceList: appointmentInstanceList ]
+		def model = [ weeks:weeks, 
+			appointmentInstanceList: appointmentInstanceList,
+			refDate: refDate ]
 		
 		render(view: format, model: model)		
 	}
@@ -260,4 +289,56 @@ class AppointmentController {
             redirect(action: "index")
         }
     }
+	
+	/* this is to help out with the calendar
+	 *
+	 * returns a map containing the following attributes:
+	 *   referenceDate
+	 *   dayOfWeek
+	 *   firstOfWeek
+	 *   lastOfWeek
+	 *   firstCalendarDate
+	 *   firstWeekdayOfMonth
+	 *   firstOfMonth
+	 *   lastOfmonth
+	 */
+	private def getMonthInfo(refDate) {
+		
+		// convert java.util.Date to org.joda.time.LocalDate
+		LocalDate referenceDate = new LocalDate(refDate.time)
+
+		def dayOfWeek = referenceDate.getDayOfWeek()
+		
+		LocalDate firstOfMonth = referenceDate.withDayOfMonth(1)
+		
+		def lastOfmonth = referenceDate.plusMonths(1).withDayOfMonth(1).minusDays(1)
+
+		// get first weekday of the month
+		def firstWeekdayOfMonth = firstOfMonth.getDayOfWeek()
+
+		// difference between first day on calendar and first
+		// day of month is (firstOfMonth - (7 - firstWeekdayOfMonth)
+		def firstCalendarDate = firstOfMonth
+		if (firstWeekdayOfMonth != 7) {
+			firstCalendarDate = firstOfMonth.minusDays(firstWeekdayOfMonth)
+		}
+		
+		def firstOfWeek = referenceDate.withDayOfWeek(1).minusDays(1)
+		def lastOfWeek = referenceDate.withDayOfWeek(6)
+
+		def midnight = new LocalTime(0,0)
+		
+		def monthInfo = [:]
+		
+		monthInfo.referenceDate = referenceDate.toDateTime(midnight).toCalendar().time
+		monthInfo.dayOfWeek = dayOfWeek
+		monthInfo.firstOfWeek = firstOfWeek.toDateTime(midnight).toCalendar().time
+		monthInfo.lastOfWeek = lastOfWeek.toDateTime(midnight).toCalendar().time
+		monthInfo.firstCalendarDate = firstCalendarDate.toDateTime(midnight).toCalendar().time
+		monthInfo.firstWeekdayOfMonth = firstWeekdayOfMonth
+		monthInfo.firstOfMonth = firstOfMonth.toDateTime(midnight).toCalendar().time
+		monthInfo.lastOfMonth = lastOfmonth.toDateTime(midnight).toCalendar().time
+		
+		return monthInfo
+	}
 }

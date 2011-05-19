@@ -39,9 +39,12 @@ class DwellingUnitController {
 
 			def trackedItemInstanceList = TrackedItem.findAllByDwellingUnit(dwellingUnitInstance)
 
-            [dwellingUnitInstance: dwellingUnitInstance,
+			def householdInstanceList = Household.findAllByDwelling(dwellingUnitInstance)
+
+			[dwellingUnitInstance: dwellingUnitInstance,
 				dwellingUnitLinkInstance: dwellingUnitLinkInstance,
-				trackedItemInstanceList: trackedItemInstanceList]
+				trackedItemInstanceList: trackedItemInstanceList,
+				householdInstanceList: householdInstanceList ]
         }
 		
 	}
