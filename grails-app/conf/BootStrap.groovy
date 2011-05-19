@@ -164,7 +164,7 @@ class BootStrap {
         // Result
         def deceasedResult = Result.findByName('deceased')
         if (!deceasedResult) {
-            deceasedResult = new Result(name:'received', abbreviation:'dead').save()
+            deceasedResult = new Result(name:'deceased', abbreviation:'dead').save()
         }
         def receivedResult = Result.findByName('received')
         if (!receivedResult) {

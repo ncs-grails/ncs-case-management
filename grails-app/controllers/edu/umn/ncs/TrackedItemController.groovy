@@ -1,5 +1,7 @@
 package edu.umn.ncs
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_NCS_LOOKUP'])
 class TrackedItemController {
 
     def index = { redirect(controller:'mainMenu') }
