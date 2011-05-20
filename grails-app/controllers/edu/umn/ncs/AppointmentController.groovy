@@ -31,13 +31,16 @@ class AppointmentController {
 	
 	// TODO: This is not done, but should be finished later on
 	def calendar = {
+		def midnight = new LocalTime(0,0)
+
 		// There is no "calendar.gsp", only "month.gsp, week.gsp, and day.gsp)
 		def format = "month"
 		if (params?.format == "week") { format = "week" }
-		if (params?.format == "day") { format = "day" }
 		
 		def refDate = new Date()
-		if (params.refDate) { refDate = params.refDate }
+		if (params.id) {
+			refDate = ( new LocalDate(params.id) ).toDateTime(midnight).toCalendar().time
+		}
 
 		/* monthInfo stuff
 		 *   referenceDate
@@ -50,17 +53,34 @@ class AppointmentController {
 		 *   lastOfmonth
 		 */
 		def monthInfo = getMonthInfo(refDate) 
-		
+		def referenceDate = new LocalDate(refDate.time)
 		def startDate
 		def endDate
 		def weeks = []
 		
+		def nextMonth = referenceDate.plusMonths(1).toDateTime(midnight).toCalendar().time
+		def prevMonth = referenceDate.minusMonths(1).toDateTime(midnight).toCalendar().time
+
+		def nextWeek = referenceDate.plusWeeks(1).toDateTime(midnight).toCalendar().time
+		def prevWeek = referenceDate.plusWeeks(1).toDateTime(midnight).toCalendar().time
+
+		// get the range for the calendar
 		if (format == "week") {
 			startDate = monthInfo.firstOfWeek
 			endDate = monthInfo.lastOfWeek
 		} else {
 			startDate = monthInfo.firstCalendarDate
 			endDate = monthInfo.lastOfMonth
+		}
+		
+		// get the appointments for the calendar
+		def c = Appointment.createCriteria()
+		def appointmentInstanceList = c.list{
+			and{
+				gt("startTime", startDate)
+				lt("startTime", endDate)
+			}
+			order("startTime")
 		}
 		
 		def cursorDate = startDate
@@ -77,28 +97,33 @@ class AppointmentController {
 			(1..7).each{
 				def day = [:]
 				def cursorLocalDate = new LocalDate(cursorDate.time)
+				def tomorrow = cursorDate + 1
 				day.dayOfMonth = cursorLocalDate.dayOfMonth
 				day.date = cursorDate
-				day.appointments = []
+				
+				day.appointments = appointmentInstanceList.find{ (it.startTime.compareTo(cursorDate) == 1) && ( it.startTime.compareTo(tomorrow) == -1 ) }
+				
+				if (referenceDate.monthOfYear == cursorLocalDate.monthOfYear) {
+					day.cssShadow = ""
+					day.thisMonth = true
+				} else {
+					day.cssShadow = "shadow"
+					day.thisMonth = false
+				} 
 				daysOfWeek.add(day)
 				
 				cursorDate++
 			}
 			weeks.add([days:daysOfWeek])
 		}
-		
-		def c = Appointment.createCriteria()
-		def appointmentInstanceList = c.list{
-			and{
-				gt("startTime", startDate)
-				lt("startTime", endDate)
-			}
-			order("startTime")
-		}
-		
+				
 		def model = [ weeks:weeks, 
 			appointmentInstanceList: appointmentInstanceList,
-			refDate: refDate ]
+			refDate: refDate,
+			nextMonth: nextMonth,
+			prevMonth: prevMonth,
+			nextWeek: nextWeek,
+			prevWeek: prevWeek ]
 		
 		render(view: format, model: model)		
 	}

@@ -1,4 +1,3 @@
-
 <%@ page import="edu.umn.ncs.Appointment" %>
 <html>
     <head>
@@ -6,21 +5,32 @@
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'appointment.label', default: 'Appointment')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'calendar.css')}" />        
     </head>
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-            <span class="menuButton"><g:link class="list" action="index" params="${ ['person.id':appointmentInstance?.person?.id] }">
-            	Back to <g:message code="default.list.label" args="[entityName]" />
+            <span class="menuButton"><g:link class="create" action="index" >
+            	Enter New Appointment
             </g:link></span>
         </div>
-        <div class="body">
+        <div class="body" style="margin: 0 0 1em 0;">
             <h1>Appointments for <g:formatDate date="${refDate}" format="MMMM yyyy" /></h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
             <div class="dialog">
-                <table>
+            	<span class="prevMonth">
+            		<g:link action="calendar" id="${formatDate(date:prevMonth, format:'yyyy-MM')}">
+            		&lt; <g:formatDate date="${prevMonth}" format="MMMM yyyy" />
+            		</g:link>
+            	</span>
+            	<span class="nextMonth">
+            		<g:link action="calendar" id="${formatDate(date:nextMonth, format:'yyyy-MM')}">
+            		<g:formatDate date="${nextMonth}" format="MMMM yyyy" /> &gt; 
+            		</g:link>
+            	</span>
+                <table class="calendar">
                 	<thead>
                 		<tr>
                 			<th>Sunday</th>
@@ -36,14 +46,15 @@
 						<g:each var="w" in="${weeks}">
 						<tr>
 							<g:each var="d" in="${w?.days}">
-							<td>
+							<td class="${d?.cssShadow}">
 								<div class="dayOfMonth">${d.dayOfMonth}</div>
 								<ul class="appointmentList">
 									<g:each var="a" in="${d?.appointments}">
 									<li>
-										<g:formatDate date="${a?.startTime}" format="h:mm" /> - ${a?.type}<br/>
-										${a.person?.lastName}
+										${formatDate(date:a?.startTime, format:'H') + formatDate(date:a?.startTime, format:'a').toLowerCase()[0]}
+										<g:link controller="appointment" action="show" id="${a.id}">${a.person?.lastName}
 										${a.dwellingUnit?.address}
+										</g:link>
 									</li>
 									</g:each>
 								</ul>

@@ -36,6 +36,7 @@
 	${batchInstance?.primaryInstrument?.study?.name}
 	</span> <span class="b" id="primaryInstrument">
 	${batchInstance?.primaryInstrument?.name}
+	(Batch ID: ${batchInstance?.id})
 	</span></h2>
 	<div class="clear"></div>
 

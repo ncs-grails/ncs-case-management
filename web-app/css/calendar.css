@@ -1,0 +1,51 @@
+table.calendar {
+	width: 960px;
+}
+
+table.calendar thead tr th {
+	width: 137px;
+	text-align: center;
+}
+
+table.calendar tbody tr td {
+	border-left: thin solid #CCC;
+	border-bottom: thin solid #CCC;
+}
+
+div.dayOfMonth  {
+	text-align: right;
+	font-size: 0.7em;
+	vertical-align: top;
+	color: #CCC;
+}
+
+ul.appointmentList li {
+	font-size: 0.8em;
+}
+
+ul.appointmentList {
+	height: 5em;
+	overflow: auto;
+	list-style: none;	
+	padding-left: 0px;
+}
+
+td.shadow {
+	background-color: #BBB;
+}
+
+span.nextMonth {
+	float:right;
+}
+
+span.prevMonth {
+	float:left;
+}
+
+span.nextMonth a {
+	color: maroon;
+}
+
+span.prevMonth a {
+	color: maroon;
+}
