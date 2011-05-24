@@ -32,42 +32,71 @@ ${batchCreationConfigInstance?.name}
 	${flash.message}
 	</div>
 </g:if>
+<div class="prop">
 
+	<g:hiddenField name="findUrl" id="findUrl" value="${createLink(controller:'documentGeneration', action:'findItem', params:[:])}" />
 
-
-<div class="prop"><span class="name"> <label
-	for="batchCreationQueueSource.id"><g:message
-	code="BatchCreationQueueSource.label" default="Source:" /></label> </span> <span
-	class="value"> <g:hiddenField name="findUrl" id="findUrl"
-	value="${createLink(controller:'documentGeneration', action:'findItem', params:[:])}" />
-<g:select name="batchCreationQueueSource.id"
-	id="batchCreationQueueSource.id"
-	from="${edu.umn.ncs.BatchCreationQueueSource.list()}" optionKey="id"
-	value="${edu.umn.ncs.BatchCreationQueueSource.findByName('dwellingUnit').id}" />
-</span> <span class="name"> <label for="sourceValue">ID</label> </span> <span
-	class="value"> <g:textField name="sourceValue" id="sourceValue"
-	size="15" value="" /> </span></div>
+	<g:if test="${batchCreationConfigInstance.useParentItem}">
+		<span class="name">
+			<label for="sourceValue">Parent Item ID</label>
+			<g:hiddenField name="useParentItem" id="useParentItem" value="${true}" />
+			<g:hiddenField name="batchCreationQueueSource.id" id="batchCreationQueueSource.id" value="${0}" />			
+		</span>
+	</g:if>
+	<g:else>
+		<span class="name">
+			<label for="batchCreationQueueSource.id">
+				<g:message code="BatchCreationQueueSource.label" default="Source:" />
+				<g:hiddenField name="useParentItem" id="useParentItem" value="${false}" />
+			</label>
+		</span> 
+		<span class="value">
+		
+			<g:select name="batchCreationQueueSource.id"
+				id="batchCreationQueueSource.id"
+				from="${edu.umn.ncs.BatchCreationQueueSource.list()}" optionKey="id"
+				value="${edu.umn.ncs.BatchCreationQueueSource.findByName('dwellingUnit').id}" />
+		</span>
+		<span class="name">
+			<label for="sourceValue">ID</label>
+		</span>
+	</g:else>
+	
+	
+	<span class="value">
+		<g:textField name="sourceValue" id="sourceValue" size="15" value="" />
+	</span>
+</div>
 
 <fieldset class="maroonBorder"><legend id="itemsLegend"
 	style="margin-left: 0.5em;">Entered Items</legend>
 
-<div class="prop-q ubb"><span class="value-q s">ID</span> <span
-	class="value-q s">Source</span> <span class="value-q l">Status</span></div>
-<div id="manualGenerationQueue">
-<p id="deleteMe" class="highlightYellow">Enter at least one of the
-above items</p>
-</div>
+	<div class="prop-q ubb">
+		<span class="value-q s">ID</span> 
+		<span class="value-q s">Source</span> 
+		<span class="value-q l">Status</span>
+	</div>
+
+	<div id="manualGenerationQueue">
+		<p id="deleteMe" class="highlightYellow">Enter at least one of the above items</p>
+	</div>
 </fieldset>
 
-<g:form method="post" controller="documentGeneration"
-	action="generation">
-	<g:hiddenField name="batchCreationConfigInstance.id"
-		value="${batchCreationConfigId}" />
+<g:form method="post" controller="documentGeneration" action="generation">
 
-	<div class="prop"><span class="name"> <label for="reason"><g:message
-		code="batchCreationConfig.defaultReason.label" default="Reason" /></label> </span> <span
-		class="value"> <g:textField name="reason" size="40"
-		value="${batchCreationConfigInstance?.defaultReason}" /> </span></div>
+	<g:hiddenField name="batchCreationConfigInstance.id" value="${batchCreationConfigId}" />
+
+	<div class="prop">
+		<span class="name"> 
+			<label for="reason">
+				<g:message code="batchCreationConfig.defaultReason.label" default="Reason" />
+			</label> 
+		</span> 
+		
+		<span class="value"> 
+			<g:textField name="reason" size="40" value="${batchCreationConfigInstance?.defaultReason}" /> 
+		</span>
+	</div>
 
 	<div class="prop"><span class="name"> <label
 		for="instructions"><g:message

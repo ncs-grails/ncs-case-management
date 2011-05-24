@@ -103,7 +103,7 @@ class MergeDataBuilderService {
 
         def trackingDocumentRecipients = batchInstance?.creationConfig?.recipients
 
-        trackingDocumentRecipients.each {
+        trackingDocumentRecipients.sort{it.id}.each {
             def record = [
                 itemId: 0,
                 itemIdBarcode: "*B${batchInstance?.id}*",

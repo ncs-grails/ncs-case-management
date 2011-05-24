@@ -46,10 +46,13 @@ $(document).ready(function(){
         if (queueId == 1) {
             $('#deleteMe').remove();
         }
+        
+        // are we searching for a parent item id?
+        var useParentItem = $("#useParentItem").val()
 
         var url = $('#findUrl').val();
 
-        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  id: sourceValue};
+        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  id: sourceValue, useParentItem: useParentItem};
 
         $("#manualGenerationQueue").prepend(newDivContent);
 

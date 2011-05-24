@@ -41,64 +41,101 @@ class DocumentGenerationController {
 
     def findItem = {
 
+		def patternParentItem = ~/[a-zA-Z][0-9]*/
         def pattern = ~/[0-9]*/
         def username = authenticateService.principal().getUsername()
         def itemPassed = params.id
-        def batchCreationQueueSourceInstance = BatchCreationQueueSource.get(params?.batchCreationQueueSource?.id)
+        def batchCreationQueueSourceInstance = null
         def batchCreationQueueInstance = null
-
+		def bcqSource = params?.batchCreationQueueSource?.id
+		
+		def useParentItem = false
+		
         def dwellingUnit = null
         def person = null
         def household = null
+		
+		def parentItemInstance = null
 
-        if (batchCreationQueueSourceInstance) {
-            if (pattern.matcher(itemPassed).matches()) {
-                if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
-                    dwellingUnit = DwellingUnit.get(itemPassed)
-                    if (dwellingUnit) {
-                        batchCreationQueueInstance = BatchCreationQueue.findAllByDwellingUnitAndSource(dwellingUnit, batchCreationQueueSourceInstance)
-                    }
-                } else if (batchCreationQueueSourceInstance.name == "person") {
-                    person = Person.get(itemPassed)
-                    if (person){
-                        batchCreationQueueInstance = BatchCreationQueue.findAllByPersonAndSource(person, batchCreationQueueSourceInstance)
-                    }
-                } else if (batchCreationQueueSourceInstance.name == "household") {
-                    household = Household.get(itemPassed)
-                    if (household){
-                        batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndSource(household, batchCreationQueueSourceInstance)
-                    }
-                }
+		if (bcqSource) {
+			batchCreationQueueInstance = BatchCreationQueueSource.get(bcqSource)
+		}
+		
+		if (params.useParentItem == 'true') {
+			useParentItem = true
+		}
+		
 
-                if (!(dwellingUnit || household || person)) {
-                    render "Not found!"
-                } else {
-                    if (batchCreationQueueInstance) {
-                        render "Already in the queue"
-                    } else {
-                        batchCreationQueueInstance = new BatchCreationQueue(source: batchCreationQueueSourceInstance, username: username)
+		if (useParentItem && patternParentItem.matcher(itemPassed).matches() 
+				|| batchCreationQueueSourceInstance && pattern.matcher(itemPassed).matches()) {
 
-                        if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
-                            batchCreationQueueInstance.dwellingUnit = dwellingUnit
-                        } else if (batchCreationQueueSourceInstance.name == "person") {
-                            batchCreationQueueInstance.person = person
-                        } else if (batchCreationQueueSourceInstance.name == "household") {
-                            batchCreationQueueInstance.household = household
-                        }
+			if (useParentItem){
+					
+				itemPassed = itemPassed.replace("I", "")
+				
+				// If the manual config uses a parent item, they MUST enter the
+				// tracked item ID of the parent.
+				// TODO: Make this optional so if the parent type is specified,
+				// we can look it up based on a person, household, or dwelling unit ID
+					parentItemInstance = TrackedItem.read(itemPassed)
+					
+					if (parentItemInstance) {
+						
+						// load the contact point
+						dwellingUnit = parentItemInstance.dwellingUnit
+						person = parentItemInstance.person
+						household = parentItemInstance.household
+						
+						// look it up by parent item
+						batchCreationQueueInstance = BatchCreationQueue.findByParentItemAndUsername(parentItemInstance, username)
+					}
 
-                        if (batchCreationQueueInstance.save(flush:true)){
-                            render "Successfully added to the queue!"
-                        } else {
-                            batchCreationQueueInstance.errors.each{
-                                println "error: ${it}"
-                            }
-                        }
-                    }
-                }
-            } else {
-                render "Invalid input!"
-            }
-        }
+			} else {
+					
+				if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
+					dwellingUnit = DwellingUnit.read(itemPassed)
+					if (dwellingUnit) {
+						batchCreationQueueInstance = BatchCreationQueue.findAllByDwellingUnitAndUsername(dwellingUnit, username)
+					}
+				} else if (batchCreationQueueSourceInstance.name == "person") {
+					person = Person.read(itemPassed)
+					if (person){
+						batchCreationQueueInstance = BatchCreationQueue.findAllByPersonAndUsername(person, username)
+					}
+				} else if (batchCreationQueueSourceInstance.name == "household") {
+					household = Household.read(itemPassed)
+					if (household){
+						batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndUsername(household, username)
+					}
+				}
+
+			}
+			
+			if (!(dwellingUnit || household || person)) {
+				render "Not found!"
+			} else {
+				if (batchCreationQueueInstance) {
+					render "Already in the queue"
+				} else {
+					batchCreationQueueInstance = new BatchCreationQueue(username: username,
+						parentItem: parentItemInstance,
+						dwellingUnit: dwellingUnit,
+						person: person,
+						household: household)
+
+					if (batchCreationQueueInstance.save(flush:true)){
+						render "Successfully added to the queue!"
+					} else {
+						batchCreationQueueInstance.errors.each{
+							println "error: ${it}"
+						}
+					}
+				}
+			}
+								
+		}else{
+			render "Invalid input!"
+		}
     }
 
     def find = {
@@ -247,22 +284,22 @@ class DocumentGenerationController {
                     batchCreationConfigInstanceList = criteria.listDistinct{
 						and {
 							eq('active', true)
-								or {
-									ilike('name', "%${q}%")
-									instrument {
-										or {
-											study {
-												or {
-													ilike('name', "%${q}%")
-													ilike('fullName', "%${q}%")
-												}
+							or {
+								ilike('name', "%${q}%")
+								instrument {
+									or {
+										study {
+											or {
+												ilike('name', "%${q}%")
+												ilike('fullName', "%${q}%")
 											}
-											ilike('name', "%${q}%")
-											ilike('nickName', "%${q}%")
 										}
+										ilike('name', "%${q}%")
+										ilike('nickName', "%${q}%")
 									}
 								}
 							}
+						}
                     }
                 }
 

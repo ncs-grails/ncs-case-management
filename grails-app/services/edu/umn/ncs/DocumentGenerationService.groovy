@@ -300,7 +300,7 @@ class DocumentGenerationService {
                             sortOrder:1])
 
                     ///////////////////////////////////////////////////////
-                    //   Create Child and Sister items of Primary Batch
+                    //   Create Child and Sister batches of Primary Batch
                     ///////////////////////////////////////////////////////
                     batchCreationConfigInstance.subItems
                     .findAll{ it.relation != attachmentOf }
