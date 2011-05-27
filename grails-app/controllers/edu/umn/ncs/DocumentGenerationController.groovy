@@ -41,6 +41,7 @@ class DocumentGenerationController {
 
     def findItem = {
 
+		// parentItem example: I62367
 		def patternParentItem = ~/[a-zA-Z][0-9]*/
         def pattern = ~/[0-9]*/
         def username = authenticateService.principal().getUsername()
@@ -64,7 +65,6 @@ class DocumentGenerationController {
 		if (params.useParentItem == 'true') {
 			useParentItem = true
 		}
-		
 
 		if (useParentItem && patternParentItem.matcher(itemPassed).matches() 
 				|| batchCreationQueueSourceInstance && pattern.matcher(itemPassed).matches()) {
@@ -114,6 +114,7 @@ class DocumentGenerationController {
 			if (!(dwellingUnit || household || person)) {
 				render "Not found!"
 			} else {
+			
 				if (batchCreationQueueInstance) {
 					render "Already in the queue"
 				} else {
