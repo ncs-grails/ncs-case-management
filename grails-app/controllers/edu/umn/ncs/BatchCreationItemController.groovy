@@ -33,7 +33,7 @@ class BatchCreationItemController {
                 redirect(controller: "batchCreationConfig", action: "edit", id: batchCreationConfig.id)
             }
             else {
-                flush.message = "Failed to save new item."
+                flash.message = "Failed to save new item."
                 redirect(controller: "batchCreationConfig", action: "edit", id: batchCreationConfig.id)
             }
         } else {
@@ -85,7 +85,7 @@ class BatchCreationItemController {
                 redirect(controller:"batchCreationConfig", action: "edit", id: batchCreationItemInstance.id)
             }
             else {
-                flush.message = "Errors saving item."
+                flash.message = "Errors saving item."
                 redirect(controller:"batchCreationConfig", action: "edit", id:batchCreationItemInstance.batchCreationConfig.id)
             }
         }
