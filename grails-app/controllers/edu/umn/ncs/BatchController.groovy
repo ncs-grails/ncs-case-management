@@ -288,29 +288,22 @@ class BatchController {
 	
 	def deleteItem = {
 		
-		def trackedItemInstance = TrackedItem.read(params.id)
+		
 		def batchInstance = null
 		def validItems = null
+		def trackedItemInstance = TrackedItem.read(params.id)
+		def batchId = trackedItemInstance?.batch?.id
 	
-		if (trackedItemInstance) {
-			batchInstance = Batch.read(trackedItemInstance?.batch?.id)
-			if (batchInstance){
-				validItems = [
-					dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
-					person: batchInstance.items.find{it.person != null},
-					household: batchInstance.items.find{it.household != null}
-				]
-			}
-			
+		if (trackedItemInstance && batchId) {
 			try {
 				trackedItemInstance.delete(flush: true)
 				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
-				render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+				redirect(action: "edit", id: batchId)
+				
 			}catch(org.springframework.dao.DataIntegrityViolationException e){
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
 			}
-			
-			render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+			redirect(action: "edit", id: batchId)
 		} else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
 			redirect(action: "list")

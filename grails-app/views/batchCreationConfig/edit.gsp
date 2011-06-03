@@ -61,8 +61,9 @@
 
 	<!-- Form goes here -->
 	<g:each var="d" in="${batchCreationConfigInstance.documents}">
-	<div id="dtabs-${d.id}"><g:form method="post"
-		controller="batchCreationDocument">
+	<div id="dtabs-${d.id}">
+	
+	<g:form method="post" controller="batchCreationDocument">
 		<g:hiddenField name="id" value="${d?.id}" />
 		<g:hiddenField name="version" value="${d?.version}" />
 
@@ -79,17 +80,14 @@
 			default="Merge Data Location" /></label> </span> <span class="value"> <g:textField
 			size="80" name="mergeSourceFile" value="${d.mergeSourceFile}" /> </span></div>
 
-		<div class="prop"><span class="name"> <g:message
-			code="batchCreationDocument.dataSets.label"
-			default="Merge Data Sources" /> </span> <span class="value"> <g:each
-			var="msg" in="${DataSetType.list()}">
-			<g:if test="${d.dataSets.find{ it.id == msg.id}}">
-				<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}"
-					value="${msg.id}" checked="checked" />
-			</g:if>
+		<div class="prop"><span class="name"> 
+			<g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" /> </span> <span class="value"> 
+				<g:each var="msg" in="${DataSetType.list()}">
+					<g:if test="${d.dataSets.find{ it.id == msg.id}}">
+						<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" checked="checked" />
+					</g:if>
 			<g:else>
-				<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}"
-					value="${msg.id}" />
+				<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" />
 			</g:else>
 
 			<label for="dataSet-${msg.id}">

@@ -124,15 +124,33 @@ Basics</legend>
 	value="${batchCreationConfigInstance?.parentInstrument?.id}"
 	noSelection="['null': '']" /> </span></div>
 
-<div class="prop"><span class="name"> <label
-	for="parentDirection"><g:message
-	code="batchCreationConfig.parentDirection.label"
-	default="Parent Direction" /></label> </span> <span
-	class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'parentDirection', 'errors')}">
-<g:select name="parentDirection.id"
-	from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id"
-	value="${batchCreationConfigInstance?.parentDirection?.id}"
-	noSelection="['null': '']" /> </span></div>
+<div class="prop">
+	<span class="name"> 
+		<label for="parentDirection">
+			<g:message code="batchCreationConfig.parentDirection.label" default="Parent Direction" />
+		</label> 
+	</span> 
+	<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'parentDirection', 'errors')}">
+		<g:select name="parentDirection.id"
+			from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id"
+			value="${batchCreationConfigInstance?.parentDirection?.id}"
+			noSelection="['null': '']" /> 
+	</span>
+</div>
+
+<div class="prop">
+	<span class="name"> 
+		<label for="parentResult">
+			<g:message code="batchCreationConfig.parentResult.label" default="Parent Result" />
+		</label> 
+	</span> 
+	<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'parentResult', 'errors')}">
+		<g:select name="parentResult.id"
+			from="${edu.umn.ncs.Result.list()}" optionKey="id" optionValue="name"
+			value="${batchCreationConfigInstance?.parentResult?.id}"
+			noSelection="['null': '']" /> 
+	</span>
+</div>
 
 <div class="prop"><span class="name"> <label
 	for="parentFormat"><g:message

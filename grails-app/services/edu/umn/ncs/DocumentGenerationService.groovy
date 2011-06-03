@@ -18,6 +18,30 @@ class DocumentGenerationService {
 	
 	def debug = false
     
+	def getItemByParentAndConfig(TrackedItem trackedItemInstance, BatchCreationConfig batchCreationConfigInstance) {
+		
+		def trackedItemInstanceList = TrackedItem.createCriteria().list{
+			and {
+				parentItem {
+					idEq(trackedItemInstance.id)
+				}
+				batch {
+					instruments {
+						instrument {
+							idEq(batchCreationConfigInstance.instrument.id)
+						}
+					}
+				}
+			}
+		}	
+		
+		if (trackedItemInstanceList) {
+			return trackedItemInstanceList[0]
+		} else {
+			return null
+		}
+	}
+	
     // Loads an existing mailing into the print queue
     def reQueueMailing(Batch batchInstance, String username) {
 

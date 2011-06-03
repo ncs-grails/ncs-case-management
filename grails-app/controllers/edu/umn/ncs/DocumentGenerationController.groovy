@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 class DocumentGenerationController {
     def documentGenerationService
     def authenticateService
-
+	
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
         //println "params in downloadDataset --> ${params}"
@@ -38,7 +38,7 @@ class DocumentGenerationController {
             redirect(action:"printDetails")
         }
     }
-
+	
     def findItem = {
 
 		// parentItem example: I62367
@@ -49,6 +49,12 @@ class DocumentGenerationController {
         def batchCreationQueueSourceInstance = null
         def batchCreationQueueInstance = null
 		def bcqSource = params?.batchCreationQueueSource?.id
+		def batchCreationConfigId = params?.batchCreationConfig?.id 
+		def batchCreationConfigInstance = null
+		
+		if (batchCreationConfigId) {
+			batchCreationConfigInstance = BatchCreationConfig.read(batchCreationConfigId)
+		}
 		
 		def useParentItem = false
 		
@@ -57,9 +63,10 @@ class DocumentGenerationController {
         def household = null
 		
 		def parentItemInstance = null
+		def youCanDoIt = true
 
 		if (bcqSource) {
-			batchCreationQueueInstance = BatchCreationQueueSource.get(bcqSource)
+			batchCreationQueueSourceInstance = BatchCreationQueueSource.read(bcqSource)
 		}
 		
 		if (params.useParentItem == 'true') {
@@ -80,14 +87,40 @@ class DocumentGenerationController {
 					parentItemInstance = TrackedItem.read(itemPassed)
 					
 					if (parentItemInstance) {
+						if (batchCreationConfigInstance.oneBatchEventParentItem) {
+							def item = documentGenerationService.getItemByParentAndConfig(parentItemInstance, batchCreationConfigInstance)
+							if (item) {
+								render "Failed to add item.  It's already been generated!"
+								youCanDoIt = false
+							}
+						}
+
+						println "ngp: parentItemInstance?.batch?.primaryInstrument --> ${parentItemInstance?.batch?.primaryInstrument?.name}"
 						
-						// load the contact point
-						dwellingUnit = parentItemInstance.dwellingUnit
-						person = parentItemInstance.person
-						household = parentItemInstance.household
+						// Check parent item instrument match config instrument
+						if (batchCreationConfigInstance.parentInstrument) {
+							if (batchCreationConfigInstance.parentInstrument != parentItemInstance?.batch?.primaryInstrument) {
+								render "Failed to add item. Parent instrument must be ${batchCreationConfigInstance.parentInstrument.name}. Not ${parentItemInstance?.batch?.primaryInstrument.name}"
+								youCanDoIt = false
+							}
+						} 
 						
-						// look it up by parent item
-						batchCreationQueueInstance = BatchCreationQueue.findByParentItemAndUsername(parentItemInstance, username)
+						if (batchCreationConfigInstance.parentResult) {
+							if (parentItemInstance?.result?.result != batchCreationConfigInstance?.parentResult) {
+								render "Failed to add item. It must have result: ${batchCreationConfigInstance.parentResult.name}. "
+								youCanDoIt = false
+							}
+						}
+						
+						if (youCanDoIt) {
+							// load the contact point
+							dwellingUnit = parentItemInstance.dwellingUnit
+							person = parentItemInstance.person
+							household = parentItemInstance.household
+							
+							// look it up by parent item
+							batchCreationQueueInstance = BatchCreationQueue.findByParentItemAndUsername(parentItemInstance, username)
+						}
 					}
 
 			} else {
@@ -108,11 +141,12 @@ class DocumentGenerationController {
 						batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndUsername(household, username)
 					}
 				}
-
 			}
 			
 			if (!(dwellingUnit || household || person)) {
-				render "Not found!"
+				if (youCanDoIt){
+					render "Not found!"
+				}
 			} else {
 			
 				if (batchCreationQueueInstance) {

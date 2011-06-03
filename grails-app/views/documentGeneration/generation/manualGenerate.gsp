@@ -4,14 +4,12 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Manual Document Generation - National Children's Study</title>
-<meta name="layout" content="ncs" />
-<g:set var="entityName"
-	value="${message(code: 'documentGeneration.label', default: 'DocumentGeneration')}" />
-<g:javascript src="manualgenerate.js" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'documentGeneration.css')}" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Manual Document Generation - National Children's Study</title>
+	<meta name="layout" content="ncs" />
+	<g:set var="entityName" value="${message(code: 'documentGeneration.label', default: 'DocumentGeneration')}" />
+	<g:javascript src="manualgenerate.js" />
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'documentGeneration.css')}" />
 </head>
 <body>
 <div class="nav"><span class="menuButton"><a class="home"
@@ -40,6 +38,7 @@ ${batchCreationConfigInstance?.name}
 		<span class="name">
 			<label for="sourceValue">Parent Item ID</label>
 			<g:hiddenField name="useParentItem" id="useParentItem" value="${true}" />
+			<g:hiddenField name="batchCreationConfig.id" id="batchCreationConfig.id" value="${batchCreationConfigInstance.id}" />
 			<g:hiddenField name="batchCreationQueueSource.id" id="batchCreationQueueSource.id" value="${0}" />			
 		</span>
 	</g:if>

@@ -13,6 +13,7 @@ $(document).ready(function(){
         var batchCreationQueueSource = $('#batchCreationQueueSource\\.id option:selected').text();
         // div the result message will go into.
         var messageDiv = "#message";
+        var batchCreationConfigId = $('#batchCreationConfig\\.id').val();
 
         // get the value entered in the field
         var sourceValue = $(this).val();
@@ -52,7 +53,7 @@ $(document).ready(function(){
 
         var url = $('#findUrl').val();
 
-        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  id: sourceValue, useParentItem: useParentItem};
+        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  id: sourceValue, useParentItem: useParentItem, 'batchCreationConfig.id': batchCreationConfigId};
 
         $("#manualGenerationQueue").prepend(newDivContent);
 
