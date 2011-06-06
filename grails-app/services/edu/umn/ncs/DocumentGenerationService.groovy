@@ -164,7 +164,10 @@ class DocumentGenerationService {
                                             FROM batch_creation_queue
                                             WHERE (username = ?)"""
                         results = sql.rows(selectionQuery, [params.username])
-
+						if (!results ) {
+                            println "Error: no results returned!"
+                            emptySelectionList = true
+                        }
                     }
                 } else {
 
@@ -381,7 +384,11 @@ class DocumentGenerationService {
                     }
 
                     // save batches
-                    if (! batchCreationConfigInstance.save()) {
+					/*
+					 * ngp: is there a reason to save batchCreationConfigInstance here?
+					 */
+
+					if (! batchCreationConfigInstance.save()) {
                         println "ERRORS:"
                         batchCreationConfigInstance.errors.each{ err ->
                             println "ERROR>> ${err}"

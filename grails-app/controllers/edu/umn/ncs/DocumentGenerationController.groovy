@@ -94,8 +94,6 @@ class DocumentGenerationController {
 								youCanDoIt = false
 							}
 						}
-
-						println "ngp: parentItemInstance?.batch?.primaryInstrument --> ${parentItemInstance?.batch?.primaryInstrument?.name}"
 						
 						// Check parent item instrument match config instrument
 						if (batchCreationConfigInstance.parentInstrument) {
