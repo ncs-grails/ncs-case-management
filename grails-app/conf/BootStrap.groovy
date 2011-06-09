@@ -345,7 +345,53 @@ class BootStrap {
 			}
 		}
 		
+		// Events
+		def eventSourceList = [
+			[ name:"ASU - Phone", incoming:true ],
+			[ name:"Incoming Call", incoming:true ],
+			[ name:"Outgoing Call", incoming:false ],
+			[ name:"Preregistration Call", incoming:true ],
+			[ name:"Incoming Correspondence", incoming:true ],
+			[ name:"Medical Records", incoming:true ],
+			[ name:"Death Certificate", incoming:true ],
+			[ name:"ASU - Mail", incoming:true ],
+			[ name:"Other", incoming:true ]
+		]
+		eventSourceList.each{ obj ->
+			def eventSourceInstance = EventSource.findByName(obj.name)
+			if (! eventSourceInstance ) {
+				eventSourceInstance = new EventSource(name:obj.name, incoming:obj.incoming).save(flush:true)
+			}
+		}
 
+		def eventTypeList = [
+			[ name:"Pregnancy",useEventCode:false,useEventDate:true,useEventDescription:false,useEventPickOne:false ],
+			[ name:"Miscarriage",useEventCode:false,useEventDate:true,useEventDescription:false,useEventPickOne:false ],
+			[ name:"Withdrawn from Study",useEventCode:false,useEventDate:false,useEventDescription:false,useEventPickOne:true ],
+			[ name:"Reactivate",useEventCode:false,useEventDate:true,useEventDescription:false,useEventPickOne:false ],
+			[ name:"Not Interested",useEventCode:false,useEventDate:false,useEventDescription:false,useEventPickOne:true ],
+			[ name:"Death",useEventCode:false,useEventDate:true,useEventDescription:true,useEventPickOne:false ]
+		]
+		eventTypeList.each{ obj ->
+			def eventTypeInstance = EventType.findByName(obj.name)
+			if (! eventTypeInstance ) {
+				eventTypeInstance = new EventType(name:obj.name,useEventCode:obj.useEventCode,useEventDate:obj.useEventDate,useEventDescription:obj.useEventDescription,useEventPickOne:obj.useEventPickOne).save(flush:true)
+			}
+		}
+
+		def eventPickOneList = [
+			[ name:"Refuses-no explanation or other",eventType:EventType.findByName("Not Interested") ],
+			[ name:"Hostile or Bad experience with study",eventType:EventType.findByName("Withdrawn from Study") ],
+			[ name:"Moving or Moved",eventType:EventType.findByName("Withdrawn from Study") ],
+			[ name:"Schedule conflict due to work, frequent traveling, family obligations or transportation problems",eventType:EventType.findByName("Not Interested") ]
+		]
+		eventPickOneList.each{ obj ->
+			def eventPickOneInstance = EventPickOne.findByName(obj.name)
+			if (! eventPickOneInstance ) {
+				eventPickOneInstance = new EventPickOne(name:obj.name,eventType:obj.eventType).save(flush:true)
+			}
+		}
+		
         if (site == "umn") {
             // Create Address for Screening Center Locations
             def mac = StreetAddress.findByAddressAndZipCode('200 Oak St SE Ste 350', 55455)

@@ -84,7 +84,10 @@ span.name {
 	clear: both;
 	text-decoration: underline;
 }
-
+span.show label {
+	color:#654B24;
+	font-variant: small-caps;
+}
 .itemMaroon {
 	color: #7A0019;
 	height: auto;
@@ -218,8 +221,7 @@ span.barcode {
 	clear: both;
 }  /* Use on a clearing element following a float */
 a.csv {
-	background: transparent url(../images/skin/database_save.png) 5px 50%
-		no-repeat;
+	background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
 	padding-left: 28px;
 	padding-right: 0.5em;
 	padding-top: 0.25em;
@@ -400,8 +402,7 @@ table.scroll td {
 	padding-left: 25px;
 }
 .buttons a.delete {
-	background: transparent url(../images/skin/database_delete.png) 5px 50%
-		no-repeat;
+	background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 
@@ -409,5 +410,16 @@ table.scroll td {
 	background-image: url(../images/skin/sorted_desc.gif);
 }
 
-
-
+.hidden {
+	display:none;
+}
+div.pad-content {
+	padding-left: 1.5em;
+	padding-bottom: 1.0em;
+}
+div.dialog {
+	width:100%;
+}
+div.eoi-header{
+	padding:1.0em;
+}
