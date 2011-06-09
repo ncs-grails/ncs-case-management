@@ -1,9 +1,13 @@
 package edu.umn.ncs
 
 import grails.converters.JSON
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_NCS'])
+// Let's us use security annotations
+import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugin.springcache.annotations.Cacheable
+import grails.plugin.springcache.annotations.CacheFlush
+
+@Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventTypeController {
 	// def debug = true
 	def debug = false

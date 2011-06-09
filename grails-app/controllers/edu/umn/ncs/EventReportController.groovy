@@ -1,8 +1,10 @@
 package edu.umn.ncs
 
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugin.springcache.annotations.Cacheable
+import grails.plugin.springcache.annotations.CacheFlush
 
-@Secured(['ROLE_NCS'])
+@Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventReportController {
 	//def debug = true		
 	def debug = false		

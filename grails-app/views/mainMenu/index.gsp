@@ -75,6 +75,20 @@
 						<dt><g:link controller="appointment">Appointment Entry</g:link></dt>
 						<dd>Enter Appointment Dates and Times for study subjects.</dd>
 						</g:ifAnyGranted>
+
+						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<dt><g:link controller="eventReport">Event of Interest Reporting</g:link></dt>
+						<dd>Enter events of interest for study subjects.
+							<g:ifAnyGranted role="ROLE_NCS_IT">
+								<br /><br />Add or edit items related to event of interest reports (admins only):
+							 	<g:link controller="eventPickOne">event pick one</g:link>,
+								<g:link controller="eventResult">event result</g:link>,
+								<g:link controller="eventSource">event source</g:link> and 
+								<g:link controller="eventType">event type</g:link>
+							</g:ifAnyGranted>							
+						</dd>
+						</g:ifAnyGranted>
+
 					</dl>
 				</div>
 
