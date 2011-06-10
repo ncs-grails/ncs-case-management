@@ -46,6 +46,7 @@ class MergeDataBuilderService {
                 parentItemId: item?.parentItem?.id,
                 parentDate: item?.parentItem?.batch?.dateCreated,
                 parentName: item?.parentItem?.batch?.primaryInstrument?.name,
+				parentInstrumentId: item?.parentItem?.batch?.primaryInstrument?.id,
                 childItemId: TrackedItem.findByParentItem(item)?.id,
                 resultName: item?.result?.result?.name,
                 resultDate: item?.result?.receivedDate
@@ -230,13 +231,23 @@ class MergeDataBuilderService {
 
             // Look up the NORC id varients for our different domain id types
             def instrumentInstance = Instrument.read(record.instrumentId)
+
+			record.norcDocId = ""
+			
             if (instrumentInstance) {
                 def instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+				
+				if (!instrumentLinkInstance) {
+					// Do we have norcDocId for the parent? (added for Transmittal Log and should not affect other docs)
+					instrumentInstance = Instrument.read(record.parentInstrumentId)
+					if (instrumentInstance) {
+						instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+					}
+				}
+				
                 if (instrumentLinkInstance) {
                     record.norcDocId = instrumentLinkInstance?.norcDocId
                 }
-            } else {
-                record.norcDocId = ""
             }
 
             def studyInstance = Study.read(record.studyId)

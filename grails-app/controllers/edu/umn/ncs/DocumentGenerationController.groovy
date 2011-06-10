@@ -304,11 +304,10 @@ class DocumentGenerationController {
                         eq('batchRunBy', username)
                         gt('dateCreated', aboutSixMonthsAgo)
                     }
+					
                 }
 
-                //		order('dateCreated', 'desc')
-
-
+                //order('dateCreated', 'desc')
 
                 // if a query was passed, we'll run it
                 if (q) {

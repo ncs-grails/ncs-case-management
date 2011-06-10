@@ -207,6 +207,7 @@ class BatchController {
         batchRecentList = c.listDistinct{
             eq('batchRunBy', username)
             gt('dateCreated', aboutSixMonthAgo)
+			order('dateCreated', 'desc')
         }
 
         if (q){
@@ -224,7 +225,9 @@ class BatchController {
                         }
                     }
                 }
+				order('dateCreated', 'desc')
             }
+			
         }
         [batchInstanceList:batchInstanceList,
             batchRecentList:batchRecentList]

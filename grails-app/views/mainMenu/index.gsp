@@ -121,7 +121,7 @@
 				<div id="report-tab">
 					<dl class="menu">
 			
-						<dt><g:link controller="batch" action="listByDate">List of Generated Batches By Month</g:link></dt>
+						<dt><g:link controller="batch" action="listByDate">Generated Batches</g:link></dt>
 						<dd>
 							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 						</dd>
