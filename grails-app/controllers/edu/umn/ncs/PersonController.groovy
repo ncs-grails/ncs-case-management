@@ -28,6 +28,14 @@ class PersonController {
 				}
 			}
 
+			def eventReportInstanceList = EventReport.createCriteria().list{
+				person {
+					idEq(personInstance.id)
+				}
+				order('contactDate', 'desc')
+			}
+				
+
 			def householdInstanceList = Household.createCriteria().list{
 				people {
 					idEq(personInstance.id)
@@ -39,7 +47,8 @@ class PersonController {
 				trackedItemInstanceList: trackedItemInstanceList, 
 				appointmentInstanceList: appointmentInstanceList,
 				householdInstanceList: householdInstanceList,
-				callInstanceList: callInstanceList ]
+				callInstanceList: callInstanceList,
+				eventReportInstanceList: eventReportInstanceList ]
 		}
 		
 	}
