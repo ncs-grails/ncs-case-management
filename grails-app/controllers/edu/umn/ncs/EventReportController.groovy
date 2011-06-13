@@ -3,10 +3,12 @@ package edu.umn.ncs
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
+import org.joda.time.LocalDate
+import org.joda.time.LocalTime
+import org.joda.time.format.DateTimeFormat
 
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventReportController {
-	//def debug = true		
 	def debug = false		
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -31,13 +33,14 @@ class EventReportController {
     }
 
     def create = {
-		
-		def personInstance = Person.read(params?.person?.id)			
+		def eventReportInstance = new EventReport()
+		eventReportInstance.properties = params
+		eventReportInstance.person = Person.read(params?.person?.id)
+		// Add NCS
+		eventReportInstance.addToStudies(Study.read(1))			
 
-		if (personInstance) {
-			def eventReportInstance = new EventReport()
-			eventReportInstance.properties = params
-			return [personInstance: personInstance, eventReportInstance: eventReportInstance]
+		if (eventReportInstance.person) {
+			return [eventReportInstance: eventReportInstance]
 		}
 		else {
 			flash.message "couldn't find person: ${params?.person?.id}"
@@ -45,14 +48,31 @@ class EventReportController {
     }
 
     def save = {
+		
+		def formatter = DateTimeFormat.forPattern('M/d/yyyy')
+		def midnight = new LocalTime(0,0)
+		
 		if (debug) {
 			println "filledOutDate::${params.filledOutDate}"			
+			println "filledOutDate::${params.contactDate}"			
 		}
-		// Convert date strings to dates
-		def filledOutDate = new Date(params.filledOutDate)
-		def contactDate = new Date(params.contactDate)
-		params.filledOutDate = filledOutDate
-		params.contactDate = contactDate
+		
+		// TODO: Convert date strings to dates
+		def filledOutDate = null
+		def contactDate = null
+		
+		// first replace . and / with -
+		if (params.filledOutDate) {
+			params.filledOutDate = params.filledOutDate.replaceAll('-', '/')
+			// parse it using the Joda Date parser, then convert back to Java Date and save
+			params.filledOutDate = formatter.parseDateTime(params.filledOutDate).toLocalDate().toDateTime(midnight).toCalendar().time
+		}
+		if (params.contactDate) {
+			params.contactDate = params.contactDate.replaceAll('-', '/')
+			// parse it using the Joda Date parser, then convert back to Java Date and save
+			params.contactDate = formatter.parseDateTime(params.contactDate).toLocalDate().toDateTime(midnight).toCalendar().time
+		}		
+
 		// Set event source other text if necessary
 		def eventSourceInstance = EventSource.read(params?.eventSource?.id)
 		if (eventSourceInstance?.name != 'Other') {
@@ -131,11 +151,12 @@ class EventReportController {
 
     def delete = {
         def eventReportInstance = EventReport.get(params.id)
+		def personInstance = eventReportInstance.person 
         if (eventReportInstance) {
             try {
                 eventReportInstance.delete(flush: true)
                 flash.message = "Event report deleted successfully!"
-                redirect(action: "index")
+                redirect(action: "index", params: ['person.id': personInstance.id])
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'eventReport.label', default: 'EventReport'), params.id])}"

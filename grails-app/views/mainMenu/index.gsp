@@ -49,8 +49,18 @@
 							in the system so that they can be properly tracked</dd>
 							<dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
 							<dd>Manage mailing dates and quota for the instrument.</dd>
-							<dt><g:link controller="batch" action="list">Batch Management</</g:link></dt>
+							<dt><g:link controller="batch" action="list">Batch Management</g:link></dt>
 							<dd>Manage batch attributes and items.</dd>							
+
+							<dt>Event of Interest Configuration</dt>
+							<dd>
+								Add or edit items related to event of interest reports:
+							 	<g:link controller="eventPickOne">event pick one</g:link>,
+								<g:link controller="eventResult">event result</g:link>,
+								<g:link controller="eventSource">event source</g:link> and 
+								<g:link controller="eventType">event type</g:link>
+							</dd>
+
 						</dl>				
 					</div>
 				</g:ifAnyGranted>
@@ -78,15 +88,7 @@
 
 						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="eventReport">Event of Interest Reporting</g:link></dt>
-						<dd>Enter events of interest for study subjects.
-							<g:ifAnyGranted role="ROLE_NCS_IT">
-								<br /><br />Add or edit items related to event of interest reports (admins only):
-							 	<g:link controller="eventPickOne">event pick one</g:link>,
-								<g:link controller="eventResult">event result</g:link>,
-								<g:link controller="eventSource">event source</g:link> and 
-								<g:link controller="eventType">event type</g:link>
-							</g:ifAnyGranted>							
-						</dd>
+						<dd>Enter events of interest for study subjects.</dd>
 						</g:ifAnyGranted>
 
 					</dl>
@@ -125,7 +127,6 @@
 						<dd>
 							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 						</dd>
-						
 						<g:each var="reportInstance" in="${Report.list().sort{ it.title }}">
 							<g:if test="${reportInstance?.enabled}">
 								<g:if test="${reportInstance?.adminsOnly}">

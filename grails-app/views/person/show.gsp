@@ -15,6 +15,15 @@
 		<h1>Person Details</h1>
 		
 		<fieldset class="maroonBorder"><legend class="m1">Person: ${personInstance.id}</legend>
+			<g:ifAnyGranted role="ROLE_NCS_CALLING">
+				<div style="float:right;">
+				<g:link base="/phone" controller="logCall" action="newCallToPerson" id="${personInstance.id}">
+					Call this person
+					<img style="vertical-align: middle;" src="${resource(dir:'images', file:'phone.png')}" width="32" height="32" alt="Make a Call to this Person" /><br/>
+				</g:link>
+				</div>
+			</g:ifAnyGranted>
+
 			<p>
 			${personInstance.title}
 			${personInstance.firstName}
@@ -42,12 +51,67 @@
 			</fieldset>
 		</g:each>
 
+		<!-- Calls -->
+		<g:if test="${callInstanceList}">
+		<fieldset class="maroonBorder">
+		<legend class="m1">Calling History</legend>
+			<table>
+				<thead>
+					<tr>
+						<th>Regarding</th>
+						<th>Call Time</th>
+						<th>Number</th>
+						<th>Contacted</th>
+						<th>Result</th>
+						<th>Caller</th>
+					</tr>
+				</thead>
+				<tbody>
+					<g:each var="c" in="${callInstanceList}">
+					<tr>
+						<td>
+							<g:ifAnyGranted role="ROLE_NCS_CALLING">
+								<g:link base="/phone" controller="report" action="item" id="${c.items.collect{it.id}.join(',')}">
+								<g:each status="s" var="i" in="${c.items}">
+									<g:if test="${s > 0}"><br/></g:if>
+									${i.batch.primaryInstrument} (${i.id})
+								</g:each>
+								</g:link>
+							</g:ifAnyGranted>
+							
+							<g:ifNotGranted role="ROLE_NCS_CALLING">
+								<g:each status="s" var="i" in="${c.items}">
+									<g:if test="${s > 0}"><br/></g:if>
+									${i.batch.primaryInstrument} (${i.id})
+								</g:each>
+							</g:ifNotGranted>
+							
+						</td>
+						<td><g:formatDate date="${c.startTime}" format="M/d/yyyy h:mm a" /></td>
+						<td>
+							<g:if test="${c.numberDialed}">${c.numberDialed}</g:if>
+							<g:else>n/a</g:else>
+						</td>
+						<td>
+							<g:if test="${c.alternateContactedParty}">${c.alternateContactedParty}</g:if>
+							<g:else>${personInstance.firstName}</g:else>
+						</td>
+						<td>${c.callResult}</td>
+						<td>${c.phoningUser}</td>
+					</tr>
+					</g:each>
+				</tbody>
+			</table>
+		</fieldset>
+		</g:if>
+
+		<!-- NORC Info -->
+		<g:if test="${personLinkInstance}">
 		<fieldset class="maroonBorder">
 		<legend class="m1">Norc Info</legend>
-		<g:if test="${personLinkInstance}">
 				  NORC SU ID: ${personLinkInstance.norcSuId}
-		</g:if><g:else>None.</g:else>
 		</fieldset>
+		</g:if>
 		
 		<fieldset class="maroonBorder">
 		<legend class="m1">Household(s)</legend>

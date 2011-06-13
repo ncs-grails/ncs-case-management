@@ -27,7 +27,10 @@
            	<fieldset class="maroonBorder">
             <g:if test="${personInstance}">
             	<legend>
-            	<g:link controller="person" action="show" id="${personInstance.id}">${ personInstance.fullName }</g:link>'s Appointments
+            	<g:link controller="person" action="show" id="${personInstance.id}" title="Open in Lookup">
+            		<img style="vertical-align: middle;" src="${resource(dir:'images', file:'magnifying-glass-48x48.png')}" width="24" height="24" alt="View in Lookup" />
+            	</g:link>
+            	${ personInstance.fullName }'s Appointments
             	</legend>
             	<g:include action="list" params="${ ['person.id': personInstance?.id ] }" />
             </g:if>

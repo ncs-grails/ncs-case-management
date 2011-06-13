@@ -18,7 +18,11 @@
             <span class="menuButton"><g:link class="create" action="create" params="['person.id': eventReportInstance?.person?.id]"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
         </div>
         <div class="body">
-            <h1>Edit Event Report for ${eventReportInstance?.person}</h1>
+            <h1>Event Report for ${eventReportInstance?.person}
+            	<g:link controller="person" action="show" id="${eventReportInstance?.person?.id}" title="Open in Lookup">
+            		<img style="vertical-align: middle;" src="${resource(dir:'images', file:'magnifying-glass-48x48.png')}" width="24" height="24" alt="View in Lookup" />
+            	</g:link>
+            </h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -31,101 +35,90 @@
 			<!-- Report Info -->
 			<div class="dialog">
 		        <!-- Form goes here -->
-                <div id="report">
-		            <g:form method="post" >
-		            	<div class="ui-tabs ui-widget ui-widget-content ui-corner-all pad-content"> 
-			            	<g:hiddenField id="personId" name="person.id" value="${eventReportInstance?.person?.id}" />
-			                <g:hiddenField name="id" value="${eventReportInstance?.id}" />
-			                <g:hiddenField name="version" value="${eventReportInstance?.version}" />
-			                <div class="prop">
-			                    <span valign="top" class="name">
-			                      <label for="studies"><g:message code="eventReport.studies.label" default="Studies" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'studies', 'errors')}">
-			                        <g:select name="studies" from="${edu.umn.ncs.Study.list()}" multiple="yes" optionKey="id" size="2" value="${eventReportInstance?.studies*.id}" />
-			                    </span>
-			                </div>
-			            
-			                <div class="prop">
-			                    <span valign="top" class="name">
-			                      <label for="eventSource"><g:message code="eventReport.eventSource.label" default="Event Source" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'eventSource', 'errors')}">
-			                        <g:select id="eventSource" name="eventSource.id" from="${edu.umn.ncs.EventSource.list()}" optionKey="id" value="${eventReportInstance?.eventSource?.id}"  />
-			                    </span>
-			                </div>
-			            	
-			            	
-			                <div id="eventSourceOther" class="prop <g:if test='${! eventReportInstance.eventSourceOther}' >hidden</g:if>">
-			                    <span valign="top" class="name">
-			                      <label for="eventSourceOther"><g:message code="eventReport.eventSourceOther.label" default="Event Source Other" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'eventSourceOther', 'errors')}">
-			                        <g:textField name="eventSourceOther" value="${eventReportInstance?.eventSourceOther}" />
-			                    </span>
-			                </div>			            	
-			            	
-			                <div class="prop">
-			                    <span valign="top" class="name">
-			                      <label for="contactDate"><g:message code="eventReport.contactDate.label" default="Contact Date" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'contactDate', 'errors')}">
-			                        <%--<gui:datePicker id="contactDate"
-			                        	value="${eventReportInstance?.contactDate}" 
-			                        	formatString="MM/dd/yyyy" />--%>
-                                    <input id="datepicker" name="contactDate" type="text" value="<g:formatDate date='${eventReportInstance?.contactDate}' format='MM/dd/yyyy' />" />
-			                    </span>
-			                </div>
-			            
-			                <div class="prop">
-			                    <span valign="top" class="name">
-			                      <label for="filledOutBy"><g:message code="eventReport.filledOutBy.label" default="Filled Out By" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'filledOutBy', 'errors')}">
-			                        <g:textField name="filledOutBy" value="${eventReportInstance?.filledOutBy}" />
-			                    </span>
-			                </div>
-			            
-			                <div class="prop">
-			                    <span valign="top" class="name">
-			                      <label for="filledOutDate"><g:message code="eventReport.filledOutDate.label" default="Filled Out Date" /></label>
-			                    </span>
-			                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'filledOutDate', 'errors')}">
-			                        <%--<gui:datePicker id="filledOutDate"
-			                        	value="${eventReportInstance?.filledOutDate}"
-			                        	formatString="MM/dd/yyyy" />--%>
-			                        <input id="filledOutDatepicker" name="filledOutDate" type="text" value="<g:formatDate date='${eventReportInstance?.filledOutDate}' format='MM/dd/yyyy' />"/>
-			                    </span>
-			                </div>
-		                </div>
-		                <div class="buttons">
-		                	<span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-		                	<span class="button"><g:actionSubmit class="list" action="index" value="${message(code: 'default.button.cancel.label', default: 'Cancel')}" /></span>
-		                </div>
-		            </g:form>
-               </div>
 
-				<!-- Events -->
-				<div class="eoi-header">
-					<h2>Events of Interest</h2>
-				</div>
-	            <g:hasErrors bean="${eventOfInterestInstance}">
-	            <div class="errors">
-	                <g:renderErrors bean="${eventOfInterestInstance}" as="list" />
-	            </div>
-	            </g:hasErrors>
                 <div id="tabs">
 					<ul>
+						<li><a href="#itabs-main">General Info</a></li>
 				        <g:each var="i" in="${eventReportInstance.events.sort{ it.eventType.name }}">
 			                <li><a href="#itabs-${i.id}">${i.eventType?.name}</a></li>
 				        </g:each>
 				        <g:set var="unusedEvents" value="${true}" />
 				        <g:if test="${unusedEvents}">
-							<li><a href="#itabs-new">New EOI</a></li>
+							<li><a href="#itabs-new">New Event</a></li>
 				        </g:if>
 					</ul>
+					<div id="itabs-main">
+		                <div id="report">
+				            <g:form method="post" >
+					            	<g:hiddenField id="personId" name="person.id" value="${eventReportInstance?.person?.id}" />
+					                <g:hiddenField name="id" value="${eventReportInstance?.id}" />
+					                <g:hiddenField name="version" value="${eventReportInstance?.version}" />
+					                <g:hiddenField name="studies" value="${eventReportInstance?.studies?.id}" />
+
+					                <div class="prop">
+					                    <span valign="top" class="name">
+					                      <label for="eventSource"><g:message code="eventReport.eventSource.label" default="Event Source" /></label>
+					                    </span>
+					                    <span valign="top" class="${hasErrors(bean: eventReportInstance, field: 'eventSource', 'errors')}">
+					                        <g:select name="eventSource.id" from="${edu.umn.ncs.EventSource.list()}" optionKey="id" value="${eventReportInstance?.eventSource?.id}"  />
+							                <span id="eventSourceOther">
+							                	<label for="eventSourceOther"><g:message code="eventReport.eventSourceOther.label" default="Explain Other:" /></label>
+							                	<g:textField name="eventSourceOther" value="${eventReportInstance?.eventSourceOther}" />
+						               		</span>
+					                    </span>
+					                </div>
+					            	
+					            	
+					                <div class="prop">
+					                    <span valign="top" class="name">
+					                      <label for="contactDate"><g:message code="eventReport.contactDate.label" default="Contact Date" /></label>
+					                    </span>
+					                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'contactDate', 'errors')}">
+					                        <%--<gui:datePicker id="contactDate"
+					                        	value="${eventReportInstance?.contactDate}" 
+					                        	formatString="MM/dd/yyyy" />--%>
+		                                    <input size="12" id="datepicker" name="contactDate" type="text" value="<g:formatDate date='${eventReportInstance?.contactDate}' format='MM/dd/yyyy' />" />
+					                    </span>
+					                </div>
+					            
+					                <div class="prop">
+					                    <span valign="top" class="name">
+					                      <label for="filledOutBy"><g:message code="eventReport.filledOutBy.label" default="Filled Out By" /></label>
+					                    </span>
+					                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'filledOutBy', 'errors')}">
+					                        <g:textField name="filledOutBy" value="${eventReportInstance?.filledOutBy}" />
+					                    </span>
+					                </div>
+					            
+					                <div class="prop">
+					                    <span valign="top" class="name">
+					                      <label for="filledOutDate"><g:message code="eventReport.filledOutDate.label" default="Filled Out Date" /></label>
+					                    </span>
+					                    <span valign="top" class="value ${hasErrors(bean: eventReportInstance, field: 'filledOutDate', 'errors')}">
+					                        <%--<gui:datePicker id="filledOutDate"
+					                        	value="${eventReportInstance?.filledOutDate}"
+					                        	formatString="MM/dd/yyyy" />--%>
+					                        <input size="12" id="filledOutDatepicker" name="filledOutDate" type="text" value="<g:formatDate date='${eventReportInstance?.filledOutDate}' format='MM/dd/yyyy' />"/>
+					                    </span>
+					                </div>
+				                <div class="buttons">
+				                	<span class="button">
+				                		<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+			                		</span>
+			                		<g:if test="${! eventReportInstance.events}">
+				                	<span class="button">
+				                		<g:actionSubmit class="delete" action="delete" value="Remove" onclick="return confirm('Are you sure you want to permanently delete this EOI Report?');" />
+				                	</span>
+				                	</g:if>
+				                	<span class="button">
+				                		<g:actionSubmit class="list" action="index" value="${message(code: 'default.button.cancel.label', default: 'Cancel')}" />
+		                			</span>
+				                </div>
+				            </g:form>
+		               </div>
+					</div>
 					<g:set var="eoiCount" value="${0}" />
-			        <g:each var="eventOfInterestInstance" in="${eventReportInstance.events.sort{ it.eventType.name }}" status="i" >
+			        <g:each var="eventOfInterestInstance" in="${eventReportInstance.events}" status="i" >
 				        <div id="itabs-${eventOfInterestInstance.id}">
 				        	<g:form method="post" controller="eventOfInterest">
 				                <g:hiddenField name="eventOfInterestInstance_id" value="${eventOfInterestInstance?.id}" />
@@ -244,14 +237,24 @@
 				                    </span>
 				                </div>
 								<g:set var="eoiCount" value="${i}" />
-								
-				                <g:actionSubmit action="update" value="Save" />
-				                <g:actionSubmit action="delete" value="Remove" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure you want to permanently delete this EOI?')}');" />
+				                <div class="buttons">
+				                	<span class="button">
+					                	<g:actionSubmit class="save" action="update" value="Save" />
+					                </span>
+				                	<span class="button">
+					                	<g:actionSubmit class="delete" action="delete" value="Remove" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure you want to permanently delete this EOI?')}');" />
+					                </span>
+				                </div>
 				        	</g:form>
 				        </div>
 					</g:each>
 					<g:if test="${unusedEvents}">
 				        <div id="itabs-new">
+			            <g:hasErrors bean="${eventOfInterestInstance}">
+			            <div class="errors">
+			                <g:renderErrors bean="${eventOfInterestInstance}" as="list" />
+			            </div>
+			            </g:hasErrors>
 				        	<g:form method="post" controller="eventOfInterest">
 				                <g:hiddenField name="eventReport.id" value="${eventReportInstance?.id}" />
 								<g:set var="eoiCount" value="${eoiCount + 1}" />
@@ -368,8 +371,11 @@
                                     	<input id="${'dateResultEnteredDatepicker' + eoiCount}" name="${'dateResultEntered' + eoiCount}" type="text" value="" />
 				                    </span>
 				                </div>
-				
-				                <g:actionSubmit action="save" value="Add" />
+				                <div class="buttons">
+				                	<span class="button">
+						                <g:actionSubmit class="save" action="save" value="Add" />
+					                </span>
+				                </div>
 				        	</g:form>
 				        </div>
 					</g:if> <!-- /Events -->

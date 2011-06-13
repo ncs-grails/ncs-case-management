@@ -1,6 +1,7 @@
 package edu.umn.ncs
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import edu.umn.ncs.phone.Call
 
 @Secured(['ROLE_NCS_PROTECTED'])
 class PersonController {
@@ -19,6 +20,14 @@ class PersonController {
 			
 			def appointmentInstanceList = Appointment.findAllByPerson(personInstance)
 			
+			def callInstanceList = Call.createCriteria().list {
+				items {
+					person {
+						idEq(personInstance.id)
+					}
+				}
+			}
+
 			def householdInstanceList = Household.createCriteria().list{
 				people {
 					idEq(personInstance.id)
@@ -29,7 +38,8 @@ class PersonController {
 				personLinkInstance: personLinkInstance,
 				trackedItemInstanceList: trackedItemInstanceList, 
 				appointmentInstanceList: appointmentInstanceList,
-				householdInstanceList: householdInstanceList ]
+				householdInstanceList: householdInstanceList,
+				callInstanceList: callInstanceList ]
 		}
 		
 	}

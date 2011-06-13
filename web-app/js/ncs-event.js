@@ -22,22 +22,28 @@ jQuery(document).ready(function() {
 	jQuery("input[id*=dateResultEnteredDatepicker]").datepicker();
 	
 	// Handle event source changes -- display additional items as needed based on selected event source
-	jQuery("#eventSource").change(function(){
-		jQuery("#eventSourceOther").addClass('hidden');
-		var eventSource = jQuery(this).find(':selected').text();
-		if (debug) {
-			alert("eventSource::" + eventSource);
-		}
-		if (eventSource == 'Other') {
-			jQuery("#eventSourceOther").removeClass('hidden');			
-		}
+	jQuery("#eventSource\\.id").change(function(){
+		eventSourceChanged();
 	});
 
+	eventSourceChanged();
+	
 	if (debug) {
 		alert("jQuery loaded");			
 	}
 
 });
+
+function eventSourceChanged() {
+	jQuery("#eventSourceOther").hide();
+	var eventSource = jQuery("#eventSource\\.id").find(':selected').text();
+	if (debug) {
+		alert("eventSource::" + eventSource);
+	}
+	if (eventSource == 'Other') {
+		jQuery("#eventSourceOther").show();			
+	}	
+}
 
 function displayControls(e) {
     if (debug) {
