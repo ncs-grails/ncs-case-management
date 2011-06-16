@@ -47,7 +47,7 @@ $(document).ready(function(){
 
                 if (data.success) {
                     var resultText = "success, received " + data.studyName + " " + data.instrumentName;
-                    resultText += ", ID: " + data.trackedItemId;
+                    resultText += ", ID: " + data.trackedItemId + ", Receipt Date: " + data.resultDate;
 
                     $("#scan-" + resultDivId + "-status").html(resultText);
                 } else {

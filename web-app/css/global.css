@@ -47,6 +47,15 @@ form.ncs input {
 	color: white;
 }
 
+.pad {
+	padding: 15px 0px 5px 15px;
+}
+
+p.padl {
+	padding: 10px 0px 10px 25px;
+}
+
+
 .highlightYellow {
 	margin: auto;
 	padding: .25em;
@@ -226,6 +235,7 @@ a.csv {
 	padding-right: 0.5em;
 	padding-top: 0.25em;
 	padding-bottom: 0.25em;
+
 	-moz-border-radius: 0.25em;
 	-webkit-border-radius: 0.25em;
 	border-radius: 0.25em;

@@ -1,6 +1,7 @@
 package edu.umn.ncs
 
 import grails.converters.*
+import org.joda.time.*
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_RECEIPT'])
@@ -103,7 +104,7 @@ class ReceiptItemsController {
 							userCreated: username, appCreated: appName, receivedDate: receivedDate)
                         if ( trackedItemInstance.save(flush:true) ) {
                             result.success = true
-                            result.resultDate = trackedItemInstance.result.receivedDate
+                            result.resultDate = new LocalDate(trackedItemInstance.result.receivedDate).toString('MM-dd-yyyy')
                             result.resultName = trackedItemInstance.result.result.name
                         } else {
 

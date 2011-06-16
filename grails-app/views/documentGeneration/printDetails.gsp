@@ -23,26 +23,43 @@
 
 <fieldset class="maroonBorder">
 	<legend class="m1">Data Sources To Save...</legend>
-	<g:each var="ds" in="${batchCreationConfigInstance?.documents}">
-	<g:if test="${ds.mergeSourceFile != null}">
-		<p>Right-Click and choose "Save Link As..."</p>
-		<g:link action="downloadDataset" class="csv"
-			params="${ [ 'batch.id':batchInstance?.id, 'batchCreationDocument.id': ds?.id ] }">
-			${ds?.mergeSourceFile}
-		</g:link>
-	</g:if>
-</g:each></fieldset>
+		<p class="padl">Right-Click and choose "Save Link As..."</p>	
+		<div class="list">
+			<table>
+                <tbody>
+                <g:each var="ds" status="i" in="${batchCreationConfigInstance?.documents.sort{it?.id}}">
+                	<g:if test="${ds.mergeSourceFile != null}">
+	                    <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+	                    	<td class="pad">
+	                    		<g:link action="downloadDataset" class="csv" params="${ [ 'batch.id':batchInstance?.id, 'batchCreationDocument.id': ds?.id ] }">
+	                    			${ds?.mergeSourceFile}
+	                    		</g:link>
+	                    	</td>
+	                    </tr>
+                    </g:if>
+                </g:each>
+                </tbody>		
+			</table>
+		</div>
+</fieldset>	
 
-
-<fieldset class="maroonBorder"><legend
-	style="margin-left: 0.5em;">Documents to open...</legend>
-<ul>
-	<g:each var="doc" in="${batchCreationConfigInstance?.documents}">
-		<li><a href="#">
-		${doc.documentLocation}
-		</a></li>
-	</g:each>
-</ul>
+<fieldset class="maroonBorder">
+	<legend style="margin-left: 0.5em;">Documents to open...</legend>
+	<div class="list">		
+		<table>
+			<tbody>
+				<g:each var="doc" status="i" in="${batchCreationConfigInstance?.documents.sort{it?.id}}">
+					<g:if test="${doc.documentLocation}">
+						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+							<td>
+								<a class="pad" href="#">${doc.documentLocation}</a>
+							</td>
+						</tr>
+					</g:if>
+				</g:each>
+			</tbody>
+		</table>
+	</div>
 </fieldset>
 
 
