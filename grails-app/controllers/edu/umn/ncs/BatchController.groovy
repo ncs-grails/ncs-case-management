@@ -449,6 +449,12 @@ class BatchController {
     def update = {
         def batchInstance = Batch.get(params.id)
         if (batchInstance) {
+			
+			def dateCreated = new LocalDate(batchInstance.dateCreated)
+			def mailDate = new LocalDate(params.mailDate)
+			def calledCampusCourierDate = new LocalDate(params.calledCampusCourierDate)
+			def addressAndMailingDate = new LocalDate(params.addressAndMailingDate)
+			def trackingReturnDate = new LocalDate(params.trackingReturnDate)
 
             def batchDate = new LocalDate(batchInstance.dateCreated)
             def referenceDateMonth = batchDate.monthOfYear
@@ -457,7 +463,7 @@ class BatchController {
 
             // check date order here
 
-            if (params.calledCampusCourierDate && params.calledCampusCourierDate < batchInstance.dateCreated) {
+            if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
                 batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
                     render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
@@ -466,7 +472,7 @@ class BatchController {
                     return
             }
 
-            if (params.addressAndMailingDate && params.addressAndMailingDate < batchInstance.dateCreated){
+            if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
                 batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
                     render(view: "editDates", model: [batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
@@ -474,8 +480,8 @@ class BatchController {
                         yearRange: yearRange])
                     return
             }
-
-            if (params.mailDate && params.mailDate < batchInstance.dateCreated) {
+			
+            if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
                 batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Mailing Date must come after date generated")
                     render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
@@ -485,7 +491,7 @@ class BatchController {
             }
 
 
-            if (params.trackingReturnDate && params.trackingReturnDate < batchInstance.dateCreated) {
+            if (trackingReturnDate && trackingReturnDate.isBefore(dateCreated) && !trackingReturnDate.isEqual(dateCreated)) {
                 batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after date generated")
                     render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,
@@ -494,7 +500,7 @@ class BatchController {
                     return
             }
 
-            if (params.mailDate && params.trackingReturnDate && params.mailDate > params.trackingReturnDate) {
+            if (mailDate && trackingReturnDate && mailDate.isBefore(trackingReturnDate) && mailDate.isEqual(trackingReturnDate)) {
                 batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
                     render(view: "editDates", model: [ batchInstance: batchInstance,
                         referenceDateMonth: referenceDateMonth,

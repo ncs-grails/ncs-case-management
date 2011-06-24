@@ -7,6 +7,7 @@
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'batch.label', default: 'Batch')}" />
         <title><g:message code="default.editDates.label" args="[entityName]" /></title>
+        <link rel="stylesheet" href="${resource(dir:'css',file:'global.css')}" />
     </head>
     <body>
         <div class="nav">
