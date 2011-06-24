@@ -210,7 +210,12 @@
 				<h3>Members</h3>
 				<ul>
 				<g:each var="p" in="${hh.people}">
-					<li><g:link controller="person" action="show" id="${p.id}">${p.fullName}</g:link></li>
+					<li>
+		            	<g:link controller="person" action="show" id="${p.id}" title="Open in Lookup">
+		            		<img style="vertical-align: middle;" src="${resource(dir:'images', file:'magnifying-glass-48x48.png')}" width="24" height="24" alt="View in Lookup" />
+		            		${p.fullName}
+		            	</g:link>
+					</li>
 				</g:each>
 				</ul>
 				</fieldset>
