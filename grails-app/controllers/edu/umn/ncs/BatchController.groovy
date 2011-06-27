@@ -136,13 +136,22 @@ class BatchController {
                     def batchInstance = Batch.get(batchId)
 
                     if (batchInstance) {
-                        // update batch mail date
-                        batchInstance.mailDate = referenceDate
-						batchInstance.lastUpdated = new Date()
-						batchInstance.updatedBy = username
-                        batchInstance.save(flush:true)
-                        flash.message = "${batchInstance.primaryInstrument.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated."
+						
+						def mailDate = new LocalDate(batchInstance.dateCreated)
+						def refDate = new LocalDate(referenceDate)
+						
+						if (refDate.isBefore(mailDate) && !refDate.isEqual(mailDate)) {
+							flash.message = "Mail Date must come after date generated"
+						} else {
+							// update batch mail date
+							batchInstance.mailDate = referenceDate
+							batchInstance.lastUpdated = new Date()
+							batchInstance.updatedBy = username
+							batchInstance.save(flush:true)
+							flash.message = "${batchInstance.primaryInstrument.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated."
 
+						}
+						
                     } else {
                         flash.message = "Batch not found: ${batchId}"
                     }
