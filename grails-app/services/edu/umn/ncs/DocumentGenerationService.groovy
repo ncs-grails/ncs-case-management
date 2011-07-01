@@ -1,5 +1,6 @@
 package edu.umn.ncs
 import groovy.sql.Sql
+import org.joda.time.format.DateTimeFormat
 
 /* This class is based on the C# class written by Aaron J. Zirbes @ umn.edu
  * located here:
@@ -16,7 +17,8 @@ class DocumentGenerationService {
 
     def appName = 'ncs-case-management'
 	
-	def debug = false
+	static def debug = false
+	static def csvDateFormat = 'yyyy-MM-dd HH:mm:ss'
     
 	def getItemByParentAndConfig(TrackedItem trackedItemInstance, BatchCreationConfig batchCreationConfigInstance) {
 		
@@ -534,18 +536,20 @@ class DocumentGenerationService {
                                             batch{
                                                 and {
                                                     instruments{
-                                                        instrument{
-                                                            eq("id", batchCreationConfigInstance.parentInstrument?.id)
-                                                        }
+														and {
+	                                                        instrument{
+	                                                            eq("id", batchCreationConfigInstance.parentInstrument?.id)
+	                                                        }
+		                                                    isInitial{
+		                                                        eq("id", batchCreationConfigInstance.isInitial?.id)
+		                                                    }
+														}
                                                     }
                                                     direction{
                                                         eq("id", batchCreationConfigInstance.parentDirection?.id)
                                                     }
                                                     format{
                                                         eq("id", batchCreationConfigInstance.parentFormat?.id)
-                                                    }
-                                                    isInitial{
-                                                        eq("id", batchCreationConfigInstance.isInitial?.id)
                                                     }
                                                 }
                                             }
@@ -660,7 +664,9 @@ class DocumentGenerationService {
 
         // the stuff to write to the file
         def mergeSourceContents = new StringBuffer()
-
+		
+		def fmt = DateTimeFormat.forPattern(csvDateFormat)
+		
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
@@ -736,6 +742,10 @@ class DocumentGenerationService {
                     // If there's a non-null value...
                     if (row[col] != null) {
                         // take the content and escape the double quotes (")
+						
+						if (debug) { println "Row Class for ${col}: " + row[col].class.toString() }
+							
+						
                         def columnContent = row[col].toString().replace('"', '""')
                         // then surround it with double quotes
                         columnValue = '"' + columnContent  + '"'

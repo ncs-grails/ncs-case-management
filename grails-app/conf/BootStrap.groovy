@@ -1,7 +1,8 @@
 import edu.umn.ncs.*
 
 class BootStrap {
-
+	def grailsApplication
+	
     def init = { servletContext ->
 
         // This will be done on the MySQL side using an identy seed
@@ -20,6 +21,20 @@ class BootStrap {
         /* Items: AddressType, ContactRole, Country, EmailType,
          * EnrollmentType, Ethnicity, Gender, PhoneType, RelationshipType,
          * Study */
+		
+		// Verifying Documents!
+		def config = grailsApplication.config.ncs
+		BatchCreationDocument.list(sort:'documentLocation').each{ batchCreationDocumentInstance ->
+			def fileLocation = "${config.documents}/${batchCreationDocumentInstance.documentLocation}"
+			// get the file
+			def file = new File(fileLocation)			
+			if (! file.exists()) {
+				println "# WARNING!!!  The following file is expected by Doc Gen, but missing:\n\t${batchCreationDocumentInstance.documentLocation}"
+				
+			}
+		}
+
+		
 
         //AddressType
         def homeAddress = AddressType.findByName('home')
@@ -585,7 +600,10 @@ class BootStrap {
         }
 		
 		def env = System.getenv()
-		println "\nBrowse to https://${env['USERNAME']}.healthstudies.umn.edu:8443/ncs-case-management/\n"
+		def username = env['USERNAME']
+		if (username) {
+			println "\nBrowse to https://${env['USERNAME']}.healthstudies.umn.edu:8443/ncs-case-management/\n"
+		}
 
     }
     def destroy = {

@@ -22,8 +22,8 @@
 <h2>${batchCreationConfigInstance?.name}</h2>
 
 <fieldset class="maroonBorder">
-	<legend class="m1">Data Sources To Save...</legend>
-		<p class="padl">Right-Click and choose "Save Link As..."</p>	
+	<legend class="m1">1. Data Sources To Save...</legend>
+		<p class="padl">Right-Click and choose "Save Link As...", then save it to ${saveLocation}</p>	
 		<div class="list">
 			<table>
                 <tbody>
@@ -44,7 +44,7 @@
 </fieldset>	
 
 <fieldset class="maroonBorder">
-	<legend style="margin-left: 0.5em;">Documents to open...</legend>
+	<legend style="margin-left: 0.5em;">2. Documents to download...</legend>
 	<div class="list">		
 		<table>
 			<tbody>
@@ -52,7 +52,9 @@
 					<g:if test="${doc.documentLocation}">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-								<a class="pad" href="#">${doc.documentLocation}</a>
+								<g:link controller="documentGeneration" action="downloadDocument" id="${doc.id}" class="pad">
+									${doc.documentLocation}
+								</g:link>
 							</td>
 						</tr>
 					</g:if>
@@ -62,9 +64,11 @@
 	</div>
 </fieldset>
 
+<fieldset class="maroonBorder">
+	<legend style="margin-left: 0.5em;">3. Print the Batch Report</legend>
+	<g:link class="report" controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link>
+</fieldset>
 
-<div class="buttons"><span class="button">
-    <g:link controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link></span></div>
 </div>
 </body>
 </html>

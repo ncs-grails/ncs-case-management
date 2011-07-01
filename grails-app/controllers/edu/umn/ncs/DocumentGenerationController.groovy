@@ -9,6 +9,43 @@ import java.util.regex.Pattern
 class DocumentGenerationController {
     def documentGenerationService
     def authenticateService
+	def grailsApplication
+	
+	def downloadDocument = {
+		
+		def config = grailsApplication.config.ncs
+		
+		def batchCreationDocumentInstance = BatchCreationDocument.read(params?.id)
+		
+		if (batchCreationDocumentInstance) {
+			// build the path
+			def fileLocation = "${config.documents}/${batchCreationDocumentInstance.documentLocation}"
+			// get the file
+			def file = new File(fileLocation)
+			
+			if (file.exists()) {
+				response.setContentType("application/octet-stream")
+				response.setHeader("Content-disposition", "filename=${file.name}")
+				response.outputStream << file.readBytes()
+				return
+			} else {
+				println "Could not find file: ${fileLocation}"
+				println "*************"
+				println "Is 'config.documents' set properly in Config.groovy?  It is currently: ${config.documents}"
+				println "Do you have the 'ncs-prod-docs repository checked out to '${config.documents}'?"
+				println "*************"
+				// actual file not found
+				response.sendError(404)
+				return
+			}
+			
+		} else {
+			println "BatchCreationDocument.id: ${params?.id} is missing!"
+			response.sendError(404)
+			return
+		}
+		 
+	}
 	
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
@@ -23,19 +60,21 @@ class DocumentGenerationController {
             // the file name... we should trim off the file name from the end of
             // the path.  (q:\stuff\data.csv --> data.csv)
 
-            def filepath = batchCreationDocumentInstance.mergeSourceFile
+            def filepath = batchCreationDocumentInstance.mergeSourceFile 
             def mergeSourceFile = new File(filepath).name
 
             def mergeSourceContents = documentGenerationService.generateMergeData(batchInstance, batchCreationDocumentInstance)
 
             response.setHeader("Content-disposition", "attachment; filename=\"${mergeSourceFile}\"");
-            render(contentType: "text/csv", text: mergeSourceContents);
+			
+            //render(contentType: "text/csv", text: mergeSourceContents)
+			render(contentType: "application/octet-stream", text: mergeSourceContents)
             
             // Use for debugging (doesn't download)
             //render(text: mergeSourceContents);
         } else {
             flash.message = "something went horribly wrong. (We can't find the batch or the document)."
-            redirect(action:"printDetails")
+            redirect(action:"printDetails", params:['batch.id': batchInstance.id])
         }
     }
 	
@@ -226,11 +265,24 @@ class DocumentGenerationController {
 
     // display details for printing the batch
     def printDetails = {
+		
+		def config = grailsApplication.config.ncs
 
-        def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
         def batchInstance = Batch.read(params?.batch?.id)
-
-        [batchCreationConfigInstance:batchCreationConfigInstance, batchInstance:batchInstance]
+			if (batchInstance) {
+	        def batchCreationConfigInstance = batchInstance?.creationConfig
+			if (! batchCreationConfigInstance ) {
+				batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfig?.id)
+			}
+	
+			def saveLocation = config.saveLocation
+			
+	        [ batchCreationConfigInstance: batchCreationConfigInstance, 
+				batchInstance: batchInstance, saveLocation: saveLocation ]
+		} else {
+			flash.message = "Unknown Batch"
+			redirect(action:'index')
+		}
     }
 
     // display a batch report

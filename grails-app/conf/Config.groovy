@@ -70,6 +70,10 @@ environments {
 
 }
 
+// This is the local file location of the NCS Production Documents
+ncs.documents = "/var/spool/ncs-prod-docs"
+ncs.saveLocation = "your Q: drive"
+
 // log4j configuration
 log4j = {
     // Example of changing the log pattern for the default console

@@ -35,12 +35,12 @@
 			<g:each var="hh" in="${householdInstanceList}">
 				<fieldset class="maroonBorder">
 				<legend class="m1">
-					# ${hh.id} 
+					Household ID: ${hh.id} 
 				</legend>
 				<h3>Members</h3>
 				<ul>
 				<g:each var="p" in="${hh.people}">
-					<li><g:link controller="person" action="show" id="${p.id}">${p.fullName}</g:link></li>
+					<li>Person ID: ${p.id}, <g:link controller="person" action="show" id="${p.id}">${p.fullName}</g:link></li>
 				</g:each>
 				</ul>
 				</fieldset>
