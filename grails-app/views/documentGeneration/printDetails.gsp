@@ -53,7 +53,7 @@
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 								<g:link controller="documentGeneration" action="downloadDocument" id="${doc.id}" class="pad">
-									${doc.documentLocation}
+									n:/Production Documents/${doc.documentLocation}
 								</g:link>
 							</td>
 						</tr>
