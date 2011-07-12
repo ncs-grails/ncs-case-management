@@ -44,9 +44,9 @@
 							events, etc...</dd>
 							<dt><g:link controller="instrumentHistory" action="list">Instrument Version Tracking</g:link></dt>
 							<dd>Manage instrument comments, revisions, and approvals.</dd>
-							<dt><g:link controller="batchCreationConfig" action="list">Configure Batch Generation</g:link></dt>
-							<dd>Configure the way that batches of instruments are generated
-							in the system so that they can be properly tracked</dd>
+							<dt><g:link controller="batchCreationConfig" action="list">Configure Document Generation</g:link></dt>
+							<dd>Configure the way that batches of instruments are generated through document generation
+							 so that they can be properly tracked</dd>
 							<dt><g:link controller="mailingSchedule" action="list">Tweak Mailing Schedule</g:link></dt>
 							<dd>Manage mailing dates and quota for the instrument.</dd>
 							<dt><g:link controller="batch" action="list">Batch Management</g:link></dt>

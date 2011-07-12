@@ -27,7 +27,7 @@ class BatchCreationDocumentController {
         def batchCreationConfig = BatchCreationConfig.get(params.batchCreationConfig.id)
         if (batchCreationConfig){
             
-            if (params?.documentLocation && params?.mergeSourceFile) {
+            if (params?.documentLocation) {
                 def batchCreationDocumentInstance = new BatchCreationDocument(params)
 
                 params?.dataSets?.id?.each{
@@ -45,7 +45,7 @@ class BatchCreationDocumentController {
                     redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
                 }
             } else {
-                flash.message = "Document location and merge datasource required. New document was not saved."
+                flash.message = "Document location is required. New document was not saved."
                 redirect(controller:"batchCreationConfig", action:"edit", id:batchCreationConfig.id)
             }
         } else {
