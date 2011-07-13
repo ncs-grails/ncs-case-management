@@ -236,6 +236,7 @@
 						<th>Study</th>
 						<th>Instrument</th>
 						<th>Generated</th>
+						<th>Date On</th>
 						<th>Mailed</th>
 						<th>Format</th>
 						<th>Result</th>
@@ -249,6 +250,7 @@
 						<td>${i.batch.primaryInstrument.study}</td>
 						<td>${i.batch.primaryInstrument}</td>
 						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.dateCreated}" /></td>
+						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.instrumentDate}" /></td>
 						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.mailDate}" /></td>
 						<td>${i.batch.format}</td>
 						<td>${i.result?.result?.name}</td>
