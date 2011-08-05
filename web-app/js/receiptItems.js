@@ -20,7 +20,7 @@ $(document).ready(function(){
         // create an element stating that we are trying to receipt it
         var strHtml = '<div id="scan-' + receivedElementId + '" class="item-' + barcodeValue + '">';
         strHtml += barcodeValue;
-        strHtml += '<span style="padding-left:3em;;" id="scan-' + receivedElementId + '-status">...Processing</span></div>';
+        strHtml += '<span style="padding-left:3em;" id="scan-' + receivedElementId + '-status">...Processing</span></div>';
 
         $('#resultLog').prepend(strHtml);
 
@@ -33,7 +33,7 @@ $(document).ready(function(){
         // build the data
         var data = { "id": barcodeValue, "divId": receivedElementId, "receiptDateInstance": receiptDateInstance };
 
-        $.getJSON(url, data, function(data, textStatus){
+        $("#scan-" + resultDivId + "-status").load(url, data, function(response, textStatus, xhr){
 
             // Possible outcomes of textStatus are:
             // "success"
@@ -45,27 +45,18 @@ $(document).ready(function(){
             if (textStatus == "success") {
                 var resultDivId = data.divId
 
-                if (data.success) {
-                    var resultText = "success, received " + data.studyName + " " + data.instrumentName;
-                    resultText += ", ID: " + data.trackedItemId + ", Receipt Date: " + data.resultDate;
-
-                    $("#scan-" + resultDivId + "-status").html(resultText);
-                } else {
-                    $("#scan-" + resultDivId + "-status").html("failed to receipt item:" + data.errorText);
-                }
+                //$("#scan-" + resultDivId + "-status").html(response);
 
             } else if (textStatus == "timeout") {
-                alert(2);
                 $("#scan-" + divId + "-status").html("request timed out.");
             } else if (textStatus == "parsererror") {
-                alert(3);
                 $("#scan-" + divId + "-status").html("error parsing response from server, please retry.");
             } else if (textStatus == "notmodified") {
-                alert(4);
                 $("#scan-" + divId + "-status").html("what? not modified? ok.");
             } else {
-                alert(5);
-                $("#scan-" + divId + "-status").html("an error occured on the server.");
+                var msg = "Sorry but there was an error: ";
+                $("#scan-" + divId + "-status").html(msg + xhr.status + " " + xhr.statusText);
+                
             }
         });
 
