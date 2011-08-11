@@ -10,6 +10,7 @@ class DocumentGenerationController {
     def documentGenerationService
     def authenticateService
 	def grailsApplication
+	private boolean debug = true
 	
 	def downloadDocument = {
 		
@@ -20,6 +21,7 @@ class DocumentGenerationController {
 		if (batchCreationDocumentInstance) {
 			// build the path
 			def fileLocation = "${config.documents}/${batchCreationDocumentInstance.documentLocation}"
+			
 			// get the file
 			def file = new File(fileLocation)
 			
@@ -136,11 +138,28 @@ class DocumentGenerationController {
 						
 						// Check parent item instrument match config instrument
 						if (batchCreationConfigInstance.parentInstrument) {
-							if (batchCreationConfigInstance.parentInstrument != parentItemInstance?.batch?.primaryInstrument) {
+							
+							def previousInstrument = parentItemInstance?.batch?.primaryInstrument?.previousInstrument
+
+							if (batchCreationConfigInstance.parentInstrument != parentItemInstance?.batch?.primaryInstrument && previousInstrument?.id != batchCreationConfigInstance.parentInstrument?.id) {
 								render "Failed to add item. Parent instrument must be ${batchCreationConfigInstance.parentInstrument.name}. Not ${parentItemInstance?.batch?.primaryInstrument.name}"
 								youCanDoIt = false
 							}
 						} 
+						
+						if (batchCreationConfigInstance.direction) {
+							if (batchCreationConfigInstance.direction.id != parentItemInstance?.batch?.direction?.id) {
+								render "Failed to add item. Parent direction must be: '${batchCreationConfigInstance.direction.name}'. Not '${parentItemInstance?.batch?.direction?.name}'"
+								youCanDoIt = false
+							}
+						}
+						
+						if (batchCreationConfigInstance.parentFormat) {
+							if (batchCreationConfigInstance.parentFormat.id != parentItemInstance?.batch?.format?.id) {
+								render "Failed to add item. Parent format must be: '${batchCreationConfigInstance.parentFormat.name}'. Not '${parentItemInstance?.batch?.format?.name}'"
+								youCanDoIt = false
+							}
+						}
 						
 						if (batchCreationConfigInstance.parentResult) {
 							if (parentItemInstance?.result?.result != batchCreationConfigInstance?.parentResult) {
@@ -531,7 +550,7 @@ class DocumentGenerationController {
         }
         autoGenerate{
             action {
-                
+				
                 // ** automatically generate documents **
                 def batchInstance = null
                 def batchCreationConfigInstance = BatchCreationConfig.read(params?.id)
@@ -550,6 +569,7 @@ class DocumentGenerationController {
                     }
 
                     docGenParams.instrumentDate = params.instrumentDate
+					
                     batchInstance = documentGenerationService.generateMailing(docGenParams)
                     
                     if (batchInstance) {

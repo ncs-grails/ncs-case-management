@@ -86,9 +86,12 @@ class ReceiptItemsController {
                 def id = barcodeValue.replace("I", "")
 
                 trackedItemInstance = TrackedItem.get(id)
-
-                // get received status and received date
-                if (trackedItemInstance) {
+				
+				if (!trackedItemInstance) {
+					result.success = false
+					result.errorText = "   Item not found."
+				} else {
+					// get received status and received date
                     result.trackedItemId = trackedItemInstance.id
                     result.instrumentName = trackedItemInstance.batch.primaryInstrument.toString()
                     result.studyName =  trackedItemInstance.batch.primaryInstrument.study.toString()

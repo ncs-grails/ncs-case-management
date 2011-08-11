@@ -17,6 +17,11 @@
         </div>
         <div class="body">
             <h1>Editing Batch # ${batchInstance?.id}</h1>
+            
+            <g:if test="${message}">
+            	<div class="message">${message}</div>
+            </g:if>            
+            
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -66,11 +71,6 @@
                                 <td valign="top" class="value">
                                 	<label>Batch Id: ${batchInstance?.id} ${batchInstance?.master?.primaryInstrument?.name?.encodeAsHTML()}</label>
                                 </td>
-                                <!-- <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'master', 'errors')}">
-                                    <g:select name="master.id" from="${masterBatchList}" optionKey="id" value="${batchInstance?.master?.id}" optionValue="name" noSelection="['null': '']" />
-                                    <g:select name="master.id" from="${edu.umn.ncs.Batch.list()}" optionKey="id" value="${batchInstance?.master?.id}" optionValue="${{it?.primaryInstrument}}" noSelection="['null': '']" />
-                                </td>
-                                  -->
                             </tr>
                         
                             <tr class="prop">
@@ -170,7 +170,7 @@
                                   <label for="creationConfig"><g:message code="batch.creationConfig.label" default="Creation Config" /></label>
                                 </td>
                                 <td valign="top" class="value">
-                                    <!-- <g:select name="creationConfig.id" from="${edu.umn.ncs.BatchCreationConfig.list()}" optionKey="id" value="${batchInstance?.creationConfig?.id}" optionValue="name" noSelection="['null': '']" /> -->
+                                    <%-- <g:select name="creationConfig.id" from="${edu.umn.ncs.BatchCreationConfig.list()}" optionKey="id" value="${batchInstance?.creationConfig?.id}" optionValue="name" noSelection="['null': '']" /> --%>
 									<label>${batchInstance?.creationConfig?.name}</label>                                    
                                 </td>
                             </tr>
@@ -206,14 +206,14 @@
 									<tbody>
 										<g:each in="${batchInstance.items.sort{it?.id}}" status="s" var="i">
 											<tr class="${(s % 2) == 0 ? 'even' : 'odd'}">
-												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i?.id?.encodeAsHTML()}</g:link></td>
+												<td><g:link controller="trackedItem" action="edit" id="${i.id}">${i?.id?.encodeAsHTML()}</g:link></td>
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.dwellingUnit?.id?.encodeAsHTML()}</g:link></td>
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.person?.id?.encodeAsHTML()}</g:link></td>
 												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.household?.id?.encodeAsHTML()}</g:link></td>
 									            <td>
 									                <div class="buttons">
 									                    <span class="button">
-									                    	<!-- <g:actionSubmit class="delete" action="deleteItem" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /> -->
+									                    	<%-- <g:actionSubmit class="delete" action="deleteItem" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /> --%>
 									                    	<g:link class="delete" action="deleteItem" id="${i.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete</g:link>
 									                    </span>
 									                </div>
@@ -244,7 +244,7 @@
 								</span>		
 									<span style="margin-left:5px;" class="buttons">
 										<g:actionSubmit name="addItemTest" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
-										<!--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" />-->
+										<%--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" /> --%>
 									</span>
 							</div>
 

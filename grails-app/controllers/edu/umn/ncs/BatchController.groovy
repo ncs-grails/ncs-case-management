@@ -7,7 +7,7 @@ import org.joda.time.contrib.hibernate.*
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 
-@Secured(['ROLE_NCS_DOCGEN'])
+@Secured(['ROLE_NCS'])
 class BatchController {
 
     private boolean debug = true
@@ -19,6 +19,7 @@ class BatchController {
         redirect(action:'list',params:params)
     }
 
+	@Secured(['ROLE_NCS_IT'])
     def sendNightlyReport = {
 
         // emailService.sendProductionReport(params)
@@ -28,6 +29,7 @@ class BatchController {
 
     }
 
+	@Secured(['ROLE_NCS_IT'])
     def nightlyReport = {
         def referenceDate = params.referenceDate
         def midnight = new LocalTime(0, 0)
@@ -55,12 +57,14 @@ class BatchController {
             customizable: true]
     }
 	
+	@Secured(['ROLE_NCS_IT'])
 	def sendNorcAlert = {
 		emailService.sendNorcAlert()
 		
 		redirect(controller:"mainMenu", action:"index")
 	}
 
+	@Secured(['ROLE_NCS_IT'])
 	def norcAlert = {
 		def referenceDate = params.referenceDate
 		def midnight = new LocalTime(0, 0)
@@ -117,6 +121,7 @@ class BatchController {
 	}
 
 	
+	@Secured(['ROLE_NCS_RECEIPT'])
     def entry = {
         // reference date
         def referenceDate = params?.referenceDate
@@ -195,16 +200,25 @@ class BatchController {
             unsentBatchInstanceList:unsentBatchInstanceList ]
     }
 
+	@Secured(['ROLE_NCS_IT'])
     def list = {
         
         def username = authenticateService?.principal()?.getUsername()
         def q = params?.q
         def searchedId = 0L
+		def itemId = 0L
 
        if (q) {
             if (q.isLong()) {
                 searchedId = Long.parseLong(q)
             }
+			if (q[0] == "I") {
+				q = q.replace("I", "")
+				if (q.isLong()) {
+	                // we have an item
+	                itemId =  Long.parseLong(q)
+				}
+			}
         }
 
         def batchInstanceList = []
@@ -233,6 +247,9 @@ class BatchController {
                             }
                         }
                     }
+					items {
+						eq('id', itemId)
+					}
                 }
 				order('dateCreated', 'desc')
             }
@@ -242,6 +259,7 @@ class BatchController {
             batchRecentList:batchRecentList]
     }
 	
+	@Secured(['ROLE_NCS_IT'])
 	def show = {
 		def batchInstance = Batch.read(params.id)
 		if (!batchInstance) {
@@ -252,6 +270,7 @@ class BatchController {
 		}
 	}
 
+	@Secured(['ROLE_NCS_IT'])
 	def edit = {
 
 		def batchInstance = Batch.read(params.id)
@@ -272,37 +291,37 @@ class BatchController {
 		batchInstanceList.each{ b ->
 			def batchInfo = [
 					id:b.id, 
-					name:"Batch ID ${b.id}: ${b.primaryInstrument.name}"
+					name:"Batch ID ${b?.id}: ${b?.primaryInstrument?.name}"
 					]
 			masterBatchList.add(batchInfo)
 		}
-		
-
 		
 		if (!batchInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
 			redirect(action: "list")
 		} else {
 
-			
 			/* Check the batch items: created for dwelling Units, persons or households */
-			
-			def validItems = [
-				dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
-				person: batchInstance.items.find{it.person != null},
-				household: batchInstance.items.find{it.household != null}
-			]
-			
-			[batchInstance: batchInstance, validItems: validItems]
+			[batchInstance: batchInstance, validItems: getValidItems(params.id)]
 		}
+	}
+	
+	@Secured(['ROLE_NCS_IT'])
+	def update = {
+		def batchInstance = Batch.read(params.id)
+		
+		println "params: ${params}"
+		
+				
+		render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
 	}
 
 	
+	@Secured(['ROLE_NCS_IT'])
 	def deleteItem = {
 		
 		
 		def batchInstance = null
-		def validItems = null
 		def trackedItemInstance = TrackedItem.read(params.id)
 		def batchId = trackedItemInstance?.batch?.id
 	
@@ -315,24 +334,20 @@ class BatchController {
 			}catch(org.springframework.dao.DataIntegrityViolationException e){
 				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
 			}
-			redirect(action: "edit", id: batchId)
+			redirect(action: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
 		} else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
 			redirect(action: "list")
 		}
 	}
 	
+	@Secured(['ROLE_NCS_IT'])
 	def addItem = {
 		
 		def batchInstance = Batch.read(params.id)
+		def trackedItemInstance = null
 		
 		if (batchInstance) {
-			
-			def validItems = [
-				dwellingUnit: batchInstance.items.find{it.dwellingUnit != null},
-				person: batchInstance.items.find{it.person != null},
-				household: batchInstance.items.find{it.household != null}
-			]
 			
 			if (params.version){
 				def version = params.version.toLong()
@@ -354,55 +369,85 @@ class BatchController {
 			def bcq = new BatchCreationQueue()
 			
 			if (dwellingUnitId) {
+				
 				def dwellingUnit = DwellingUnit.read(dwellingUnitId)
 				if (dwellingUnit) {
 					bcq.dwellingUnit = dwellingUnit
+					trackedItemInstance = batchInstance.items.find{it.dwellingUnitId == dwellingUnit.id}
 				}
 			} else if (personId){
 				def person = Person.read(personId)
 				if (person){
 					bcq.person = person
+					trackedItemInstance = batchInstance.items.find{it.personId == person.id}
 				}
 			} else if (householdId){
 				def household = Household.read(householdId)
 				if (household){
 					bcq.household = household
+					trackedItemInstance = batchInstance.items.find{it.householdId == household.id}
 				}
 			}
-	
+
+            def message = ''
 			bcq.username = username
 			if (!bcq.validate()) {
 				
 				bcq.errors.each{ e->
 					e.fieldErrors.each{fe -> println "! Rejected'${fe.rejectedValue}' for field '${fe.field}'\n"}
 				}
-				flash.message = "Valid DwellingUnit, Person or Household ID Required."
+				message = "Valid DwellingUnit, Person or Household ID Required."
 			} else {
-				batchInstance.properties = params
-			
-				def trackedItemInstance = new TrackedItem(person: bcq.person,
-													dwellingUnit: bcq.dwellingUnit,
-													household: bcq.household)
-				batchInstance.updatedBy = username
-				batchInstance.addToItems(trackedItemInstance)
 				
-				if (!batchInstance.hasErrors() && batchInstance.save(flush:true)){
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
-				} else {
-					batchInstance.errors.each{e ->
-						e.fieldErrors.each{fe -> println "! Saving Batch. Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
+				if (!trackedItemInstance) {
+
+					batchInstance.properties = params
+										
+					trackedItemInstance = new TrackedItem(person: bcq.person,
+						dwellingUnit: bcq.dwellingUnit,
+						household: bcq.household)
+					
+					batchInstance.updatedBy = username
+					batchInstance.addToItems(trackedItemInstance)
+					
+					if (!batchInstance.hasErrors() && batchInstance.save(flush:true)){
+						message = "Batch ${batchInstance.id} successfully updated!"
+					} else {
+						batchInstance.errors.each{e ->
+							e.fieldErrors.each{fe -> println "! Saving Batch. Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
+						}
 					}
+					
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), message: message])
+					return
+					
+				} else {
+					render(view: "edit", model: [ batchInstance: batchInstance, validItems: getValidItems(params.id), message: "Item already in batch. Item ID: ${trackedItemInstance?.id}"])
+					return
 				}
-				render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
 			}
-			render(view: "edit", model: [batchInstance: batchInstance, validItems: validItems])
+			render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
 		} else {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
 			redirect(action: "list")
 		}
 	}
+	
+	private def getValidItems(batchId) {
+		def validItems = [:]
+		
+		def batchInstance = Batch.read(batchId)
+		
+		if (batchInstance) {
+			validItems.dwellingUnit = batchInstance.items.find { it.dwellingUnit != null}
+			validItems.person = batchInstance.items.find{it.person != null}
+			validItems.household = batchInstance.items.find{it.household != null}
+		}
+		return validItems
+	}
 
 	
+	@Secured(['ROLE_NCS_RECEIPT'])
     def listByDate = {
 
         def referenceDate = params?.referenceDate
@@ -432,6 +477,7 @@ class BatchController {
             batchInstanceList: batchInstanceList]
     }
 
+	@Secured(['ROLE_NCS_RECEIPT'])
     def editDates = {
         def batchInstance = Batch.get(params.id)
         if (!batchInstance) {
@@ -455,7 +501,8 @@ class BatchController {
         }
     }
 
-    def update = {
+	@Secured(['ROLE_NCS_RECEIPT'])
+    def updateDates = {
         def batchInstance = Batch.get(params.id)
         if (batchInstance) {
 			

@@ -52,7 +52,9 @@ class MergeDataBuilderService {
                 resultDate: item?.result?.receivedDate
             ]
 			
-			if (debug) { println "MergeDataBuilderService:getBaseData::record.itemId = ${record.itemId}" }
+			if (debug) { 
+				println "MergeDataBuilderService:getBaseData::record.itemId = ${record.itemId}" 
+			}
 
             if (item.dwellingUnit) {
                 record.dwellingUnitId = item.dwellingUnit.id

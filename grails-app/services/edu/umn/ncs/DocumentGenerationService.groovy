@@ -100,8 +100,6 @@ class DocumentGenerationService {
          *
          **/
 
-        if (debug) { println "${params}" }
-
         // We'll use these later...
         def attachmentOf = BatchCreationItemRelation.findByName('attachment')
         def childOf = BatchCreationItemRelation.findByName('child')
@@ -111,7 +109,7 @@ class DocumentGenerationService {
         def instructions = null
         def comments = null       
 
-        if (debug) { println "generateMailing params --> ${params}" }
+        
         if (!params.mailDate) {
             params.mailDate = null
         }
@@ -183,6 +181,8 @@ class DocumentGenerationService {
                         comments = batchCreationConfigInstance.defaultComments
                     }
 
+					if (debug) {println "batchCreationConfigInstance.selectionQuery --> ${batchCreationConfigInstance.selectionQuery}"}
+					
                     def selectionQuery = batchCreationConfigInstance.selectionQuery
                     def selectionParams = [:]
                     // Replace :mailDate with actual mail date
@@ -199,7 +199,7 @@ class DocumentGenerationService {
                     // If it's auto selection..
                     def sql = new Sql(dataSource)
                     if (sql) {
-
+						
                         if (selectionParams) {
                             results = sql.rows(selectionQuery, selectionParams)
                         } else {
