@@ -18,9 +18,9 @@ $(document).ready(function(){
 
         var divId = receivedElementId;
         // create an element stating that we are trying to receipt it
-        var strHtml = '<div id="scan-' + receivedElementId + '" class="item-' + barcodeValue + '">';
+        var strHtml = '<div style="padding-top:0.5em;" id="scan-' + receivedElementId + '" class="item-' + barcodeValue + '">';
         strHtml += barcodeValue;
-        strHtml += '<span style="padding-left:3em;" id="scan-' + receivedElementId + '-status">...Processing</span></div>';
+        strHtml += '<span style="padding-left: 1em;" id="scan-' + receivedElementId + '-status">...Processing</span></div>';
 
         $('#resultLog').prepend(strHtml);
 
@@ -33,7 +33,7 @@ $(document).ready(function(){
         // build the data
         var data = { "id": barcodeValue, "divId": receivedElementId, "receiptDateInstance": receiptDateInstance };
 
-        $("#scan-" + resultDivId + "-status").load(url, data, function(response, textStatus, xhr){
+        $("#scan-" + receivedElementId + "-status").load(url, data, function(response, textStatus, xhr){
 
             // Possible outcomes of textStatus are:
             // "success"

@@ -52,8 +52,11 @@
 			<span class="value">
 			<input type="text" size="15" id="barcode" name="barcode" value="" /> </span>
 		</div>
-
-		<div id="resultLog" class="grid_12"></div>
+	<fieldset class="maroonBorder">
+		<legend>Receipting Status</legend>
+		<div class="list">
+			<div id="resultLog" class="grid_12"></div>
+		</div>
 	</div>
 </body>
 </html>

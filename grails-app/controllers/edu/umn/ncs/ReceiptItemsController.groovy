@@ -26,7 +26,7 @@ class ReceiptItemsController {
 	}
 
     def receiptItem = {
-
+		
         // Check if it has I infront. If yes remove the "I" and proceed
         def username = authenticateService.principal().getUsername()
         def appName = "ncs-case-management"
@@ -50,9 +50,9 @@ class ReceiptItemsController {
 		if ( ! receivedDate ) {
 			receivedDate = new Date()
 		} else {
-                    // Mon Jan 31 13:38:42 CST 2011
-                    receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
-                }
+            // Mon Jan 31 13:38:42 CST 2011
+            receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
+        }
 		//println "receiptItems:receivedDate::${receivedDate}"
 
         // prep all the things we'll need to send back
@@ -108,7 +108,10 @@ class ReceiptItemsController {
                         
                         // tie the result back to the item
                         trackedItemInstance.result = new ItemResult(result:receivedResult, 
-							userCreated: username, appCreated: appName, receivedDate: receivedDate)
+							userCreated: username, 
+							appCreated: appName, 
+							receivedDate: receivedDate)
+						
                         if ( trackedItemInstance.save(flush:true) ) {
                             result.success = true
                             result.resultDate = new LocalDate(trackedItemInstance.result.receivedDate).toString('MM-dd-yyyy')
@@ -158,6 +161,7 @@ class ReceiptItemsController {
                 }
 
             } else if (	norcMailingPattern.matcher(barcodeValue).matches() ) {
+			
 				// Looks like someone scanned in a NORC barcode...
 				// Hmm....
 				def barcodeParts = barcodeValue.split('-')
@@ -183,7 +187,7 @@ class ReceiptItemsController {
 							eq('dwellingUnit', dwellingUnitInstance)
 							batch{
 								instruments{
-									eq('instrument', instrumentInstance)
+									'in'("instrument", instrumentInstanceList)
 								}
 							}
 						}
@@ -196,7 +200,7 @@ class ReceiptItemsController {
 							eq('person', personInstance)
 							batch{
 								instruments{
-									eq('instrument', instrumentInstance)
+									'in'("instrument", instrumentInstanceList)
 								}
 							}
 						}
