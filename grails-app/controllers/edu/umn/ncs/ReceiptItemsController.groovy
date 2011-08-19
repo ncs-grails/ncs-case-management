@@ -182,7 +182,7 @@ class ReceiptItemsController {
 				if (studyInstance && dwellingUnitInstance && instrumentInstanceList) {
 					
 					// get a list of tracked items for this dwelling unit and instrument combo
-					trackedItemInstanceList = TrackedItem.createCriteria().list{
+					trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
 						and{
 							eq('dwellingUnit', dwellingUnitInstance)
 							batch{
@@ -193,9 +193,14 @@ class ReceiptItemsController {
 						}
 					}
 					
+					trackedItemInstanceList.each{
+						println "trackedItemInstanceList: ${it.id}"
+					}
+					
+					
 				} else if (studyInstance && personInstance && instrumentInstanceList) {
 					// get a list of tracked items for this dwelling unit and instrument combo
-					trackedItemInstanceList = TrackedItem.createCriteria().list{
+					trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
 						and{
 							eq('person', personInstance)
 							batch{
@@ -227,5 +232,6 @@ class ReceiptItemsController {
 
     }
 
+	def cancelItem = { }
 
 }

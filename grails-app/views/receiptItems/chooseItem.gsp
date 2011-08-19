@@ -14,18 +14,19 @@
 						${trackedItemInstance.id} : 
 						${trackedItemInstance.batch.primaryInstrument.study}
 						${trackedItemInstance.batch.primaryInstrument.name}
-						Generated: ${trackedItemInstance.batch.dateCreated}
-						Mailed: ${trackedItemInstance.batch.mailDate}
+						Generated: ${formatDate(date:trackedItemInstance.batch.dateCreated, format:'M/d/yyyy')}
+						Mailed: ${formatDate(date: trackedItemInstance.batch.mailDate, format: 'M/d/yyyy')}
 						<g:if test="${trackedItemInstance.result}">
 							<span class="warning">
 								Warning: This item already has a result of: ${trackedItemInstance.result.result.name}
-								entered on ${trackedItemInstance.result.dateCreated}.
+								entered on ${formatDate(date: trackedItemInstance.result.dateCreated, format: 'M/d/yyyy')}.
 							</span>
 						</g:if>
 					</li>
 				</g:each>
 				</ul>
 				<g:submitToRemote url="${[action:'receiptItem', controller:'receiptItems']}" update="scan-${divId}-status" name="Submit" value="Submit" />
+				<g:submitToRemote url="${[action:'cancelItem', controller:'receiptItems']}" update="scan-${divId}-status" name="Cancel" value="Cancel" />
 			</g:form>
 		</div>
 	</fieldset>
