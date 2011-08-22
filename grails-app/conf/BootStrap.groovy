@@ -29,7 +29,9 @@ class BootStrap {
 			// get the file
 			def file = new File(fileLocation)			
 			if (! file.exists()) {
-				println "# WARNING!!!  The following file is expected by Doc Gen, but missing:\n\t${batchCreationDocumentInstance.documentLocation}"
+				println "# WARNING!!!  The following file is expected by Doc Gen, but missing:"
+				println "\thttps://secure.ncs.umn.edu/ncs-case-management/batchCreationConfig/edit/${batchCreationDocumentInstance.batchCreationConfig.id}"
+				println "\t${batchCreationDocumentInstance.documentLocation}"
 				
 			}
 		}

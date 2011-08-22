@@ -1,6 +1,7 @@
 package edu.umn.ncs
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 class DwellingUnitController {
 
@@ -35,16 +36,48 @@ class DwellingUnitController {
 			render "Dwelling Unit ${params.id} Not found"
         }
         else {
+			
 			def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
 
 			def trackedItemInstanceList = TrackedItem.findAllByDwellingUnit(dwellingUnitInstance)
 
 			def householdInstanceList = Household.findAllByDwelling(dwellingUnitInstance)
+			
+			def resultHistoryList = []
+			
+			// Find IDs for ItemResults
+			def itemResultIdList = trackedItemInstanceList.collect{ it?.result?.id?.toString() }
+			// get rid of nulls in the list
+			itemResultIdList.removeAll([null])
+
+			// Find Matching Audit Events for ItemResults		
+			def auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
+					eq('className', 'edu.umn.ncs.ItemResult')
+					'in'('persistedObjectId', itemResultIdList)
+			}
+			
+			auditLogEventInstanceList.each{
+				def item = [:]
+				
+				item.id = it.persistedObjectId.toInteger()
+				def ti = trackedItemInstanceList.find{it.result?.id == item.id}
+				item.trackedItem = TrackedItem.read(ti.id)
+				item.username = it.actor
+				item.dateCreated = it.dateCreated
+				
+				def resultId = it?.oldValue?.replace('edu.umn.ncs.Result : ', '')?.toInteger()
+				item.oldResult = Result.read(resultId)
+				
+				if (item.oldResult) {
+					resultHistoryList.add(item)
+				}
+			}
 
 			[dwellingUnitInstance: dwellingUnitInstance,
 				dwellingUnitLinkInstance: dwellingUnitLinkInstance,
 				trackedItemInstanceList: trackedItemInstanceList,
-				householdInstanceList: householdInstanceList ]
+				householdInstanceList: householdInstanceList,
+				resultHistoryList: resultHistoryList ]
         }
 		
 	}

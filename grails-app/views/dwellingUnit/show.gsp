@@ -69,7 +69,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<g:each var="i" in="${trackedItemInstanceList}">
+		<g:each var="i" in="${trackedItemInstanceList}">
 			<tr>
 				<td>${i.id}</td>
 				<td>${i.batch.primaryInstrument.study}</td>
@@ -81,7 +81,19 @@
 				<td>${i.result?.result?.name}</td>
 				<td>${i.result?.receivedDate}</td>
 			</tr>
+			<g:each var="al" in="${resultHistoryList.findAll{it.trackedItem.id == i.id} }">
+				<tr style="background-color: #DDD; font-style: italic;">
+					<td></td>
+					<td></td>
+					<td></td>
+					<td colspan="3">Old Result, transacted out by:</td>
+					<td>${al.username}</td>
+					<td>${al.oldResult.name}</td>
+					<td>on <g:formatDate date="${al.dateCreated}" format="MM/dd/yyyy"/></td>
+				</tr>
+				
 			</g:each>
+		</g:each>
 		</tbody>
 	</table>
 
