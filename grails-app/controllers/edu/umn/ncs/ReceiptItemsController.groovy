@@ -27,16 +27,10 @@ class ReceiptItemsController {
 
     def receiptItem = {
 		
-        // Check if it has I infront. If yes remove the "I" and proceed
-        def username = authenticateService.principal().getUsername()
-        def appName = "ncs-case-management"
 		def renderView = "itemResult"
-        
-		// ${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}
+
+		//${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}
 		def norcMailingPattern = ~/[0-9]{4}-[0-9]{8,10}-[0-9]{2,3}/		
-		
-        //println "receiptItems params --> ${params}"
-        def trackedItemInstance = null
 
         // Delay Code, used to test out of sequence responses
         /*
@@ -76,56 +70,15 @@ class ReceiptItemsController {
         if (params?.id){
             def barcodeValue = params?.id
 
-            def receivedResult = Result.findByName('received')
-
             //println "barcodeValue: ${barcodeValue}"
             //println "barcodeValue[1]: ${barcodeValue[0]}"
 
+			// Check if it has I infront. If yes remove the "I" and proceed
             if (barcodeValue[0].toUpperCase() == "I") {
                 // we have an item
                 def id = barcodeValue.replace("I", "")
 
-                trackedItemInstance = TrackedItem.get(id)
-				
-				if (!trackedItemInstance) {
-					result.success = false
-					result.errorText = "   Item not found."
-				} else {
-					// get received status and received date
-                    result.trackedItemId = trackedItemInstance.id
-                    result.instrumentName = trackedItemInstance.batch.primaryInstrument.toString()
-                    result.studyName =  trackedItemInstance.batch.primaryInstrument.study.toString()
-
-                    if (trackedItemInstance.result) {
-                        // item has been recepted already.  See what it was
-                        result.resultDate = trackedItemInstance.result.receivedDate
-                        result.resultName = trackedItemInstance.result.result.name
-
-                        result.success = false
-                        result.errorText = "Item already receipted ${result.resultDate}."
-
-                    } else {
-                        
-                        // tie the result back to the item
-                        trackedItemInstance.result = new ItemResult(result:receivedResult, 
-							userCreated: username, 
-							appCreated: appName, 
-							receivedDate: receivedDate)
-						
-                        if ( trackedItemInstance.save(flush:true) ) {
-                            result.success = true
-                            result.resultDate = new LocalDate(trackedItemInstance.result.receivedDate).toString('MM-dd-yyyy')
-                            result.resultName = trackedItemInstance.result.result.name
-                        } else {
-
-                            trackedItemInstance.errors.each{
-                                println "   error: ${it}"
-                            }
-                            result.success = false
-                            result.errorText = "unable to save result"
-                        }
-                    }
-                }
+				result = _receiptItem(id, receivedDate, result)
 			
             } else if (barcodeValue[0].toUpperCase() == "B") {
                 // we have a batch id
@@ -192,12 +145,6 @@ class ReceiptItemsController {
 							}
 						}
 					}
-					
-					trackedItemInstanceList.each{
-						println "trackedItemInstanceList: ${it.id}"
-					}
-					
-					
 				} else if (studyInstance && personInstance && instrumentInstanceList) {
 					// get a list of tracked items for this dwelling unit and instrument combo
 					trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
@@ -217,10 +164,14 @@ class ReceiptItemsController {
 					// No can do.
 					result.errorText = "No items matched that NORC Mailing ID!"
 				} else {
-					renderView = 'chooseItem'
-					result.trackedItemInstanceList = trackedItemInstanceList
-				}
 				
+					if (trackedItemInstanceList.size() == 1) {
+						result = _receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
+					} else {
+						renderView = 'chooseItem'
+						result.trackedItemInstanceList = trackedItemInstanceList
+					}
+				}
 			} else {
                 // invalid barcode!
                 result.errorText = "invalid barcode"
@@ -233,5 +184,58 @@ class ReceiptItemsController {
     }
 
 	def cancelItem = { }
+	
+	private def _receiptItem(itemId, receivedDate, result){
+		
+		def username = authenticateService.principal().getUsername()
+		def appName = "ncs-case-management"
+		
+		def receivedResult = Result.findByName('received')
+		
+		def trackedItemInstance = TrackedItem.get(itemId)
+		
+		if (!trackedItemInstance) {
+			result.success = false
+			result.errorText = "   Item not found."
+		} else {
+			// get received status and received date
+			result.trackedItemId = trackedItemInstance.id
+			result.instrumentName = trackedItemInstance.batch.primaryInstrument.toString()
+			result.studyName =  trackedItemInstance.batch.primaryInstrument.study.toString()
 
+			if (trackedItemInstance.result) {
+				// item has been recepted already.  See what it was
+				result.resultDate = trackedItemInstance.result.receivedDate
+				result.resultName = trackedItemInstance.result.result.name
+
+				result.success = false
+				result.errorText = "Item already receipted ${result.resultDate}."
+
+			} else {
+				
+				// tie the result back to the item
+				trackedItemInstance.result = new ItemResult(result:receivedResult,
+					userCreated: username,
+					appCreated: appName,
+					receivedDate: receivedDate)
+				
+				if ( trackedItemInstance.save(flush:true) ) {
+					result.success = true
+					result.resultDate = new LocalDate(trackedItemInstance.result.receivedDate).toString('MM-dd-yyyy')
+					result.resultName = trackedItemInstance.result.result.name
+				} else {
+
+					trackedItemInstance.errors.each{
+						println "   error: ${it}"
+					}
+					result.success = false
+					result.errorText = "unable to save result"
+				}
+			}
+		}
+		
+		
+		
+		return result
+	}
 }
