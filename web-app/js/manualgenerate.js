@@ -31,6 +31,7 @@ $(document).ready(function(){
 
         var newResultDivId = 'queueAddResult-' + queueId + '';
         var newDivContent = "";
+        
         if ((queueId % 2) == 0) {
             newDivContent = '<div class="prop-q odd bb">';
         } else {
@@ -53,7 +54,11 @@ $(document).ready(function(){
 
         var url = $('#findUrl').val();
 
-        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  id: sourceValue, useParentItem: useParentItem, 'batchCreationConfig.id': batchCreationConfigId};
+        var data = { 'batchCreationQueueSource.id': batchCreationQueueSourceId,  
+	        									id: sourceValue, 
+	        						 useParentItem: useParentItem, 
+	        						 	   queueId: queueId,
+	        			  'batchCreationConfig.id': batchCreationConfigId};
 
         $("#manualGenerationQueue").prepend(newDivContent);
 

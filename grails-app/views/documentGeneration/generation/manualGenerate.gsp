@@ -32,16 +32,17 @@ ${batchCreationConfigInstance?.name}
 </g:if>
 <div class="prop">
 
-	<g:hiddenField name="findUrl" id="findUrl" value="${createLink(controller:'documentGeneration', action:'findItem', params:[:])}" />
+	<g:hiddenField name="findUrl" id="findUrl" value="${createLink(controller:'documentGeneration', action:'findItem', params:[:])}"/>
 
 	<g:if test="${batchCreationConfigInstance.useParentItem}">
 		<span class="name">
 			<label for="sourceValue">Parent Item ID</label>
 			<g:hiddenField name="useParentItem" id="useParentItem" value="${true}" />
-			<g:hiddenField name="batchCreationConfig.id" id="batchCreationConfig.id" value="${batchCreationConfigInstance.id}" />
-			<g:hiddenField name="batchCreationQueueSource.id" id="batchCreationQueueSource.id" value="${0}" />			
+			<g:hiddenField name="batchCreationConfig.id" id="batchCreationConfig.id" value="${batchCreationConfigInstance.id}"/>
+			<g:hiddenField name="batchCreationQueueSource.id" id="batchCreationQueueSource.id" value="${0}"/>			
 		</span>
 	</g:if>
+	
 	<g:else>
 		<span class="name">
 			<label for="batchCreationQueueSource.id">
@@ -67,8 +68,8 @@ ${batchCreationConfigInstance?.name}
 	</span>
 </div>
 
-<fieldset class="maroonBorder"><legend id="itemsLegend"
-	style="margin-left: 0.5em;">Entered Items</legend>
+<fieldset class="maroonBorder">
+<legend id="itemsLegend" style="margin-left: 0.5em;">Entered Items</legend>
 
 	<div class="prop-q ubb">
 		<span class="value-q s">ID</span> 
@@ -112,6 +113,7 @@ ${batchCreationConfigInstance?.name}
 
 	<div class="buttons"><span class="button"><g:submitButton
 		name="generateDocuments" value="Generate Document(s)" /></span></div>
-</g:form></div>
+</g:form>
+</div>
 </body>
 </html>

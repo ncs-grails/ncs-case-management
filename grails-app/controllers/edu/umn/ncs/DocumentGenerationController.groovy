@@ -85,137 +85,162 @@ class DocumentGenerationController {
 		// parentItem example: I62367
 		def patternParentItem = ~/[a-zA-Z][0-9]*/
         def pattern = ~/[0-9]*/
+		
+		def renderView = "itemInfo"
+		
+		//${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}
+		def norcMailingPattern = ~/[0-9]{4}-[0-9]{8,10}-[0-9]{2,3}/
+		
         def username = authenticateService.principal().getUsername()
         def itemPassed = params.id
         def batchCreationQueueSourceInstance = null
         def batchCreationQueueInstance = null
-		def bcqSource = params?.batchCreationQueueSource?.id
+		def batchCreationQueueSourceId = params?.batchCreationQueueSource?.id
 		def batchCreationConfigId = params?.batchCreationConfig?.id 
-		def batchCreationConfigInstance = null
-		
-		if (batchCreationConfigId) {
-			batchCreationConfigInstance = BatchCreationConfig.read(batchCreationConfigId)
-		}
 		
 		def useParentItem = false
 		
-        def dwellingUnit = null
-        def person = null
-        def household = null
-		
-		def parentItemInstance = null
-		def youCanDoIt = true
-
-		if (bcqSource) {
-			batchCreationQueueSourceInstance = BatchCreationQueueSource.read(bcqSource)
+		if (batchCreationQueueSourceId) {
+			batchCreationQueueSourceInstance = BatchCreationQueueSource.read(batchCreationQueueSourceId)
 		}
 		
 		if (params.useParentItem == 'true') {
 			useParentItem = true
 		}
-
-		if (useParentItem && patternParentItem.matcher(itemPassed).matches() 
+		
+		def itemInfo = [
+			success: false,
+			itemPassed: itemPassed,
+			useParentItem: useParentItem,
+			batchCreationConfigId: batchCreationConfigId,
+			batchCreationQueueSourceId: batchCreationQueueSourceId,
+			parentItemInstance: null,
+			dwellingUnit: null,
+			person: null,
+			household: null,
+			youCanDoIt: true,
+			batchCreationQueueInstance: null,
+			queueId: 0,
+			errorText: ""
+		]
+		
+		// if queueId was passed let's save it to the itemInfo
+		if (params?.queueId) {
+			itemInfo.queueId = params.queueId
+		}
+		
+		if (useParentItem && (patternParentItem.matcher(itemPassed).matches() || norcMailingPattern.matcher(itemPassed).matches()) 
 				|| batchCreationQueueSourceInstance && pattern.matcher(itemPassed).matches()) {
 
 			if (useParentItem){
-					
-				itemPassed = itemPassed.replace("I", "")
 				
-				// If the manual config uses a parent item, they MUST enter the
-				// tracked item ID of the parent.
-				// TODO: Make this optional so if the parent type is specified,
-				// we can look it up based on a person, household, or dwelling unit ID
-					parentItemInstance = TrackedItem.read(itemPassed)
-					
-					if (parentItemInstance) {
-						if (batchCreationConfigInstance.oneBatchEventParentItem) {
-							def item = documentGenerationService.getItemByParentAndConfig(parentItemInstance, batchCreationConfigInstance)
-							if (item) {
-								render "Failed to add item.  It's already been generated!"
-								youCanDoIt = false
-							}
-						}
-						
-						// Check parent item instrument match config instrument
-						if (batchCreationConfigInstance.parentInstrument) {
-							
-							def previousInstrument = parentItemInstance?.batch?.primaryInstrument?.previousInstrument
+				if (itemPassed[0].toUpperCase() == "I") {
+					itemPassed = itemPassed.replace("I", "")
+					itemInfo = _checkItem(itemPassed, itemInfo)
 
-							if (batchCreationConfigInstance.parentInstrument != parentItemInstance?.batch?.primaryInstrument && previousInstrument?.id != batchCreationConfigInstance.parentInstrument?.id) {
-								render "Failed to add item. Parent instrument must be ${batchCreationConfigInstance.parentInstrument.name}. Not ${parentItemInstance?.batch?.primaryInstrument.name}"
-								youCanDoIt = false
-							}
-						} 
+				} else if (norcMailingPattern.matcher(itemPassed).matches()) {
+				
+					// Looks like someone scanned in a NORC barcode...
+					// Hmm....
+					def barcodeParts = itemPassed.split('-')
+					
+					def norcProjectId = barcodeParts[0]
+					def norcSuId = barcodeParts[1]
+					def norcDocId = barcodeParts[2]
+					
+					// look up the EnHS.HS Equivalent
+					def studyInstance = StudyLink.findByNorcProjectId(norcProjectId)?.study
+					def dwellingUnitInstance = DwellingUnitLink.findByNorcSuId(norcSuId)?.dwellingUnit
+					def personInstance = PersonLink.findByNorcSuId(norcSuId)?.person
+					def instrumentInstanceList = InstrumentLink.findAllByNorcDocId(norcDocId)?.collect{ it.instrument }
+					
+					def trackedItemInstanceList = []
+					
+					// If everything went as expected...
+					if (studyInstance && dwellingUnitInstance && instrumentInstanceList) {
 						
-						if (batchCreationConfigInstance.direction) {
-							if (batchCreationConfigInstance.direction.id != parentItemInstance?.batch?.direction?.id) {
-								render "Failed to add item. Parent direction must be: '${batchCreationConfigInstance.direction.name}'. Not '${parentItemInstance?.batch?.direction?.name}'"
-								youCanDoIt = false
+						// get a list of tracked items for this dwelling unit and instrument combo
+						trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
+							and{
+								eq('dwellingUnit', dwellingUnitInstance)
+								batch{
+									instruments{
+										'in'("instrument", instrumentInstanceList)
+									}
+								}
 							}
 						}
-						
-						if (batchCreationConfigInstance.parentFormat) {
-							if (batchCreationConfigInstance.parentFormat.id != parentItemInstance?.batch?.format?.id) {
-								render "Failed to add item. Parent format must be: '${batchCreationConfigInstance.parentFormat.name}'. Not '${parentItemInstance?.batch?.format?.name}'"
-								youCanDoIt = false
+					} else if (studyInstance && personInstance && instrumentInstanceList) {
+						// get a list of tracked items for this dwelling unit and instrument combo
+						trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
+							and{
+								eq('person', personInstance)
+								batch{
+									instruments{
+										'in'("instrument", instrumentInstanceList)
+									}
+								}
 							}
-						}
-						
-						if (batchCreationConfigInstance.parentResult) {
-							if (parentItemInstance?.result?.result != batchCreationConfigInstance?.parentResult) {
-								render "Failed to add item. It must have result: ${batchCreationConfigInstance.parentResult.name}. "
-								youCanDoIt = false
-							}
-						}
-						
-						if (youCanDoIt) {
-							// load the contact point
-							dwellingUnit = parentItemInstance.dwellingUnit
-							person = parentItemInstance.person
-							household = parentItemInstance.household
-							
-							// look it up by parent item
-							batchCreationQueueInstance = BatchCreationQueue.findByParentItemAndUsername(parentItemInstance, username)
 						}
 					}
+					
+					if ( ! trackedItemInstanceList ) {
+						// No can do.
+						itemInfo.errorText = "No items matched that NORC Mailing ID!"
+					} else {
+					
+						if (trackedItemInstanceList.size() == 1) {
+							// Do what you do when itemId scanned
+							_checkItem(trackedItemInstanceList[0].id, itemInfo)
+						} else {
+							renderView = 'chooseItem'
+							itemInfo.trackedItemInstanceList = trackedItemInstanceList
+						}
+					}
+					
+					
+				} else {
+					itemInfo.errorText = "invalid barcode"
+				}
 
 			} else {
 					
 				if (batchCreationQueueSourceInstance.name == "dwellingUnit") {
-					dwellingUnit = DwellingUnit.read(itemPassed)
-					if (dwellingUnit) {
-						batchCreationQueueInstance = BatchCreationQueue.findAllByDwellingUnitAndUsername(dwellingUnit, username)
+					itemInfo.dwellingUnit = DwellingUnit.read(itemPassed)
+					if (itemInfo.dwellingUnit) {
+						itemInfo.batchCreationQueueInstance = BatchCreationQueue.findAllByDwellingUnitAndUsername(itemInfo.dwellingUnit, username)
 					}
 				} else if (batchCreationQueueSourceInstance.name == "person") {
-					person = Person.read(itemPassed)
-					if (person){
-						batchCreationQueueInstance = BatchCreationQueue.findAllByPersonAndUsername(person, username)
+					itemInfo.person = Person.read(itemPassed)
+					if (itemInfo.person){
+						itemInfo.batchCreationQueueInstance = BatchCreationQueue.findAllByPersonAndUsername(itemInfo.person, username)
 					}
 				} else if (batchCreationQueueSourceInstance.name == "household") {
-					household = Household.read(itemPassed)
-					if (household){
-						batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndUsername(household, username)
+					itemInfo.household = Household.read(itemPassed)
+					if (itemInfo.household){
+						itemInfo.batchCreationQueueInstance = BatchCreationQueue.findAllByHouseholdAndUsername(itemInfo.household, username)
 					}
 				}
 			}
 			
-			if (!(dwellingUnit || household || person)) {
-				if (youCanDoIt){
-					render "Not found!"
+			if (!(itemInfo.dwellingUnit || itemInfo.household || itemInfo.person)) {
+				if (itemInfo.youCanDoIt){
+					itemInfo.errorText = "Not found!"
 				}
 			} else {
 			
-				if (batchCreationQueueInstance) {
-					render "Already in the queue"
+				if (itemInfo.batchCreationQueueInstance) {
+					itemInfo.errorText = "Already in the queue"
 				} else {
 					batchCreationQueueInstance = new BatchCreationQueue(username: username,
-						parentItem: parentItemInstance,
-						dwellingUnit: dwellingUnit,
-						person: person,
-						household: household)
+						parentItem: itemInfo.parentItemInstance,
+						dwellingUnit: itemInfo.dwellingUnit,
+						person: itemInfo.person,
+						household: itemInfo.household)
 
 					if (batchCreationQueueInstance.save(flush:true)){
-						render "Successfully added to the queue!"
+						itemInfo.success = true
+						itemInfo.batchCreationQueueInstance = batchCreationQueueInstance
 					} else {
 						batchCreationQueueInstance.errors.each{
 							println "error: ${it}"
@@ -225,10 +250,88 @@ class DocumentGenerationController {
 			}
 								
 		}else{
-			render "Invalid input!"
+			itemInfo.errorText = "Invalid input!"
 		}
+		
+		render(view: renderView, model: itemInfo)
     }
+	
+	
+	def cancelItem = {}
+	
+	private def _checkItem(itemPassed, itemInfo){
+		def username = authenticateService.principal().getUsername()
+		def batchCreationConfigInstance = null
+		
+		if (itemInfo.batchCreationConfigId) {
+			batchCreationConfigInstance = BatchCreationConfig.read(itemInfo.batchCreationConfigId)
+		}
+	
+		// If the manual config uses a parent item, they MUST enter the
+		// tracked item ID of the parent.
+		// TODO: Make this optional so if the parent type is specified,
+		// we can look it up based on a person, household, or dwelling unit ID
+			itemInfo.parentItemInstance = TrackedItem.read(itemPassed)
+			def parentItemInstance = itemInfo.parentItemInstance
+			
+			if (parentItemInstance) {
+				if (batchCreationConfigInstance.oneBatchEventParentItem) {
+					def item = documentGenerationService.getItemByParentAndConfig(parentItemInstance, batchCreationConfigInstance)
+					if (item) {
+						itemInfo.errorText = "It's already been generated!"
+						itemInfo.youCanDoIt = false
+					}
+				}
+				
+				// Check parent item instrument match config instrument
+				if (batchCreationConfigInstance.parentInstrument) {
+					
+					def previousInstrument = parentItemInstance?.batch?.primaryInstrument?.previousInstrument
 
+					if (batchCreationConfigInstance.parentInstrument != parentItemInstance?.batch?.primaryInstrument && previousInstrument?.id != batchCreationConfigInstance.parentInstrument?.id) {
+						itemInfo.errorText = "Parent instrument must be ${batchCreationConfigInstance.parentInstrument.name}. Not ${parentItemInstance?.batch?.primaryInstrument.name}"
+						itemInfo.youCanDoIt = false
+					}
+				}
+				
+				if (batchCreationConfigInstance.direction) {
+					if (batchCreationConfigInstance.direction.id != parentItemInstance?.batch?.direction?.id) {
+						itemInfo.errorText = "Parent direction must be: '${batchCreationConfigInstance.direction.name}'. Not '${parentItemInstance?.batch?.direction?.name}'"
+						itemInfo.youCanDoIt = false
+					}
+				}
+				
+				if (batchCreationConfigInstance.parentFormat) {
+					if (batchCreationConfigInstance.parentFormat.id != parentItemInstance?.batch?.format?.id) {
+						itemInfo.errorText = "Parent format must be: '${batchCreationConfigInstance.parentFormat.name}'. Not '${parentItemInstance?.batch?.format?.name}'"
+						itemInfo.youCanDoIt = false
+					}
+				}
+				
+				if (batchCreationConfigInstance.parentResult) {
+					if (parentItemInstance?.result?.result != batchCreationConfigInstance?.parentResult) {
+						itemInfo.errorText = "It must have result: ${batchCreationConfigInstance.parentResult.name}. "
+						itemInfo.youCanDoIt = false
+					}
+				}
+				
+				if (itemInfo.youCanDoIt) {
+					// load the contact point
+					itemInfo.dwellingUnit = parentItemInstance.dwellingUnit
+					itemInfo.person = parentItemInstance.person
+					itemInfo.household = parentItemInstance.household
+					
+					// look it up by parent item
+					itemInfo.batchCreationQueueInstance = BatchCreationQueue.findByParentItemAndUsername(parentItemInstance, username)
+				}
+			}
+			
+			return itemInfo
+	}
+
+	
+	
+	
     def find = {
         flash.message = null
         def batchCreationQueue = null
