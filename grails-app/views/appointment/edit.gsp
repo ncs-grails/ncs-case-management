@@ -211,7 +211,8 @@
                                 <td valign="top" class="value ${hasErrors(bean: appointmentInstance, field: 'incentives', 'errors')}">
 									<ul>
 									<g:each in="${appointmentInstance?.incentives?}" var="i">
-									    <li><g:link controller="incentive" action="edit" id="${i.id}">${i?.encodeAsHTML()}</g:link></li>
+									    <%--<li><g:link controller="incentive" action="edit" id="${i.id}">${i?.encodeAsHTML()}</g:link></li> --%>
+									    <li><g:link controller="incentive" action="edit" id="${i?.incentive.id}">${i?.incentive}</g:link></li>
 									</g:each>
 									</ul>
 									<g:link controller="incentive" action="create" params="['appointment.id': appointmentInstance?.id]">${message(code: 'default.add.label', args: [message(code: 'incentive.label', default: 'Incentive')])}</g:link>

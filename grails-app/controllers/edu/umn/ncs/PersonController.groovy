@@ -51,9 +51,12 @@ class PersonController {
 			itemResultIdList.removeAll([null])
 
 			// Find Matching Audit Events for ItemResults
-			def auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
+			def auditLogEventInstanceList = []
+			if (itemResultIdList) {
+				auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
 					eq('className', 'edu.umn.ncs.ItemResult')
 					'in'('persistedObjectId', itemResultIdList)
+				}
 			}
 			
 			auditLogEventInstanceList.each{

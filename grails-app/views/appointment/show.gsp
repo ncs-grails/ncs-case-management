@@ -92,7 +92,7 @@
                         </tr>
                         </g:if>
 
-						<g:if test="${appointmentInstance.incentives}">
+						<%--<g:if test="${appointmentInstance.incentives}">
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="appointment.incentives.label" default="Incentives" /></td>
                             
@@ -100,6 +100,20 @@
                                 <ul>
                                 <g:each in="${appointmentInstance.incentives}" var="i">
                                     <li><g:link controller="incentive" action="edit" id="${i.id}">${i?.encodeAsHTML()}</g:link></li>
+                                </g:each>
+                                </ul>
+                            </td>
+                        </tr>
+                        </g:if> --%>
+
+						<g:if test="${appointmentInstance.incentives}">
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="appointment.incentives.label" default="Incentives" /></td>
+                            
+                            <td valign="top" style="text-align: left;" class="value">
+                                <ul>
+                                <g:each in="${appointmentInstance.incentives}" var="i">
+                                    <li><g:link controller="incentive" action="edit" id="${i?.incentive.id}">${i?.incentive}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>
