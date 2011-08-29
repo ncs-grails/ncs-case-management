@@ -54,8 +54,8 @@ class PersonController {
 			def auditLogEventInstanceList = []
 			if (itemResultIdList) {
 				auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
-					eq('className', 'edu.umn.ncs.ItemResult')
-					'in'('persistedObjectId', itemResultIdList)
+						eq('className', 'edu.umn.ncs.ItemResult')
+						'in'('persistedObjectId', itemResultIdList)
 				}
 			}
 			
