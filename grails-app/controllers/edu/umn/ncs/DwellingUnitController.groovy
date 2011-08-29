@@ -53,7 +53,7 @@ class DwellingUnitController {
 			// Find Matching Audit Events for ItemResults		
 			def auditLogEventInstanceList = []
 			if (itemResultIdList) {
-				def auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
+				auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
 					eq('className', 'edu.umn.ncs.ItemResult')
 					'in'('persistedObjectId', itemResultIdList)
 				}
