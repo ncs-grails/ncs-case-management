@@ -19,6 +19,7 @@ class DocumentGenerationService {
     def appName = 'ncs-case-management'
 	
 	static def debug = false
+	
 	static def csvDateFormat = 'yyyy-MM-dd HH:mm:ss'
     
 	def getItemByParentAndConfig(TrackedItem trackedItemInstance, BatchCreationConfig batchCreationConfigInstance) {
@@ -669,7 +670,7 @@ class DocumentGenerationService {
 		def fmt = DateTimeFormat.forPattern(csvDateFormat)
 		
 		def startTime = new GregorianCalendar().time.time
-		def splitTime = new GregorianCalendar().time.time
+		def splitTime = startTime
 		
 		if (debug) {
 			def newSplitTime = new GregorianCalendar().time.time

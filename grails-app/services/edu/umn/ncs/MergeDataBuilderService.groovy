@@ -17,8 +17,27 @@ class MergeDataBuilderService {
     def getBaseData(Batch batchInstance) {
         // this will be a list of map items.
         def dataSet = []
+		
+		def statistics = [:]
+		
 
 		if (debug) { println "MergeDataBuilderService:getBaseData:: called." }
+		
+		// create a cache
+		def childItemCache = [:]
+		
+		// find all child items for this batch
+		def childItems = TrackedItem.executeQuery("\
+			select cti.id as childItemId, pti.id as trackedItemId \
+				from TrackedItem as cti inner join \
+				cti.parentItem as pti inner join \
+				pti.batch as b \
+			where b.id = ?", [batchInstance.id])
+		childItems.each{ row ->
+			def childItemId = row[0]
+			def trackedItemId = row[1]
+			childItemCache[trackedItemId] = childItemId 
+		}
 		
         // loop through the items in the batch
         // Not sure if I mapped right: eventDesc, childSID
@@ -47,9 +66,12 @@ class MergeDataBuilderService {
                 parentDate: item?.parentItem?.batch?.dateCreated,
                 parentName: item?.parentItem?.batch?.primaryInstrument?.name,
 				parentInstrumentId: item?.parentItem?.batch?.primaryInstrument?.id,
-                childItemId: TrackedItem.findByParentItem(item)?.id,
+                childItemId: childItemCache[item.id],
                 resultName: item?.result?.result?.name,
-                resultDate: item?.result?.receivedDate
+                resultDate: item?.result?.receivedDate,
+				instructions: "",
+				comments: "",
+				reason: ""
             ]
 			
 			if (debug) { 
@@ -83,11 +105,6 @@ class MergeDataBuilderService {
 					record.salutation ="Dear ${record.title} ${record.lastName}"
 				}
             }
-			
-			
-			record.comments = ""
-			record.instructions = ""
-			record.reason = ""
 
 			// look up any comments that may exist
 			item.comments.each{ c ->
@@ -102,7 +119,6 @@ class MergeDataBuilderService {
 			
             dataSet.add(record)
         }
-
 
         // Add Tracking Recipient info (if it exists...)
 
@@ -136,6 +152,9 @@ class MergeDataBuilderService {
                 dwellingUnitId: 0,
                 householdId: 0,
                 personId: 0,
+				instructions: null,
+				comments: "tracking document",
+				reason: null,
                 address: it.address?.address,
                 address2: it.address?.address2,
                 zipCode: it.address?.zipCode,
@@ -201,6 +220,8 @@ class MergeDataBuilderService {
         dataSet.collect{ record ->
             def personInstance = Person.read(record.personId)
             if (personInstance) {
+				
+				// TODO: Speed this up with some HQL pre-fetching to a cache map
 				def subjectInstance = Subject.findByPersonAndStudy(personInstance, studyInstance)
 				
                 record.subjectId = subjectInstance?.subjectId
@@ -235,6 +256,56 @@ class MergeDataBuilderService {
 		def instrumentLinkCache = [:]
 		def studyLinkCache = [:]
 		
+		def batchId = dataSet[0].batchId
+		
+		// we want to get all of the NORC SU_IDs in a single query.
+		// ... so how do we do this? Let's try HQL (test batch: 340)
+		// Baseline time = 45s for 2000 records
+		
+		// Let's cache the NORC SU_IDs.
+		def norcSuIdCache = [:]
+		def query = ""
+			
+		// First we'll load the Dwelling Unit SU_ID records
+		query = "\
+		select ti.id as trackedItemId, dul.norcSuId \
+		from DwellingUnitLink as dul inner join \
+			dul.dwellingUnit as du, \
+			TrackedItem as ti inner join \
+			ti.batch as b \
+		where ti.dwellingUnit = du \
+			and b.id = ?"
+	
+		// Fingers crossed!!!
+		def dwellingUnitNorcSuId = DwellingUnitLink.executeQuery(query, [batchId])
+		dwellingUnitNorcSuId.each{ row ->
+			def trackedItemId = row[0]
+			def norcSuId = row[1]
+			// saving the NORC SU_ID to the cache
+			norcSuIdCache[trackedItemId] = norcSuId
+		}
+	
+		// Next we load the Person SU_ID records
+		query = "\
+		select ti.id as trackedItemId, pl.norcSuId \
+		from PersonLink as pl inner join \
+			pl.person as p, \
+			TrackedItem as ti inner join \
+			ti.batch as b \
+		where ti.person = p \
+			and b.id = ?"
+	
+		// Fingers crossed!!!
+		def personNorcSuId = PersonLink.executeQuery(query, [batchId])
+		personNorcSuId.each{ row ->
+			def trackedItemId = row[0]
+			def norcSuId = row[1]
+			// saving the NORC SU_ID to the cache
+			norcSuIdCache[trackedItemId] = norcSuId
+		}
+
+		// OK, we should have the person and dwelling unit SUIDs cached.
+		
         dataSet.collect{record ->
 
             // Look up the NORC id varients for our different domain id types
@@ -247,7 +318,7 @@ class MergeDataBuilderService {
 			record.norcMailingId = ""
 			record.norcMailingBarcode = ""
 
-			// see if we've cache'd the link id		
+			// see if we've cache'd "docId" data		
 			if (instrumentLinkCache[record.instrumentId]) {
 				// if so, load the instrumentLinkInstance
 				record.norcDocId = instrumentLinkCache[record.instrumentId]
@@ -278,6 +349,7 @@ class MergeDataBuilderService {
 				}
 			}			
 
+			// try to use cache'd "projectId" data
 			if (studyLinkCache[record.studyId]) {
 				record.norcProjectId = studyLinkCache[record.studyId]
 			} else {
@@ -295,22 +367,32 @@ class MergeDataBuilderService {
 
 			}
 									
-            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)			
-            if (dwellingUnitInstance) {
-                def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
-                if (dwellingUnitLinkInstance) {
-                    record.norcSuId = dwellingUnitLinkInstance?.norcSuId
-                } 
-            }
+			// try to find the SU_ID in cache
+			if (norcSuIdCache[record.itemId]) {
+				// we found it in the cache, so use that one
+				record.norcSuId = norcSuIdCache[record.itemId]
+			} else if (record.itemId) {
+				// Otherwise, for some reason ???, we need to look it up.
+				println "Warning!  Missed HQL Cache of NORC SU_ID for tracked item: ${record.trackedItemId}"
+	            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)
+	            if (dwellingUnitInstance) {
+	                def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
+	                if (dwellingUnitLinkInstance) {
+	                    record.norcSuId = dwellingUnitLinkInstance?.norcSuId
+	                } 
+	            }
+				
+				def personInstance = Person.read(record.personId)
+				if (personInstance) {
+					def personLinkInstance = PersonLink.findByPerson(personInstance)
+					if (personLinkInstance) {
+						record.norcSuId = personLinkInstance?.norcSuId
+					}
+	        	}
+	
+	        }
 			
-			def personInstance = Person.read(record.personId)
-			if (personInstance) {
-				def personLinkInstance = PersonLink.findByPerson(personInstance)
-				if (personLinkInstance) {
-					record.norcSuId = personLinkInstance?.norcSuId
-				}
-        	}
-
+			// build the NORC Mailing ID and bar code
 			if (record.norcDocId && record.norcProjectId && record.norcSuId) {
 				record.norcMailingId = "${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}"
 				record.norcMailingBarcode = "*${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}*"
@@ -323,6 +405,8 @@ class MergeDataBuilderService {
 	def addAppointmentData(dataSet) {
 		dataSet.collect{record ->
 			def trackedItemInstance = TrackedItem.read(record.itemId)
+			// TODO: Speed this up by pre-fetching Appointments by tracked item to a cache map.
+			// Note, this is probably OK as the number of records it'll see is minimal.
 			def appointmentInstance = Appointment.findByLetter(trackedItemInstance)
 			if ( appointmentInstance ) {
 				if (debug) { println "Found Appointment." }
