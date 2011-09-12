@@ -1,6 +1,7 @@
 package edu.umn.ncs
 import groovy.sql.Sql
 import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
 
 /* This class is based on the C# class written by Aaron J. Zirbes @ umn.edu
  * located here:
@@ -667,30 +668,80 @@ class DocumentGenerationService {
 		
 		def fmt = DateTimeFormat.forPattern(csvDateFormat)
 		
+		def startTime = new GregorianCalendar().time.time
+		def splitTime = new GregorianCalendar().time.time
+		
+		if (debug) {
+			def newSplitTime = new GregorianCalendar().time.time
+			println "Begin"
+			println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+			splitTime = newSplitTime 
+		}
+		
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
 
-		
+		if (debug) {
+			def newSplitTime = new GregorianCalendar().time.time
+			println "getBaseData"
+			println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+			splitTime = newSplitTime
+		}
+
         batchCreationDocumentInstance.dataSets.each{
 			if (debug) {
 				println "Dataset type: ${it.code}"
 			}
             if (it.code == "dwelling") {
                 outputData = mergeDataBuilderService.addDwellingUnitData(outputData)
+				
+				if (debug) {
+					def newSplitTime = new GregorianCalendar().time.time
+					println "addDwellingUnitData"
+					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+					splitTime = newSplitTime
+				}
             } else if (it.code == "person") {
                 outputData = mergeDataBuilderService.addPersonData(outputData)
+				
+				if (debug) {
+					def newSplitTime = new GregorianCalendar().time.time
+					println "addPersonData"
+					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+					splitTime = newSplitTime
+				}
             } else if (it.code == "norc") {
                 outputData = mergeDataBuilderService.addNORCData(outputData)
+				
+				if (debug) {
+					def newSplitTime = new GregorianCalendar().time.time
+					println "addNORCData"
+					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+					splitTime = newSplitTime
+				}
             } else if (it.code == "appointment") {
 				outputData = mergeDataBuilderService.addAppointmentData(outputData)
+				
+				if (debug) {
+					def newSplitTime = new GregorianCalendar().time.time
+					println "addAppointmentData"
+					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+					splitTime = newSplitTime
+				}
 			} else {
 				println "Uknown Data Set Type: ${it.code}!"
 			}
         }
-
+		
         outputData = outputData.sort{ it.itemId }
 		
-		
+		if (debug) {
+			def newSplitTime = new GregorianCalendar().time.time
+			println "Sorting."
+			println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+			splitTime = newSplitTime
+		}
+
 		
         def recNo = 0
         outputData.each{
@@ -743,10 +794,18 @@ class DocumentGenerationService {
                     if (row[col] != null) {
                         // take the content and escape the double quotes (")
 						
-						if (debug) { println "Row Class for ${col}: " + row[col].class.toString() }
-							
+						
 						
                         def columnContent = row[col].toString().replace('"', '""')
+						
+						if (row[col].class.toString() == 'class java.sql.Timestamp') {
+							// if (debug) { println "Row Class for ${col}: " + row[col].class.toString() }
+							// This is a SQL Timestamp.  We're changing the date format so that MS Word can parse it
+							// (it has trouble with milliseconds)
+							def sqlDate = new DateTime(row[col].time)
+							columnContent = fmt.print(sqlDate)
+						}
+						
                         // then surround it with double quotes
                         columnValue = '"' + columnContent  + '"'
                     }
@@ -756,7 +815,13 @@ class DocumentGenerationService {
                 mergeSourceContents << "\r\n"
             }
         }
-        
+		 if (debug) {
+			 def newSplitTime = new GregorianCalendar().time.time
+			 println "Done."
+			 println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+			 splitTime = newSplitTime
+		 }
+ 
         return mergeSourceContents
     }
 	

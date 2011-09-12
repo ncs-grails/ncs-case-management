@@ -83,21 +83,23 @@ class MergeDataBuilderService {
 					record.salutation ="Dear ${record.title} ${record.lastName}"
 				}
             }
+			
+			
+			record.comments = ""
+			record.instructions = ""
+			record.reason = ""
 
-            def comments = TrackedItemComment.findByItemAndSubject(item, 'general')
-            if (comments) {
-                record.comments = comments.text
-            }
-
-            def instructions = TrackedItemComment.findByItemAndSubject(item, 'instructions')
-            if (instructions) {
-                record.instructions = instructions.text
-            }
-
-            def reason = TrackedItemComment.findByItemAndSubject(item, 'reason')
-            if (reason) {
-                record.reason = reason.text
-            }
+			// look up any comments that may exist
+			item.comments.each{ c ->
+				if (c.subject == 'general') {
+					record.comments = c.text
+				} else if (c.subject == 'instructions') {
+					record.instructions = c.text
+				} else if (c.subject == 'reason') {
+					record.reason = c.text
+				}
+			}
+			
             dataSet.add(record)
         }
 
@@ -229,42 +231,71 @@ class MergeDataBuilderService {
         dataSet
     }
     def addNORCData(dataSet) {
+		
+		def instrumentLinkCache = [:]
+		def studyLinkCache = [:]
+		
         dataSet.collect{record ->
 
             // Look up the NORC id varients for our different domain id types
-            def instrumentInstance = Instrument.read(record.instrumentId)
-
+			def instrumentInstance = null
+			def instrumentLinkInstance = null
+			// add the default values for the columns we are appending
+			record.norcProjectId = ""
 			record.norcDocId = ""
-			
-            if (instrumentInstance) {
-                def instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
-				
-				if (!instrumentLinkInstance) {
-					// Do we have norcDocId for the parent? (added for Transmittal Log and should not affect other docs)
-					instrumentInstance = Instrument.read(record.parentInstrumentId)
-					if (instrumentInstance) {
-						instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+			record.norcSuId = ""
+			record.norcMailingId = ""
+			record.norcMailingBarcode = ""
+
+			// see if we've cache'd the link id		
+			if (instrumentLinkCache[record.instrumentId]) {
+				// if so, load the instrumentLinkInstance
+				record.norcDocId = instrumentLinkCache[record.instrumentId]
+			} else {
+				// otherwise pull up the instrument
+				instrumentInstance = Instrument.read(record.instrumentId)
+				// make sure we found one (shouldn't fail really)
+				if (instrumentInstance) {
+					// find the instrumnet link associated with this instrument
+					instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+					
+					// If we didn't find it, then...
+					if (!instrumentLinkInstance) {
+						// then we'll lookup it up by the parent id 
+						// Do we have norcDocId for the parent?
+						
+						instrumentInstance = Instrument.read(record.parentInstrumentId)
+						if (instrumentInstance) {
+							// success!
+							instrumentLinkInstance = InstrumentLink.findByInstrument(instrumentInstance)
+						}
+					}
+					
+					if (instrumentLinkInstance) {
+						record.norcDocId = instrumentLinkInstance?.norcDocId
+						instrumentLinkCache[record.instrumentId] = record.norcDocId
 					}
 				}
-				
-                if (instrumentLinkInstance) {
-                    record.norcDocId = instrumentLinkInstance?.norcDocId
-                }
-            }
+			}			
 
-            def studyInstance = Study.read(record.studyId)
-            if (studyInstance) {
-                def studyLinkInstance = StudyLink.findByStudy(studyInstance)
-                if (studyLinkInstance) {
-                    record.norcProjectId = studyLinkInstance?.norcProjectId
-                }
-            } else {
-                record.norcProjectId = ""
-            }
+			if (studyLinkCache[record.studyId]) {
+				record.norcProjectId = studyLinkCache[record.studyId]
+			} else {
+				def studyInstance = Study.read(record.studyId)
+				if (studyInstance) {
+					def studyLinkInstance = StudyLink.findByStudy(studyInstance)
+					if (studyLinkInstance) {
+						record.norcProjectId = studyLinkInstance?.norcProjectId
+						// save the result to the cache
+						studyLinkCache[record.studyId] = studyLinkInstance?.norcProjectId
+					}
+				} else {
+					record.norcProjectId = ""
+				}
 
-            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)
-			record.norcSuId = ""
-			
+			}
+									
+            def dwellingUnitInstance = DwellingUnit.read(record.dwellingUnitId)			
             if (dwellingUnitInstance) {
                 def dwellingUnitLinkInstance = DwellingUnitLink.findByDwellingUnit(dwellingUnitInstance)
                 if (dwellingUnitLinkInstance) {
@@ -277,17 +308,12 @@ class MergeDataBuilderService {
 				def personLinkInstance = PersonLink.findByPerson(personInstance)
 				if (personLinkInstance) {
 					record.norcSuId = personLinkInstance?.norcSuId
-				} else {
-					record.norcSuId = ""
 				}
         	}
 
 			if (record.norcDocId && record.norcProjectId && record.norcSuId) {
 				record.norcMailingId = "${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}"
 				record.norcMailingBarcode = "*${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}*"
-			} else {
-				record.norcMailingId = ""
-				record.norcMailingBarcode = ""
 			}
         }
 		
