@@ -42,94 +42,87 @@ class TrackedItemController {
 			return [trackedItemInstance: trackedItemInstance]
 		}
 	}
+
 	
 	@Secured(['ROLE_NCS_IT'])
 	def update = {
-		
+
+		def username = authenticateService.principal().getUsername()
+		def appName = "ncs-case-management"
+
 		def message = ''
-		def today = new LocalDate()		
+		def today = new LocalDate()	
+		def eventName = ''
+		def newValue = ''
+		
+		def itemResultInstance = null
+		
+		def oldResult = null
+		def oldReceivedDate = null
+		def oldUserName = null
+		def oldUserPropertyName = null
 		
 		def trackedItemInstance = TrackedItem.read(params.id)
 		if (trackedItemInstance){
 
-			// Saving Result	
-			if (params.receiptDate && params?.result?.id) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (trackedItemInstance.version > version) {
 
-				def username = authenticateService.principal().getUsername()
-				def appName = "ncs-case-management"
-				def receivedDate = params.receiptDate
-				
-				if ( ! receivedDate ) {
-					receivedDate = new LocalDate()
-				} else {
-					// Mon Jan 31 13:38:42 CST 2011
-					//receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
-					receivedDate = new LocalDate(receivedDate)
+					trackedItemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", "Another user has updated this trackedItem while you were editing")
+					render(view: "edit", model: [trackedItemInstance: trackedItemInstance])
+					return
 				}
+			}
+			
+			if (params?.result?.id == 'null') {
+				params?.result?.id = null
+			}
+			
+			if (!params.receiptDate && params?.result?.id || params.receiptDate && !params?.result?.id) {
+				trackedItemInstance.errors.rejectValue("result", "trackedItem.result", "RECEIPT DATE & RESULT values required.")
+					render(view: "edit", model: [ trackedItemInstance: trackedItemInstance])
+					return
+			}
+			
+			if (trackedItemInstance.result) {
+				// Get old values
+				itemResultInstance = ItemResult.read(trackedItemInstance?.result?.id)
+				
+				oldResult = itemResultInstance.result.id
+				oldReceivedDate = itemResultInstance.receivedDate
+				oldUserName = (itemResultInstance.userUpdated ? itemResultInstance.userUpdated : itemResultInstance.userCreated)
+				oldUserPropertyName = (itemResultInstance.userUpdated ? "userUpdated" : "userCreated")
+			}
 
+			if (params.receiptDate && params?.result?.id) {
+				// Save Result
+				
+				// Mon Jan 31 13:38:42 CST 2011
+				//receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
+				def receivedDate = new LocalDate(params.receiptDate)
+				
 				if (receivedDate.isAfter(today)) {
-					trackedItemInstance.errors.rejectValue("receiptDate", "trackedItem.result.receivedDate.receiptedWithFutureDate", [message(code: 'trackedItem.label', default: 'Tracked Item')] as Object[], "Received date must not be greater than todays date.")
+					trackedItemInstance.errors.rejectValue("result", "trackedItem.result", "Received date must not be greater than today's date.")
 						render(view: "edit", model: [ trackedItemInstance: trackedItemInstance])
 						return
 				}
 				
-				def result = Result.read(params.result.id)
-				
 				// converting receivedDate from Joda LocalDate to Java Date
 				def javaReceivedDate = receivedDate.toDateTime(midnight).toCalendar().time
+				def result = Result.read(params.result.id)
 				
-				if(trackedItemInstance.result) {
+				if (result.id != oldResult || javaReceivedDate != oldReceivedDate) {
 					
-					def itemResultInstance = ItemResult.read(trackedItemInstance?.result?.id)
-					
-					def jodaOldReceivedDate = new LocalDate(itemResultInstance.receivedDate)
-					
-					println "NGP Debug; jodaOldReceivedDate: ${jodaOldReceivedDate}"
-					println "NGP Debug; receivedDate: ${receivedDate}"
-					
-					if (jodaOldReceivedDate.isEqual(receivedDate)) {
-						println "NGP Debug; Dates are equal;"
-					}
-					
-					if (itemResultInstance.result.id != result.id || itemResultInstance.receivedDate != javaReceivedDate) {
-						
-						if (itemResultInstance.result.id != result.id) {
-							//Log old result
-							//def auditLogInstance = AuditLogEvent.findByPersistedObjectId(itemResultInstance.id)
-								
-							// Log result 
-							message += auditLog("edu.umn.ncs.ItemResult", 
-								"UPDATE", 
-								"edu.umn.ncs.Result:${result.id}", 
-								"edu.umn.ncs.Result:${itemResultInstance.result.id}", 
-								itemResultInstance.id, 
-								"result")
-
-							// Update result
+					if (oldResult && oldReceivedDate) {
+						if (result.id != oldResult) {
 							itemResultInstance.result = result
 						}
 						
-						if (itemResultInstance.receivedDate != javaReceivedDate) {
-							
-							message += auditLog('edu.umn.ncs.ItemResult',
-								'UPDATE',
-								javaReceivedDate.toString(),
-								"${itemResultInstance.receivedDate.toString()}",
-								itemResultInstance.id,
-								'receivedDate')
-						
-							// Update receiveDate
+						if (javaReceivedDate != oldReceivedDate) {
 							itemResultInstance.receivedDate = javaReceivedDate
 						}
 						
-						// Transact out userUpdated
-						message += auditLog('edu.umn.ncs.ItemResult', 
-							'UPDATE', 
-							username, 
-							itemResultInstance.userUpdated, 
-							itemResultInstance.id, 
-							'userUpdated')
-
 						// Update userUpdated
 						itemResultInstance.userUpdated = username
 						
@@ -142,41 +135,134 @@ class TrackedItemController {
 								e.fieldErrors.each{fe -> println "! Rejected '${fe.rejectedValues}' for field '${fe.field}'<br/>"}
 							}
 						}
+					} else {
+						trackedItemInstance.result = new ItemResult(result: result,
+							userCreated: username,
+							appCreated: appName,
+							receivedDate: javaReceivedDate,
+							trackedItem: trackedItemInstance)
+					}
+				}
+				
+			} else if (!params.receiptDate && !params?.result?.id && oldResult && oldReceivedDate) {
+			
+				// DELETE Result
+				try {
+					
+					trackedItemInstance.result = null
+					if (!trackedItemInstance.hasErrors() && trackedItemInstance.save(flush: true)) {
+						flash.message += "<br/>Tracked Item ID: ${trackedItemInstance.id} updated."
+					} else {
+						flash.message += "<br/>Tracked Item ID: ${trackedItemInstance.id} NOT updated."
 					}
 					
-				} else {
-					trackedItemInstance.result = new ItemResult(result: result,
-						userCreated: username,
-						appCreated: appName,
-						receivedDate: javaReceivedDate,
-						trackedItem: trackedItemInstance)
+					itemResultInstance.delete(flush: true)
+					flash.message += "Item Result ID: ${itemResultInstance.id} successfully deleted."
+				} catch (org.springframework.dao.DataIntegrityViolationException e) {
+					flash.message += "Item Result ID: ${itemResultInstance.id} not deleted."
+					
+					itemResultInstance.errors.each{ err ->
+						err.fieldErrors.each{fe -> println "! Rejected '${fe.rejectedValues}' for field '${fe.field}'<br/>"}
+					}
 				}
+			
 			}
-			 
+
+			// Update parentItem			 
+			def oldParentItem = trackedItemInstance.parentItem
 			if (params?.parentItem?.id) {
 				def parentItem = TrackedItem.read(params?.parentItem?.id)
 				if (parentItem) {
 					trackedItemInstance.parentItem = parentItem
 				} else {
-					trackedItemInstance.errors.rejectValue("parentItem", "trackedItem.parentItem.notFound", [message(code: 'trackedItem.label', default: 'trackedItem')] as Object[], "Parent tracked item for entered parent item ID not found.")
+					trackedItemInstance.errors.rejectValue("parentItem", "trackedItem.parentItem.notFound", "Parent tracked item for entered parent item ID not found.")
 					render(view: "edit", model: [trackedItemInstance: trackedItemInstance])
 					return
 				}
+			} else if (oldParentItem && !params?.parentItem?.id){
+				trackedItemInstance.parentItem = null
 			}
 			
-			if (params.version) {
-				def version = params.version.toLong()
-				if (trackedItemInstance.version > version) {
-
-					trackedItemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'trackedItem.label', default: 'trackedItem')] as Object[], "Another user has updated this Batch while you were editing")
-					render(view: "edit", model: [trackedItemInstance: trackedItemInstance])
-					return
-				}
+			// Update studyYear
+			def oldStudyYear = trackedItemInstance.studyYear
+			if (params?.studyYear) {
+				trackedItemInstance.studyYear = params?.studyYear?.toInteger()
+				
+			} else if (oldStudyYear && !params?.studyYear){
+				trackedItemInstance.studyYear = null
 			}
 			
 			if (!trackedItemInstance.hasErrors() && trackedItemInstance.save(flush: true)) {
+				
+				// Log studyYear
+				if (oldStudyYear && oldStudyYear != trackedItemInstance.studyYear) {
+					eventName = (trackedItemInstance.studyYear ? "UPDATE" : "DELETE")
+					message += auditLog('edu.umn.ncs.trackedItemInstance',
+						eventName,
+						trackedItemInstance.studyYear,
+						oldStudyYear,
+						trackedItemInstance.id,
+						'studyYear')
+				}
+				
+				// Log parentItem
+				if (oldParentItem && oldParentItem != trackedItemInstance.parentItem) {
+					eventName = (trackedItemInstance.parentItem ? "UPDATE" : "DELETE")
+					message += auditLog('edu.umn.ncs.trackedItemInstance',
+						eventName,
+						trackedItemInstance.parentItem,
+						oldParentItem,
+						trackedItemInstance.id,
+						'parentItem')
+				}
+
+				// Log result, receivedDate, user
+				eventName = (trackedItemInstance?.result ? "UPDATE" : "DELETE")
+				
+				if (oldResult && oldResult != trackedItemInstance?.result?.id) {
+				
+				newValue = (eventName == "DELETE" ? null : "edu.umn.ncs.Result:${itemResultInstance.result.id}")
+
+					// Log result
+					message += auditLog("edu.umn.ncs.ItemResult",
+						eventName,
+						newValue,
+						"edu.umn.ncs.Result:${oldResult}",
+						itemResultInstance.id,
+						"result")
+				}
+				
+				if (oldReceivedDate && oldReceivedDate != trackedItemInstance?.result?.receivedDate) {
+					
+					newValue = (eventName == "DELETE" ? null : "${itemResultInstance.receivedDate.toString()}")
+					
+					// Log receivedDate
+					message += auditLog('edu.umn.ncs.ItemResult',
+						eventName,
+						newValue,
+						oldReceivedDate.toString(),
+						itemResultInstance.id,
+						'receivedDate')
+				}
+				
+				if (oldUserName && (oldUserName != trackedItemInstance?.result?.userUpdated && oldUserPropertyName == "userUpdated"
+						|| oldUserName != trackedItemInstance?.result?.userCreated && oldUserPropertyName == "userCreated")) {
+					
+					newValue = (eventName == "DELETE" ? null : username)
+					
+					// Log user
+					message += auditLog('edu.umn.ncs.ItemResult',
+						eventName,
+						newValue,
+						oldUserName,
+						itemResultInstance.id,
+						oldUserPropertyName)
+					
+				}
+				
 				message += "Item ${trackedItemInstance.id} updated successfully!"
 				render(view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
+				
 			} else {
 				message += "Failed updating Item ${trackedItemInstance.id}!"
 				render (view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
