@@ -275,10 +275,15 @@ class BatchController {
 
 		def batchInstance = Batch.read(params.id)
 		
-		def dayPrior = batchInstance.dateCreated - 1
-		def dayAfter = batchInstance.dateCreated + 1
+		def batchDate = new LocalDate(batchInstance.dateCreated)
+        def referenceDateYear = batchDate.year
+        def yearRange = (referenceDateYear..(referenceDateYear+1))
 		
 		// List of batches to choose for master batch
+		/*
+		 * 
+		def dayPrior = batchInstance.dateCreated - 1
+		def dayAfter = batchInstance.dateCreated + 1
 		def masterBatchList = []
 		def c = Batch.createCriteria()
 		def batchInstanceList = c.listDistinct {
@@ -296,24 +301,126 @@ class BatchController {
 			masterBatchList.add(batchInfo)
 		}
 		
+		
+		*/
+		
 		if (!batchInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
 			redirect(action: "list")
 		} else {
 
 			/* Check the batch items: created for dwelling Units, persons or households */
-			[batchInstance: batchInstance, validItems: getValidItems(params.id)]
+			[batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange]
+		}
+	}
+	
+	def delete = {
+		def batchInstance = Batch.get(params.id)
+		
+		if (batchInstance) {
+			
+			def batchDate = new LocalDate(batchInstance.dateCreated)
+			def referenceDateYear = batchDate.year
+			def yearRange = (referenceDateYear..(referenceDateYear+1))
+			
+			if (batchInstance.items.size() == 0) {
+				try {
+					batchInstance.delete(flush: true)
+					flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+					redirect(action: "list")
+				}
+				catch (org.springframework.dao.DataIntegrityViolationException e) {
+					flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+					redirect(action: "edit", id: batchInstance.id)
+				}
+			} else {
+				batchInstance.errors.rejectValue("id", "id.NotEmpty", [message(code: 'id.label', default: 'Batch')] as Object[], "Batch: ${batchInstance.id} not deleted. All tracked items must be deleted.")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+			redirect(action: "list")
 		}
 	}
 	
 	@Secured(['ROLE_NCS_IT'])
 	def update = {
-		def batchInstance = Batch.read(params.id)
 		
 		println "params: ${params}"
 		
-				
-		render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
+		def batchInstance = Batch.read(params.id)
+		if (batchInstance) {
+			
+			def dateCreated = new LocalDate(batchInstance.dateCreated)
+			def mailDate = new LocalDate(params.mailDate)
+			def calledCampusCourierDate = new LocalDate(params.calledCampusCourierDate)
+			def printingServicesDate = new LocalDate(params.printingServicesDate)
+			def addressAndMailingDate = new LocalDate(params.addressAndMailingDate)
+			def trackingReturnDate = new LocalDate(params.trackingReturnDate)
+
+			def batchDate = new LocalDate(batchInstance.dateCreated)
+			def referenceDateMonth = batchDate.monthOfYear
+			def referenceDateYear = batchDate.year
+			def yearRange = (referenceDateYear..(referenceDateYear+1))
+			
+            // check date order here
+
+            if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
+                batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
+                    render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+                    return
+            }
+			
+			if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
+				batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+			
+			if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
+				batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Mailing Date must come after date generated")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+
+
+			if (trackingReturnDate && trackingReturnDate.isBefore(dateCreated) && !trackingReturnDate.isEqual(dateCreated)) {
+				batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after date generated")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+
+			if (mailDate && trackingReturnDate && mailDate.isBefore(trackingReturnDate) && mailDate.isEqual(trackingReturnDate)) {
+				batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+
+			if (params.version) {
+				def version = params.version.toLong()
+				if (batchInstance.version > version) {
+
+					batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+				}
+			}
+			batchInstance.properties = params
+			if (!batchInstance.hasErrors() && batchInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
+				redirect(action: "edit", id: batchInstance.id)
+			}
+			else {
+				render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+			}
+			
+		} else {
+		    flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+            redirect(action: "list")
+        }
+		
 	}
 
 	

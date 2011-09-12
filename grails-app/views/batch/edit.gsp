@@ -80,7 +80,7 @@
                                   </label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'trackingReturnDate', 'errors')}">
-                                    <g:datePicker name="trackingReturnDate" precision="day" value="${batchInstance?.trackingReturnDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="trackingReturnDate" precision="day" value="${batchInstance?.trackingReturnDate}" default="none" noSelection="['': '']" years="${yearRange}"/>
                                 </td>
                             </tr>
                         
@@ -89,7 +89,7 @@
                                   <label for="minimumReturnDate"><g:message code="batch.minimumReturnDate.label" default="Minimum Return Date" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'minimumReturnDate', 'errors')}">
-                                    <g:datePicker name="minimumReturnDate" precision="day" value="${batchInstance?.minimumReturnDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="minimumReturnDate" precision="day" value="${batchInstance?.minimumReturnDate}" default="none" noSelection="['': '']" years="${yearRange}" />
                                 </td>
                             </tr>
                         
@@ -98,7 +98,7 @@
                                   <label for="instrumentDate"><g:message code="batch.instrumentDate.label" default="Instrument Date" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'instrumentDate', 'errors')}">
-                                    <g:datePicker name="instrumentDate" precision="day" value="${batchInstance?.instrumentDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="instrumentDate" precision="day" value="${batchInstance?.instrumentDate}" default="none" noSelection="['': '']" years="${yearRange}" />
                                 </td>
                             </tr>
                         
@@ -107,7 +107,7 @@
                                   <label for="mailDate"><g:message code="batch.mailDate.label" default="Mail Date" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'mailDate', 'errors')}">
-                                    <g:datePicker name="mailDate" precision="day" value="${batchInstance?.mailDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="mailDate" precision="day" value="${batchInstance?.mailDate}" default="none" noSelection="['': '']" years="${yearRange}" />
                                 </td>
                             </tr>
                         
@@ -116,7 +116,7 @@
                                   <label for="addressAndMailingDate"><g:message code="batch.addressAndMailingDate.label" default="Address And Mailing Date" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'addressAndMailingDate', 'errors')}">
-                                    <g:datePicker name="addressAndMailingDate" precision="day" value="${batchInstance?.addressAndMailingDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="addressAndMailingDate" precision="day" value="${batchInstance?.addressAndMailingDate}" default="none" noSelection="['': '']" years="${yearRange}" />
                                 </td>
                             </tr>
                         
@@ -125,9 +125,18 @@
                                   <label for="printingServicesDate"><g:message code="batch.printingServicesDate.label" default="Printing Services Date" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'printingServicesDate', 'errors')}">
-                                    <g:datePicker name="printingServicesDate" precision="day" value="${batchInstance?.printingServicesDate}" default="none" noSelection="['': '']" />
+                                    <g:datePicker name="printingServicesDate" precision="day" value="${batchInstance?.printingServicesDate}" default="none" noSelection="['': '']" years="${yearRange}" />
                                 </td>
                             </tr>
+                            
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                  <label for="calledCampusCourierDate"><g:message code="batch.calledCampusCourierDate.label" default="Called Campus Courier Date" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'printingServicesDate', 'errors')}">
+                                    <g:datePicker name="calledCampusCourierDate" precision="day" value="${batchInstance?.calledCampusCourierDate}" default="none" noSelection="['': '']" years="${yearRange}" />
+                                </td>
+                            </tr>                            
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -256,7 +265,7 @@
                 </div>
                 <div class="buttons">
                     <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
+                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" /></span>
                 </div>
             </g:form>
         </div>

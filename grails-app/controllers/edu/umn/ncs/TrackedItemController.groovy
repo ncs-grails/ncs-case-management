@@ -193,7 +193,9 @@ class TrackedItemController {
 			}
 			
 			if (!trackedItemInstance.hasErrors() && trackedItemInstance.save(flush: true)) {
-				
+
+/*********** Disable audit logging. It should be log automatically. It does not work if I run it locally. 
+ 
 				// Log studyYear
 				if (oldStudyYear && oldStudyYear != trackedItemInstance.studyYear) {
 					eventName = (trackedItemInstance.studyYear ? "UPDATE" : "DELETE")
@@ -259,6 +261,8 @@ class TrackedItemController {
 						oldUserPropertyName)
 					
 				}
+				
+*/				
 				
 				message += "Item ${trackedItemInstance.id} updated successfully!"
 				render(view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
