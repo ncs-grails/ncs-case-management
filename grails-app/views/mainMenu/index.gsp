@@ -70,6 +70,11 @@
 						<dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
 						<dd>Generate instrument batches either automatically or by hand.</dd>
 									
+						<dt><g:link controller="fatherEngagement" action="create">Father Engagement Form Entry</g:link></dt>
+						<dd>
+							Enter father enhanced consent form data for father engagement participants.  
+						</dd>
+
 						<dt><g:link controller="batch" action="listByDate">Generated Batches</g:link></dt>
 						<dd>
 							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
