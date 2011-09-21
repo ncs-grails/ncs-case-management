@@ -12,6 +12,7 @@
 	<div class="nav">
 		<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
 		<span class="menuButton"><g:link class="create" action="create">New Father Engagement Form</g:link></span>
+		<span class="menuButton"><g:link class="list" action="downloadDataset">Download Father Engagement Data</g:link></span>
 	</div>
 	<div class="body">
 		<h1>Father Engagement Form List</h1>

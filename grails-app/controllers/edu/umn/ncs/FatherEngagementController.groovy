@@ -1,5 +1,8 @@
 package edu.umn.ncs
 
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
+
 // Let's us use security annotations
 import grails.converters.*
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
@@ -8,6 +11,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class FatherEngagementController {
+    def fatherEngagementDataBuilderService
 	def debug = false
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -194,6 +198,95 @@ class FatherEngagementController {
 
 		render result as JSON
 
+	}
+	
+	// this sends a CSV file to the user on the other end
+	def downloadDataset = {
+		if (debug) {
+			println "downloadDataset..."			
+		}
+		def dataSourceContents = new StringBuffer()
+		
+		def fatherEngagementList = FatherEngagement.list()
+
+		// Check for father engagement data
+		if (fatherEngagementList) {
+
+			// the file name... we should trim off the file name from the end of
+			// the path.  (q:\stuff\data.csv --> data.csv)
+
+			def filepath = "father_engagement_data.csv"
+			def dataSourceFile = new File(filepath).name
+
+			def outputData = fatherEngagementDataBuilderService.generateData(fatherEngagementList)
+
+			if (outputData) {
+				// assume this doesn't work
+				// Render outputData as CSV
+	
+				// get a field list
+				def firstRow = outputData[0]
+				def columnNames = firstRow.collect{ it.key }
+	
+				/*columnNames.each{
+					println "Dataset columnNames >> ${it}"
+				}*/
+	
+				// write the header column
+				//  "ID","FirstName","MiddleName","LastName","Suffix"
+				columnNames.eachWithIndex{ col, i ->
+					if (i > 0) {
+						dataSourceContents << ","
+					}
+					dataSourceContents << ("\"" + col.replace("\"", "\"\"") + "\"")
+				}
+				// Using \r\n for MS Windows
+				dataSourceContents << "\r\n"
+	
+				// write the data
+				outputData.each{ row ->
+					columnNames.eachWithIndex{ col, i ->
+	
+						if (i > 0) {
+							dataSourceContents << ","
+						}
+						// default content is empty
+						def columnValue = ""
+						// If there's a non-null value...
+						if (row[col] != null) {
+							// take the content and escape the double quotes (")
+							
+							
+							
+							def columnContent = row[col].toString().replace('"', '""')
+							
+							if (row[col].class.toString() == 'class java.sql.Timestamp') {
+								// if (debug) { println "Row Class for ${col}: " + row[col].class.toString() }
+								// This is a SQL Timestamp.  We're changing the date format so that MS Word can parse it
+								// (it has trouble with milliseconds)
+								def sqlDate = new DateTime(row[col].time)
+								columnContent = fmt.print(sqlDate)
+							}
+							
+							// then surround it with double quotes
+							columnValue = '"' + columnContent  + '"'
+						}
+	
+						dataSourceContents << columnValue
+					}
+					dataSourceContents << "\r\n"
+				}
+			}
+			response.setHeader("Content-disposition", "attachment; filename=\"${dataSourceFile}\"");
+			
+			render(contentType: "application/octet-stream", text: dataSourceContents)
+
+			// Use for debugging (doesn't download)
+			//render(text: dataSourceContents);
+		} else {
+			flash.message = "No father engagement data found"
+			redirect(action:"list")
+		}
 	}
 
 }
