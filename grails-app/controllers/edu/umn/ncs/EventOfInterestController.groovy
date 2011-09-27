@@ -8,6 +8,9 @@ import grails.plugin.springcache.annotations.CacheFlush
 class EventOfInterestController {
 	//def debug = true
 	def debug = false
+
+	def authenticateService	
+	def eventTriggerService
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -41,6 +44,9 @@ class EventOfInterestController {
 			println "eventReport.id::${params.eventReport.id}"
 		}
 		def eventReportInstance = EventReport.get(params.eventReport.id)
+		
+		// get the username of the logged in user
+		def username = authenticateService?.principal()?.getUsername()
 		
 		if (eventReportInstance){
 			// Set the event report to which the eoi belongs
@@ -122,6 +128,10 @@ class EventOfInterestController {
 
 			if (eventOfInterestInstance.save(flush: true)) {
 				eventReportInstance.addToEvents(eventOfInterestInstance).save()
+				
+				// process any triggers to run on event creation
+				eventTriggerService.processEventTriggers(username)
+				
 				flash.message = "Event of Interest id: ${eventOfInterestInstance.id} successfuly saved."
 				redirect(controller: "eventReport", action: "edit", id: eventReportInstance.id)
 			}
@@ -158,6 +168,10 @@ class EventOfInterestController {
     }
 
     def update = {
+		
+		// get the username of the logged in user
+		def username = authenticateService?.principal()?.getUsername()
+
         def eventOfInterestInstance = EventOfInterest.get(params.eventOfInterestInstance_id)
 		def eventReportInstance = EventReport.read(eventOfInterestInstance.eventReport.id)
         if (eventOfInterestInstance) {
@@ -239,6 +253,10 @@ class EventOfInterestController {
 			}
             eventOfInterestInstance.properties = params
             if (!eventOfInterestInstance.hasErrors() && eventOfInterestInstance.save(flush: true)) {
+				
+				// process any triggers to run on event update
+				eventTriggerService.processEventTriggers(username)
+
                 flash.message = "Event of interest updated successfully!"
 				redirect(controller:"eventReport", action: "edit", id: eventOfInterestInstance.eventReport.id)
             }

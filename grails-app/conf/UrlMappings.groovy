@@ -7,8 +7,10 @@ class UrlMappings {
 			}
 		}
 
-		// "/"(view:"/index")
-                "/"(controller:"mainMenu")
+		"/admin/manage/$action?"(controller: "adminManage")
+
+
+		"/"(controller:"mainMenu")
 		"500"(view:'/error')
 	}
 }

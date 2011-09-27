@@ -9,6 +9,7 @@ security {
 	// Much Safer!!!
 	controllerAnnotationStaticRules = [
 		'/console/**': ['ROLE_NCS_IT'], 
+		'/admin/manage/**': ['ROLE_NCS_IT'], 
 		'/logout/**':['IS_AUTHENTICATED_FULLY'], 
 		'/plugins/**':['IS_AUTHENTICATED_FULLY'], 
 		'/css/**':['IS_AUTHENTICATED_FULLY'], 

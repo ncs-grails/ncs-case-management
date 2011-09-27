@@ -59,6 +59,17 @@ environments {
 		birt.reportHome = "/var/lib/webreports"
 		birt.engineHome = "/usr/local/birt/ReportEngine"
 		birt.imageUrl = "images/reports"
+
+		grails.plugins.dynamicController.mixins = [
+			'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':       'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.HibernateControllerMixin':   'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :      'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' : 'com.burtbeckwith.appinfo_test.AdminManageController',
+			'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :     'com.burtbeckwith.appinfo_test.AdminManageController'
+		]
+
     }
     test {
         grails.serverURL = "https://localhost.umn.edu:8443/${appName}"
@@ -67,7 +78,6 @@ environments {
 		birt.engineHome = "/usr/local/birt/ReportEngine"
 		birt.imageUrl = "images/reports"
     }
-
 }
 
 // This is the local file location of the NCS Production Documents
