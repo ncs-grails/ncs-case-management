@@ -272,48 +272,22 @@ class BatchController {
 
 	@Secured(['ROLE_NCS_IT'])
 	def edit = {
-
 		def batchInstance = Batch.read(params.id)
-		
-		def batchDate = new LocalDate(batchInstance.dateCreated)
-        def referenceDateYear = batchDate.year
-        def yearRange = (referenceDateYear..(referenceDateYear+1))
-		
-		// List of batches to choose for master batch
-		/*
-		 * 
-		def dayPrior = batchInstance.dateCreated - 1
-		def dayAfter = batchInstance.dateCreated + 1
-		def masterBatchList = []
-		def c = Batch.createCriteria()
-		def batchInstanceList = c.listDistinct {
-			and {
-				gt("dateCreated", dayPrior)
-				lt("dateCreated", dayAfter)
-			}
-		}
-		
-		batchInstanceList.each{ b ->
-			def batchInfo = [
-					id:b.id, 
-					name:"Batch ID ${b?.id}: ${b?.primaryInstrument?.name}"
-					]
-			masterBatchList.add(batchInfo)
-		}
-		
-		
-		*/
-		
 		if (!batchInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
 			redirect(action: "list")
 		} else {
+			
+			def batchDate = new LocalDate(batchInstance.dateCreated)
+			def referenceDateYear = batchDate.year
+			def yearRange = (referenceDateYear..(referenceDateYear+1))
 
 			/* Check the batch items: created for dwelling Units, persons or households */
 			[batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange]
 		}
 	}
 	
+	@Secured(['ROLE_NCS_IT'])
 	def delete = {
 		def batchInstance = Batch.get(params.id)
 		
@@ -348,7 +322,7 @@ class BatchController {
 	@Secured(['ROLE_NCS_IT'])
 	def update = {
 		
-		println "params: ${params}"
+		println "****************** NGP, I am in UPDATE!"
 		
 		def batchInstance = Batch.read(params.id)
 		if (batchInstance) {
@@ -423,33 +397,78 @@ class BatchController {
 		
 	}
 
-	
-	@Secured(['ROLE_NCS_IT'])
-	def deleteItem = {
+	def deleteItem(Integer item) {
 		
+		def trackedItemInstance = null
+		def r = [batchId: 0,
+			message: "",
+			err: ""]
 		
-		def batchInstance = null
-		def trackedItemInstance = TrackedItem.read(params.id)
-		def batchId = trackedItemInstance?.batch?.id
-	
-		if (trackedItemInstance && batchId) {
-			try {
-				trackedItemInstance.delete(flush: true)
-				flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
-				redirect(action: "edit", id: batchId)
-				
-			}catch(org.springframework.dao.DataIntegrityViolationException e){
-				flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
+		trackedItemInstance = TrackedItem.read(item)
+		println "********************* before if (trackedItemInstance"
+		if (trackedItemInstance) {
+			r.batchId = trackedItemInstance.batchId
+			
+			println "trackedItemInstance.batchId: ${trackedItemInstance.batchId}"
+			
+			// Delete BatchQueue parent records
+			def BatchQueueInstanceList = BatchQueue.createCriteria().list{
+				items {
+					eq('id', trackedItemInstance.id)
+				}
 			}
-			redirect(action: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
+			BatchQueueInstanceList.each{batchQueueInstance
+				try {
+					batchQueueInstance.delete()
+				}catch(org.springframework.dao.DataIntegrityViolationException e){
+					r.err += "${message(code: 'default.not.deleted.message', args: [message(code: 'batchQueue.label', default: 'Batch Queue'), ${item}])}"
+				}
+			}
+			
+			// Delete Item
+			try {
+				trackedItemInstance.delete()
+				r.message += "${item}, "
+			}catch(org.springframework.dao.DataIntegrityViolationException e){
+				r.err += "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), ${item}])}"
+			}
+		}
+		return r
+	}
+
+	@Secured(['ROLE_NCS_IT'])
+	def deleteItems = {
+		def message = ""
+		def err = ""
+		def batchId = null
+		def r = [:]
+		
+		message = "Deleted Items: "
+		params?.item?.id?.each { 
+			def itemId = Integer.parseInt(it)
+			
+			if (itemId) {
+				r = deleteItem(itemId)
+	
+				message += r?.message
+				err += r?.err
+				batchId = r?.batchId
+			}
+		}
+
+		if (batchId) {
+			flash.message = message + err
+			flash.errorMessage = err
+			redirect(action: "edit", id: batchId)
 		} else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), params.id])}"
 			redirect(action: "list")
 		}
 	}
-	
+		
 	@Secured(['ROLE_NCS_IT'])
 	def addItem = {
+		
+		println "******************  NGP debug; I am in additem"
 		
 		def batchInstance = Batch.read(params.id)
 		def trackedItemInstance = null

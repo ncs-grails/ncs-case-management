@@ -52,15 +52,18 @@ class TrackedItemController {
 
 		def message = ''
 		def today = new LocalDate()	
-		def eventName = ''
-		def newValue = ''
 		
 		def itemResultInstance = null
 		
 		def oldResult = null
 		def oldReceivedDate = null
-		def oldUserName = null
-		def oldUserPropertyName = null
+		
+
+		// Next 4 used for audit logging
+		def oldItemResultDateCreated = null
+		def oldItemResultLastUpdated = null
+		def oldItemResultUserCreated = null
+		def oldItemResultUserUpdated = null
 		
 		def trackedItemInstance = TrackedItem.read(params.id)
 		if (trackedItemInstance){
@@ -91,8 +94,12 @@ class TrackedItemController {
 				
 				oldResult = itemResultInstance.result.id
 				oldReceivedDate = itemResultInstance.receivedDate
-				oldUserName = (itemResultInstance.userUpdated ? itemResultInstance.userUpdated : itemResultInstance.userCreated)
-				oldUserPropertyName = (itemResultInstance.userUpdated ? "userUpdated" : "userCreated")
+				
+				oldItemResultDateCreated = itemResultInstance?.dateCreated
+				oldItemResultLastUpdated = itemResultInstance?.lastUpdated
+				
+				oldItemResultUserCreated = itemResultInstance?.userCreated
+				oldItemResultUserUpdated = itemResultInstance?.userUpdated
 			}
 
 			if (params.receiptDate && params?.result?.id) {
@@ -194,76 +201,56 @@ class TrackedItemController {
 			
 			if (!trackedItemInstance.hasErrors() && trackedItemInstance.save(flush: true)) {
 
-/*********** Disable audit logging. It should be log automatically. It does not work if I run it locally. 
+/* 
+ 				Skip manually logging "DELETE" events. 
+				They logged automatically. (problem: actor not saved on auto logging. But it works for ajz)
+				UPDATEs are not auto logged should be manually logged here:
+ */
  
 				// Log studyYear
-				if (oldStudyYear && oldStudyYear != trackedItemInstance.studyYear) {
-					eventName = (trackedItemInstance.studyYear ? "UPDATE" : "DELETE")
+				if (oldStudyYear && trackedItemInstance.studyYear && oldStudyYear != trackedItemInstance.studyYear) {
+					// Log studyYear "UPDATE" 
 					message += auditLog('edu.umn.ncs.trackedItemInstance',
-						eventName,
+						"UPDATE",
 						trackedItemInstance.studyYear,
 						oldStudyYear,
 						trackedItemInstance.id,
-						'studyYear')
+						"studyYear")
 				}
 				
 				// Log parentItem
-				if (oldParentItem && oldParentItem != trackedItemInstance.parentItem) {
-					eventName = (trackedItemInstance.parentItem ? "UPDATE" : "DELETE")
-					message += auditLog('edu.umn.ncs.trackedItemInstance',
-						eventName,
-						trackedItemInstance.parentItem,
-						oldParentItem,
-						trackedItemInstance.id,
-						'parentItem')
+				if (oldParentItem && trackedItemInstance.parentItem && trackedItemInstance.parentItem && oldParentItem != trackedItemInstance.parentItem) {
+					// Log parentItem "UPDATE" 
+					// Result for 85753 of edu.umn.ncs.Result : 281 on 2011-09-10 00:00:00.0. 
+						message += auditLog('edu.umn.ncs.trackedItemInstance',
+							"UPDATE",
+							trackedItemInstance.parentItem.toString(),
+							oldParentItem.toString(),
+							trackedItemInstance.id,
+							"parentItem")
 				}
 
-				// Log result, receivedDate, user
-				eventName = (trackedItemInstance?.result ? "UPDATE" : "DELETE")
-				
-				if (oldResult && oldResult != trackedItemInstance?.result?.id) {
-				
-				newValue = (eventName == "DELETE" ? null : "edu.umn.ncs.Result:${itemResultInstance.result.id}")
-
+				// Log result, receivedDate, user "UPDATE" events
+				if (oldResult && trackedItemInstance?.result?.id && oldResult != trackedItemInstance?.result?.result?.id) {
 					// Log result
 					message += auditLog("edu.umn.ncs.ItemResult",
-						eventName,
-						newValue,
-						"edu.umn.ncs.Result:${oldResult}",
+						"UPDATE",
+						"edu.umn.ncs.Result:${itemResultInstance.result.id}",
+						"edu.umn.ncs.Result:${oldResult}" + " Created: [on: ${oldItemResultDateCreated} by: ${oldItemResultUserCreated}] Updated: [on: ${oldItemResultLastUpdated} by ${oldItemResultUserUpdated} ]",
 						itemResultInstance.id,
 						"result")
 				}
 				
-				if (oldReceivedDate && oldReceivedDate != trackedItemInstance?.result?.receivedDate) {
-					
-					newValue = (eventName == "DELETE" ? null : "${itemResultInstance.receivedDate.toString()}")
-					
+				if (oldReceivedDate && trackedItemInstance?.result?.receivedDate && oldReceivedDate != trackedItemInstance?.result?.receivedDate) {
 					// Log receivedDate
 					message += auditLog('edu.umn.ncs.ItemResult',
-						eventName,
-						newValue,
-						oldReceivedDate.toString(),
+						"UPDATE",
+						"${itemResultInstance.receivedDate.toString()}",
+						oldReceivedDate.toString() + " Created: [on: ${oldItemResultDateCreated} by: ${oldItemResultUserCreated}] Updated: [on: ${oldItemResultLastUpdated} by ${oldItemResultUserUpdated} ]",
 						itemResultInstance.id,
-						'receivedDate')
+						"receivedDate")
 				}
-				
-				if (oldUserName && (oldUserName != trackedItemInstance?.result?.userUpdated && oldUserPropertyName == "userUpdated"
-						|| oldUserName != trackedItemInstance?.result?.userCreated && oldUserPropertyName == "userCreated")) {
-					
-					newValue = (eventName == "DELETE" ? null : username)
-					
-					// Log user
-					message += auditLog('edu.umn.ncs.ItemResult',
-						eventName,
-						newValue,
-						oldUserName,
-						itemResultInstance.id,
-						oldUserPropertyName)
-					
-				}
-				
-*/				
-				
+
 				message += "Item ${trackedItemInstance.id} updated successfully!"
 				render(view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
 				
@@ -294,7 +281,12 @@ class TrackedItemController {
 			propertyName: propertyName)
 		
 		if (!auditLog.hasErrors() && auditLog.save(flush: true)) {
+			
 			message += "Logged ${propertyName}: ${oldValue} <br/>"
+			if (debug && propertyName == "studyYear") {
+				def studyYear = AuditLogEvent.findByPersistedObjectIdAndPropertyName(85758, "studyYear")
+				println "LOGGED STUDYYEAR: ${studyYear}"
+			}
 			
 		} else {
 			message += "Failed to log old ${propertyName}: ${oldValue} <br/>"

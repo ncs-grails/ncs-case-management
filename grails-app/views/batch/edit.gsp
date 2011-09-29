@@ -23,8 +23,13 @@
             </g:if>            
             
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            	<div class="message">${flash.message}</div>
             </g:if>
+            
+            <g:if test="${flash.errorMessage}">
+            	<div class="errors">${flash.errorMessage}</div>
+            </g:if>
+
             <g:hasErrors bean="${batchInstance}">
             <div class="errors">
                 <g:renderErrors bean="${batchInstance}" as="list" />
@@ -203,69 +208,80 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'items', 'errors')}">
                                 
-                                <div class="manageBatch">
- 								<table class="scroll">
-									<thead>
-										<th>Item ID</th>
-										<th>Dwelling Unit Id</th>
-										<th>Person Id</th>
-										<th>Household Id</th>
-										<th>Remove</th>
-									</thead>
-									<tbody>
-										<g:each in="${batchInstance.items.sort{it?.id}}" status="s" var="i">
-											<tr class="${(s % 2) == 0 ? 'even' : 'odd'}">
-												<td><g:link controller="trackedItem" action="edit" id="${i.id}">${i?.id?.encodeAsHTML()}</g:link></td>
-												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.dwellingUnit?.id?.encodeAsHTML()}</g:link></td>
-												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.person?.id?.encodeAsHTML()}</g:link></td>
-												<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.household?.id?.encodeAsHTML()}</g:link></td>
-									            <td>
-									                <div class="buttons">
-									                    <span class="button">
+	                                <div class="manageBatch">
+		                                <g:hiddenField name="item.id" value="0" />
+		                                <g:hiddenField name="item.id" value="0" />
+		 								<table class="scroll" id="itemsList">
+											<thead>
+												<th>Item ID</th>
+												<th>Dwelling Unit Id</th>
+												<th>Person Id</th>
+												<th>Household Id</th>
+												<th>Remove</th>
+											</thead>
+											<tbody>
+												<g:each in="${batchInstance.items.sort{it?.id}}" status="s" var="i">
+													<tr class="${(s % 2) == 0 ? 'even' : 'odd'}">
+														<td><g:link controller="trackedItem" action="edit" id="${i.id}">${i?.id?.encodeAsHTML()}</g:link></td>
+														<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.dwellingUnit?.id?.encodeAsHTML()}</g:link></td>
+														<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.person?.id?.encodeAsHTML()}</g:link></td>
+														<td><g:link controller="trackedItem" action="show" id="${i.id}">${i.household?.id?.encodeAsHTML()}</g:link></td>
+																								
+											            <td>
+															<g:checkBox id="itemId-${i.id}" class="itemsId" name="item.id" value="${i.id}" checked="${false}"/>									            			
 									                    	<%-- <g:actionSubmit class="delete" action="deleteItem" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /> --%>
-									                    	<g:link class="delete" action="deleteItem" id="${i.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete</g:link>
-									                    </span>
-									                </div>
-									            </td>												
-											</tr>
-										</g:each>
-									</tbody>
-							</table>   
-							</div>
-	
-							<div class="prop">
-							
-								<span class="name">Add New:</span>
-
-								<span class="prop">
-									<label for="dwellingUnit.id">Dwelling Unit:</label>
-									<g:textField size="10" name="dwellingUnit.id"/>
-								</span>
-								<span class="prop">
-									 Or 
-									<label for="person.id">Person:</label>
-									<g:textField name="person.id" size="10" />
-								</span>
-								<span class="value">
-									 Or 
-									<label for="household.id">Household:</label>
-									<g:textField name="household.id" size="10" />
-								</span>		
-									<span style="margin-left:5px;" class="buttons">
-										<g:actionSubmit name="addItemTest" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
-										<%--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" /> --%>
-									</span>
-							</div>
+									                    	<%-- last implemented: <g:link class="delete" action="deleteItem" id="${i.id}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">Delete</g:link> --%>
+											            </td>												
+													</tr>
+												</g:each>
+											</tbody>
+										</table>   
+									</div>
+									
+									<div class="buttons">
+										<span class="button" style="float:right;">
+											<g:actionSubmit class="delete" action="deleteItems" value="Delete Selected Items"/>
+										</span>
+									</div>
+									
+									<div class="prop">
+										<!--  TODO: Move this into it's own form. -->
+											<span class="name">Add New:</span>
+											
+											<g:hiddenField name="valid.dwelling.id" value="${validItems?.dwellingUnit?.id}"/>
+											<g:hiddenField name="valid.person.id" value="${validItems?.person?.id}"/>
+											<g:hiddenField name="valid.household.id" value="${validItems?.household?.id}"/>
+											
+											<span class="prop">
+												<label for="dwellingUnit.id">Dwelling Unit:</label>
+												<g:textField onSubmit="return false;" size="10" name="dwellingUnit.id"/>
+											</span>
+											<span class="prop">
+												 Or 
+												<label for="person.id">Person:</label>
+												<g:textField name="person.id" size="10" />
+											</span>
+											<span class="value">
+												 Or 
+												<label for="household.id">Household:</label>
+												<g:textField name="household.id" size="10" />
+											</span>		
+											<span style="margin-left:5px;" class="buttons">
+												<g:actionSubmit name="addItem" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
+												<%--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" /> --%>
+											</span>
+									</div>    									
 
                                 </td>
                             </tr>
-                        
                         </tbody>
                     </table>
+                   
                 </div>
+                
                 <div class="buttons">
                     <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-                    <span class="button"><g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" /></span>
+                    <span class="button"><g:actionSubmit class="delete" action="delete" value="Delete Batch" /></span>
                 </div>
             </g:form>
         </div>

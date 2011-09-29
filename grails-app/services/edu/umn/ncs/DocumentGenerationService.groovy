@@ -212,13 +212,13 @@ class DocumentGenerationService {
                             results.each{ row ->
                                 def bcq = new BatchCreationQueue()
 
-                                if (row.containsKey('person')) {
-                                    bcq.person = Person.read(row.person)
+								if (row.containsKey('person')) {
+									bcq.person = Person.read(row.person)
 									if (debug) { println "Person found: ${bcq.person}" }
-                                } else if (row.containsKey('person_id')) {
-                                    bcq.person = Person.read(row.person_id)
+								} else if (row.containsKey('person_id')) {
+									bcq.person = Person.read(row.person_id)
 									if (debug) { println "Person.id found: ${bcq.person}" }
-                                }
+								}
                                 if (row.containsKey('household')) {
                                     bcq.household = Household.read(row.household)
                                 } else if (row.containsKey('household_id')) {
