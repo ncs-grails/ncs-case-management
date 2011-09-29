@@ -322,8 +322,6 @@ class BatchController {
 	@Secured(['ROLE_NCS_IT'])
 	def update = {
 		
-		println "****************** NGP, I am in UPDATE!"
-		
 		def batchInstance = Batch.read(params.id)
 		if (batchInstance) {
 			
@@ -333,6 +331,7 @@ class BatchController {
 			def printingServicesDate = new LocalDate(params.printingServicesDate)
 			def addressAndMailingDate = new LocalDate(params.addressAndMailingDate)
 			def trackingReturnDate = new LocalDate(params.trackingReturnDate)
+			def instrumentDate = new LocalDate(params.instrumentDate)
 
 			def batchDate = new LocalDate(batchInstance.dateCreated)
 			def referenceDateMonth = batchDate.monthOfYear
@@ -346,7 +345,13 @@ class BatchController {
                     render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
                     return
             }
-			
+
+			if (instrumentDate && instrumentDate.isBefore(dateCreated) && !instrumentDate.isEqual(dateCreated)) {
+				batchInstance.errors.rejectValue("instrumentDate", "batch.instrumentDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Instrument Date (Date on Letter) must come after date generated")
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					return
+			}
+						
 			if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
 				batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
 					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
