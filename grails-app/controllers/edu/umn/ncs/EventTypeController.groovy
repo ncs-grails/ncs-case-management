@@ -9,8 +9,11 @@ import grails.plugin.springcache.annotations.CacheFlush
 
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventTypeController {
+
+	def authenticateService
 	// def debug = true
 	def debug = false
+	def appName = 'ncs-case-management'
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -30,10 +33,17 @@ class EventTypeController {
     }
 
     def save = {
+		// get the username of the logged in user
+		def username = authenticateService?.principal()?.getUsername()
+
         def eventTypeInstance = new EventType(params)
+
+		eventTypeInstance.userCreated = username
+		eventTypeInstance.appCreated = appName
+
         if (eventTypeInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'eventType.label', default: 'EventType'), eventTypeInstance.id])}"
-            redirect(action: "show", id: eventTypeInstance.id)
+            redirect(action: "save", id: eventTypeInstance.id)
         }
         else {
             render(view: "create", model: [eventTypeInstance: eventTypeInstance])
@@ -41,15 +51,14 @@ class EventTypeController {
     }
 
     def show = {
-        def eventTypeInstance = EventType.get(params.id)
-        if (!eventTypeInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'eventType.label', default: 'EventType'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [eventTypeInstance: eventTypeInstance]
-        }
+		flash.message = flash.message
+		redirect(action:'edit', params:params)
     }
+
+	def jsonNames = {
+		def eventTypeInstance = EventType.get(params.id)
+		render eventTypeInstance as JSON
+	}
 
     def edit = {
         def eventTypeInstance = EventType.get(params.id)
@@ -63,6 +72,9 @@ class EventTypeController {
     }
 
     def update = {
+		// get the username of the logged in user
+		def username = authenticateService?.principal()?.getUsername()
+
         def eventTypeInstance = EventType.get(params.id)
         if (eventTypeInstance) {
             if (params.version) {
@@ -75,9 +87,18 @@ class EventTypeController {
                 }
             }
             eventTypeInstance.properties = params
+			if ( ! eventTypeInstance.userCreated ) {
+				eventTypeInstance.userCreated = username
+			}
+			if ( ! eventTypeInstance.appCreated ) {
+				eventTypeInstance.appCreated = appName
+			}
+			eventTypeInstance.lastUpdated = new Date()
+			eventTypeInstance.userUpdated = username
+
             if (!eventTypeInstance.hasErrors() && eventTypeInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'eventType.label', default: 'EventType'), eventTypeInstance.id])}"
-                redirect(action: "show", id: eventTypeInstance.id)
+                redirect(action: "list", id: eventTypeInstance.id)
             }
             else {
                 render(view: "edit", model: [eventTypeInstance: eventTypeInstance])
@@ -99,7 +120,7 @@ class EventTypeController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'eventType.label', default: 'EventType'), params.id])}"
-                redirect(action: "show", id: params.id)
+                redirect(action: "edit", id: params.id)
             }
         }
         else {

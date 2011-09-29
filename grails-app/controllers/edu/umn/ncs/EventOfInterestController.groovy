@@ -24,6 +24,9 @@ class EventOfInterestController {
     }
 
     def create = {
+		// get the username of the logged in user
+		def username = authenticateService?.principal()?.getUsername()
+		
         def eventOfInterestInstance = new EventOfInterest()
         eventOfInterestInstance.properties = params
         return [eventOfInterestInstance: eventOfInterestInstance]

@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormat
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventReportController {
 	def debug = false		
+	def authenticateService
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -33,8 +34,14 @@ class EventReportController {
     }
 
     def create = {
+		// get the username of the logged in user
+        def username = authenticateService?.principal()?.getUsername()
+
 		def eventReportInstance = new EventReport()
 		eventReportInstance.properties = params
+		if ( ! eventReportInstance.filledOutBy ) {
+			eventReportInstance.filledOutBy = username
+		}
 		eventReportInstance.person = Person.read(params?.person?.id)
 		// Add NCS
 		eventReportInstance.addToStudies(Study.read(1))			

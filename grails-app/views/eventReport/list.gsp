@@ -1,4 +1,3 @@
-
 <%@ page import="edu.umn.ncs.EventReport" %>
 <div class="list">
     <table>

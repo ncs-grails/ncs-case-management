@@ -2,8 +2,6 @@ package edu.umn.ncs
 
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
-import grails.plugin.springcache.annotations.Cacheable
-import grails.plugin.springcache.annotations.CacheFlush
 
 @Secured(['ROLE_NCS_IT'])
 class EventPickOneController {
