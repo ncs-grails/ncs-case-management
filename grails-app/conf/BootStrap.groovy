@@ -387,7 +387,7 @@ class BootStrap {
 		eventTypeList.each{ obj ->
 			def eventTypeInstance = EventType.findByName(obj.name)
 			if (! eventTypeInstance ) {
-				eventTypeInstance = new EventType(name:obj.name,useEventCode:obj.useEventCode,useEventDate:obj.useEventDate,useEventDescription:obj.useEventDescription,useEventPickOne:obj.useEventPickOne).save(flush:true)
+				eventTypeInstance = new EventType(name:obj.name,useEventCode:obj.useEventCode,useEventDate:obj.useEventDate,useEventDescription:obj.useEventDescription,useEventPickOne:obj.useEventPickOne,dateCreated:new Date(),userCreated:'ast').save(flush:true)
 			}
 		}
 		/*

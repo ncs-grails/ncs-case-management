@@ -11,8 +11,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 class EventTypeController {
 
 	def authenticateService
-	// def debug = true
-	def debug = false
+	def debug = true
 	def appName = 'ncs-case-management'
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -86,6 +85,9 @@ class EventTypeController {
                     return
                 }
             }
+			if (debug) {
+				println "eventTypeInstance.dateCreated::${eventTypeInstance?.dateCreated}"
+			}
             eventTypeInstance.properties = params
 			if ( ! eventTypeInstance.userCreated ) {
 				eventTypeInstance.userCreated = username
@@ -140,8 +142,10 @@ class EventTypeController {
 				def jsonList = eventTypeInstance.collect { [
 						controlId: params.controlId,
 						useEventCode: it.useEventCode,
+						eventCode: it?.nameEventCode,
 						useEventDate: it.useEventDate,
 						useEventDescription: it.useEventDescription,
+						eventDescription: it?.nameEventDescription,
 						useEventPickOne: it.useEventPickOne,
 						eventPickOneList:eventPickOneList
 					]}

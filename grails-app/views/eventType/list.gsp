@@ -48,17 +48,13 @@
                         
                             <td>${fieldValue(bean: eventTypeInstance, field: "name")}</td>
                         
-                            <td><g:if test="${eventTypeInstance.useEventCode}">${eventTypeInstance.nameEventCode}</g:if>
-								<g:else>no</g:else></td>
+                            <td><g:formatBoolean boolean="${eventTypeInstance.useEventCode}" true="YES" false="no" /></td>
 								
-                            <td><g:if test="${eventTypeInstance.useEventPickOne}">${eventTypeInstance.nameEventPickOne}</g:if>
-								<g:else>no</g:else></td>
+                            <td><g:formatBoolean boolean="${eventTypeInstance.useEventPickOne}" true="YES" false="no" /></td>
                         
-                            <td><g:if test="${eventTypeInstance.useEventDate}">${eventTypeInstance.nameEventDate}</g:if>
-								<g:else>no</g:else></td>
+                            <td><g:formatBoolean boolean="${eventTypeInstance.useEventDate}" true="YES" false="no" /></td>
                         
-                            <td><g:if test="${eventTypeInstance.useEventDescription}">${eventTypeInstance.nameEventDescription}</g:if>
-								<g:else>no</g:else></td>
+                            <td><g:formatBoolean boolean="${eventTypeInstance.useEventDescription}" true="YES" false="no" /></td>
                         
 			</tr>
 		</g:each>

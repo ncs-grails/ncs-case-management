@@ -70,6 +70,13 @@ function displayControls(e) {
         	var element = '#eventCode' + controlId;
 	    	if (control.useEventCode) {
 	    		jQuery(element).removeClass('hidden');
+		    	element = '#eventCodeName' + controlId;
+		    	if (control.eventCode != null && control.eventCode != '') {
+			    	jQuery(element).html(control.eventCode)		    		
+		    	}
+		    	else {
+		    		jQuery(element).html("Event Code")
+		    	}
 	    	}
 	    	element = '#eventDateDiv' + controlId;
             //if (debug) {
@@ -83,6 +90,13 @@ function displayControls(e) {
 	    	element = '#eventDescription' + controlId;
 	    	if (control.useEventDescription) {
 	    		jQuery(element).removeClass('hidden');
+		    	element = '#eventDescriptionName' + controlId;
+		    	if (control.eventDescription != null && control.eventDescription != '') {
+			    	jQuery(element).html(control.eventDescription)		    		
+		    	}
+		    	else {
+		    		jQuery(element).html("Event Description")
+		    	}
 	    	}
 	    	element = '#eventPickOne' + controlId;
 	    	if (control.useEventPickOne) {	    		

@@ -95,7 +95,7 @@
 								<g:if test="${eventOfInterestInstance?.eventType?.useEventDescription}" >
 				                <div class="prop">
 				                	<span class="show">
-                                    	<label for="eventDescription"><g:message code="eventOfInterest.eventDescription.label" default="Event Description:" /></label>    ${eventOfInterestInstance?.eventDescription}
+                                    	<label for="eventDescription"><g:if test="${eventOfInterestInstance?.eventType?.nameEventDescription}" >${eventOfInterestInstance?.eventType?.nameEventDescription}:</g:if><g:else>Event Code:</g:else></label>    ${eventOfInterestInstance?.eventDescription}
 				                    </span>
 				                </div>
 				                </g:if>

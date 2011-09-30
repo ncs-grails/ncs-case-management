@@ -6,8 +6,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventOfInterestController {
-	//def debug = true
-	def debug = false
+	def debug = true
 
 	def authenticateService	
 	def eventTriggerService
@@ -127,7 +126,14 @@ class EventOfInterestController {
 				println "eventOfInterestInstance.params::${params}"
 			}
 			
+			params.userCreated = username
+			params.userUpdated = username
+			
 			def eventOfInterestInstance = new EventOfInterest(params)
+
+			if (debug) {
+				println "eventOfInterestInstance::${eventOfInterestInstance.properties}"
+			}
 
 			if (eventOfInterestInstance.save(flush: true)) {
 				eventReportInstance.addToEvents(eventOfInterestInstance).save()

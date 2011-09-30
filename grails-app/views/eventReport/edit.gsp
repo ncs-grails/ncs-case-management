@@ -143,9 +143,9 @@
 				                    </span>
 				                </div>
 	
-				                <div id="${'eventDescription' + i}" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventDescription }'>hidden</g:if>">
+				                <div id="${'eventDescription' + i}" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventDescription}'>hidden</g:if>">
 				                	<span class="name">
-	                                   	<label for="eventDescription"><g:message code="eventOfInterest.eventDescription.label" default="Event Description" /></label>
+	                                   	<label for="eventDescription"><g:if test="${eventOfInterestInstance?.eventType?.nameEventDescription}" >${eventOfInterestInstance?.eventType?.nameEventDescription}</g:if><g:else>Event Description</g:else></label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:textField name="eventDescription" value="${eventOfInterestInstance?.eventDescription}" />
@@ -154,7 +154,7 @@
 	
 				                <div id="${'eventCode' + i}" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventCode }'>hidden</g:if>">
 				                	<span class="name">
-	                                   	<label for="eventCode"><g:message code="eventOfInterest.eventCode.label" default="Event Code" /></label>
+	                                   	<label for="eventCode"><g:if test="${eventOfInterestInstance?.eventType?.nameEventCode}" >${eventOfInterestInstance?.eventType?.nameEventCode}</g:if><g:else>Event Code</g:else></label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:textField name="eventCode" value="${fieldValue(bean: eventOfInterestInstance, field: 'eventCode')}" />
@@ -281,7 +281,7 @@
 	
 				                <div id="${'eventDescription' + eoiCount}" class="prop hidden">
 				                	<span class="name">
-	                                   	<label for="eventDescription"><g:message code="eventOfInterest.eventDescription.label" default="Event Description" /></label>
+	                                   	<label id="${'eventDescriptionName' + eoiCount}" for="eventDescription"><g:message code="eventOfInterest.eventDescription.label" default="Event Description" /></label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:textField name="eventDescription" value="${eventOfInterestInstance?.eventDescription}" />
@@ -290,7 +290,7 @@
 	
 				                <div id="${'eventCode' + eoiCount}" class="prop hidden">
 				                	<span class="name">
-	                                   	<label for="eventCode"><g:message code="eventOfInterest.eventCode.label" default="Event Code" /></label>
+	                                   	<label id="${'eventCodeName' + eoiCount}" for="eventCode"><g:message code="eventOfInterest.eventCode.label" default="Event Code" /></label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:textField name="eventCode" value="${fieldValue(bean: eventOfInterestInstance, field: 'eventCode')}" />
