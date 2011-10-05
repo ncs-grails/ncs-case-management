@@ -473,8 +473,6 @@ class BatchController {
 	@Secured(['ROLE_NCS_IT'])
 	def addItem = {
 		
-		println "******************  NGP debug; I am in additem"
-		
 		def batchInstance = Batch.read(params.id)
 		def trackedItemInstance = null
 		
