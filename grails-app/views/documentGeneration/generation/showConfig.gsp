@@ -55,7 +55,7 @@ ${batchCreationConfigInstance?.name}
 				<th>
 				${message(code: 'instrumentDate.name.label', default: 'Instrument Date')}
 				</th>
-				<th>Peices</th>
+				<th>Pieces</th>
 			</tr>
 		</thead>
 		<tbody>
