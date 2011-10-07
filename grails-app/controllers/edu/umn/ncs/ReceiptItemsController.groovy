@@ -123,6 +123,12 @@ class ReceiptItemsController {
 				def norcSuId = barcodeParts[1]
 				def norcDocId = barcodeParts[2]
 				
+				// Rerouting 119 to 122
+				// Reason: 3500 EQs went out with norcDocId: 119 instead of 122 (JS late update)
+				if (norcDocId == "119") {
+					norcDocId = "122"
+				}
+				
 				// look up the EnHS.HS Equivalent
 				def studyInstance = StudyLink.findByNorcProjectId(norcProjectId)?.study
 				def dwellingUnitInstance = DwellingUnitLink.findByNorcSuId(norcSuId)?.dwellingUnit
