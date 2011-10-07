@@ -47,6 +47,12 @@ class TrackedItemController {
 	@Secured(['ROLE_NCS_IT'])
 	def update = {
 
+		// this update looks very involved.
+		// I realize that some of it is tricky due to the result changing?
+		// but could it have used the "trackedItemInstance.parameters = params" trick?
+		// ... the answer may be "no", but I thought I'd ask.
+		
+		// TODO: Expiration date doesn't show up for addition/modification/deletion
 		def username = authenticateService.principal().getUsername()
 		def appName = "ncs-case-management"
 
@@ -109,6 +115,7 @@ class TrackedItemController {
 				//receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
 				def receivedDate = new LocalDate(params.receiptDate)
 				
+				// TODO: This could be a contstraint on the domain class
 				if (receivedDate.isAfter(today)) {
 					trackedItemInstance.errors.rejectValue("result", "trackedItem.result", "Received date must not be greater than today's date.")
 						render(view: "edit", model: [ trackedItemInstance: trackedItemInstance])
@@ -174,7 +181,8 @@ class TrackedItemController {
 				}
 			
 			}
-
+			// TODO: Do not allow parent item to be assigned to different person/household/dwelling unit
+			// TODO: Do not allow parent item to be assigned to existing child item (parent -> child loop)
 			// Update parentItem			 
 			def oldParentItem = trackedItemInstance.parentItem
 			if (params?.parentItem?.id) {
@@ -265,6 +273,7 @@ class TrackedItemController {
         }
 	}
 	
+	// this should probably be in a service? (so it can be re-used )
 	private def auditLog(className, eventName, newValue, oldValue, persistedObjectId, propertyName){
 
 		def message = ""		

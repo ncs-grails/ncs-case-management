@@ -13,7 +13,10 @@
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
+			<!-- TODO: Why is there a create link when the action fails? -->
+			<%--
             <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
+			--%>
         </div>
         <div class="body">
             <h1>Editing Batch # ${batchInstance?.id}</h1>
@@ -245,7 +248,8 @@
 									</div>
 									
 									<div class="prop">
-										<!--  TODO: Move this into it's own form. -->
+										<!--  TODO: Move this into a separate -->
+										<!-- TODO: If batch has item(s) in it, only allow new items of similar type, IE: if has person, only allow person... -->
 											<span class="name">Add New:</span>
 											
 											<g:hiddenField name="valid.dwelling.id" value="${validItems?.dwellingUnit?.id}"/>
@@ -267,6 +271,7 @@
 												<g:textField name="household.id" size="10" />
 											</span>		
 											<span style="margin-left:5px;" class="buttons">
+												<!-- TODO: a hash tag to bring the jump back to the same spot would be nice.  An AJAX call would be even better -->
 												<g:actionSubmit name="addItem" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
 												<%--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" /> --%>
 											</span>

@@ -164,7 +164,7 @@ class EmailService {
 	// passed.  Example:
 	// Jan 3rd, 2011 2:34 PM ->
 	//     [startDate: "Jan 3rd, 2011 12:00 AM", endDate: "Jan 4th, 2011 12:00 AM" ]
-	private def getFullDayRange = { referenceDate ->
+	def getFullDayRange = { referenceDate ->
 
 		// default day is "Yesterday"
 

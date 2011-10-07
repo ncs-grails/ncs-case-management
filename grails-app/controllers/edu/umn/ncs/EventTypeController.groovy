@@ -58,6 +58,13 @@ class EventTypeController {
 		def eventTypeInstance = EventType.get(params.id)
 		render eventTypeInstance as JSON
 	}
+	
+	// This will display the form elements needed to input a particular eventType
+	def form = {
+		def eventTypeInstance = EventType.get(params.id)
+		// Notice, there is no failure, or redirect if eventTypeInstance is null.
+		[ eventTypeInstance: eventTypeInstance ]
+	}
 
     def edit = {
         def eventTypeInstance = EventType.get(params.id)

@@ -15,7 +15,7 @@
 		</span> 
 		<span class="menuButton">
 			<g:set var="batch_id" value="${trackedItemInstance?.batchId}"/>
-			<g:link class="edit" controller="batch" action="edit" params="[id: trackedItemInstance?.batchId]">
+			<g:link class="list" controller="batch" action="edit" params="[id: trackedItemInstance?.batchId]">
 				<g:message code="default.edit.label" args="['Batch']" />
 			</g:link>
 		</span> 
@@ -56,7 +56,9 @@
 			             <label for="expiration"><g:message code="trackedItem.expiration.label" default="Expiration" /></label>
 			           </span>
 			           <span class="value ${hasErrors(bean: trackedItemInstance, field: 'expiration', 'errors')}">
-			               <!-- <g:datePicker name="expiration" precision="day" value="${trackedItemInstance?.expiration}" noSelection="['': '']" />  -->
+						   <%--
+						   <g:datePicker name="expiration" precision="day" value="${trackedItemInstance?.expiration}" noSelection="['': '']" />
+						   --%>
 			               <label><g:formatDate date="${trackedItemInstance?.expiration}" format="M/d/yyyy"/></label>
 			           </span>
 			       </div>

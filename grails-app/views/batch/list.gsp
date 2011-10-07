@@ -10,7 +10,10 @@
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
+			<!-- TODO: Why is there a create link when the action fails? -->
+			<%--
             <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
+			--%>
         </div>
         <div class="body">
             <h1><g:message code="default.list.label" args="[entityName]" /></h1>
@@ -22,7 +25,8 @@
             <g:form action="list">
               <div id="searchForm">
                 <g:textField name="q" value="${params.q}" />
-                <g:submitButton name="search" value="Search"/>
+				<g:submitButton name="search" value="Search"/>
+				Enter a batch ID or item ID prefixed by "I"
               </div>
             </g:form>
 

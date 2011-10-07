@@ -76,7 +76,7 @@ class BatchController {
 		}
 
 		// get the time range for yesterday (or whatever reference date)
-		def dateRange = getFullDayRange(params?.referenceDate)
+		def dateRange = emailService.getFullDayRange(params?.referenceDate)
 
 		
 		def now = new Date()
@@ -208,7 +208,9 @@ class BatchController {
         def searchedId = 0L
 		def itemId = 0L
 
-       if (q) {
+		// instrument descriptions as well as IDs
+		// TODO: search when term contains a "-"
+		if (q) {
             if (q.isLong()) {
                 searchedId = Long.parseLong(q)
             }
@@ -219,7 +221,7 @@ class BatchController {
 	                itemId =  Long.parseLong(q)
 				}
 			}
-        }
+		}
 
         def batchInstanceList = []
         def batchRecentList = []
@@ -234,6 +236,8 @@ class BatchController {
         }
 
         if (q){
+
+			// See lookup for an example.
             c = Batch.createCriteria()
             batchInstanceList = c.listDistinct{
                 or {
@@ -324,7 +328,8 @@ class BatchController {
 		
 		def batchInstance = Batch.read(params.id)
 		if (batchInstance) {
-			
+			// validators should be moved to domain class.  See TODO in tracking plugin.
+
 			def dateCreated = new LocalDate(batchInstance.dateCreated)
 			def mailDate = new LocalDate(params.mailDate)
 			def calledCampusCourierDate = new LocalDate(params.calledCampusCourierDate)
@@ -340,26 +345,28 @@ class BatchController {
 			
             // check date order here
 
+			// TODO: Add messages to messages.properties in grails-app/i18n/
+
             if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
-                batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
+                batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly")
                     render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
                     return
             }
 
 			if (instrumentDate && instrumentDate.isBefore(dateCreated) && !instrumentDate.isEqual(dateCreated)) {
-				batchInstance.errors.rejectValue("instrumentDate", "batch.instrumentDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Instrument Date (Date on Letter) must come after date generated")
+				batchInstance.errors.rejectValue("instrumentDate", "batch.instrumentDate.dateToEarly")
 					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 						
 			if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
-				batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
+				batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly")
 					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 			
 			if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
-				batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Mailing Date must come after date generated")
+				batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly")
 					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
 					return
 			}
@@ -402,7 +409,13 @@ class BatchController {
 		
 	}
 
-	def deleteItem(Integer item) {
+	// TODO: Errors out if tracked item has a child item.
+	// TODO: Errors out if tracked item is in the user queue (edu.umn.ncs.phone.UserQueue)
+	// TODO: check for any other kinds of errors that may cause the item to fail on deletion
+	//		 then report what table caused the failure
+	//
+	// TODO: shouldn't this be in TrackedItemController.deleteItem(Integer item) ?
+	private def deleteItem(Integer item) {
 		
 		def trackedItemInstance = null
 		def r = [batchId: 0,
@@ -410,11 +423,15 @@ class BatchController {
 			err: ""]
 		
 		trackedItemInstance = TrackedItem.read(item)
-		println "********************* before if (trackedItemInstance"
+		if (debug) {
+			println "********************* before if (trackedItemInstance"
+		}
 		if (trackedItemInstance) {
 			r.batchId = trackedItemInstance.batchId
 			
-			println "trackedItemInstance.batchId: ${trackedItemInstance.batchId}"
+			if (debug) {
+				println "trackedItemInstance.batchId: ${trackedItemInstance.batchId}"
+			}
 			
 			// Delete BatchQueue parent records
 			def BatchQueueInstanceList = BatchQueue.createCriteria().list{
@@ -441,6 +458,7 @@ class BatchController {
 		return r
 	}
 
+	// TODO: shouldn't this be in TrackedItemController.delete() ?
 	@Secured(['ROLE_NCS_IT'])
 	def deleteItems = {
 		def message = ""
@@ -470,9 +488,12 @@ class BatchController {
 		}
 	}
 		
+	// TODO: shouldn't this be in TrackedItemController.create() ?
 	@Secured(['ROLE_NCS_IT'])
 	def addItem = {
-		
+		if (debug) {
+			println "******************  NGP debug; I am in additem"
+		}
 		def batchInstance = Batch.read(params.id)
 		def trackedItemInstance = null
 		
@@ -562,6 +583,7 @@ class BatchController {
 		}
 	}
 	
+	// TODO: shouldn't this be in TrackedItemController?
 	private def getValidItems(batchId) {
 		def validItems = [:]
 		
@@ -576,6 +598,8 @@ class BatchController {
 	}
 
 	
+	// Data entry screen for batch dates
+	// "Recent Batches Status"
 	@Secured(['ROLE_NCS_RECEIPT'])
     def listByDate = {
 
@@ -606,6 +630,7 @@ class BatchController {
             batchInstanceList: batchInstanceList]
     }
 
+	// used by listByDate
 	@Secured(['ROLE_NCS_RECEIPT'])
     def editDates = {
         def batchInstance = Batch.get(params.id)
@@ -630,6 +655,7 @@ class BatchController {
         }
     }
 
+	// used by editDates
 	@Secured(['ROLE_NCS_RECEIPT'])
     def updateDates = {
         def batchInstance = Batch.get(params.id)
@@ -648,6 +674,7 @@ class BatchController {
 
             // check date order here
 
+			// This should be done via contstraints in the domain class.  DRY!  =)
             if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
                 batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
                     render(view: "editDates", model: [ batchInstance: batchInstance,
@@ -717,34 +744,4 @@ class BatchController {
             redirect(action: "list")
         }
     }
-
-	// used to get the full time range for a day when a java.util.Date is
-	// passed.  Example:
-	// Jan 3rd, 2011 2:34 PM ->
-	//     [startDate: "Jan 3rd, 2011 12:00 AM", endDate: "Jan 4th, 2011 12:00 AM" ]
-	private def getFullDayRange = { referenceDate ->
-
-		// default day is "Yesterday"
-
-		// Some start/end date voodoo
-
-		if ( referenceDate ) {
-			referenceDate = new LocalDate(referenceDate)
-		} else {
-			referenceDate = new LocalDate()
-			referenceDate = referenceDate.minusDays(1)
-		}
-
-		// we need a midnight time (for later on)
-		def midnight = new LocalTime(0, 0)
-
-		// get the midnight "LocalDate" and change it to a java.util.Date
-		def startDate = referenceDate.toDateTime(midnight).toCalendar().getTime()
-		// get the midnight + 1 "LocalDate" and change it to a java.util.Date
-		def endDate = referenceDate.plusDays(1).toDateTime(midnight).toCalendar().getTime()
-
-		// return the start and end Dates as a map.
-		return [ startDate: startDate
-			, endDate: endDate ]
-	}
 }
