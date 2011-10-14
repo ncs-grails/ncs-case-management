@@ -40,17 +40,14 @@ class BatchController {
             referenceDate = new LocalDate(referenceDate)
         }
 
-
         def startDate = referenceDate.toDateTime(midnight).toCalendar().getTime()
         def endDate = referenceDate.plusDays(1).toDateTime(midnight).toCalendar().getTime()
 		
         def c = Batch.createCriteria()
-
-        def batchInstanceList = c.list{
+		def batchInstanceList = c?.list{
             gt("dateCreated", startDate)
             lt("dateCreated", endDate)
         }
-
 
         [ referenceDate: startDate,
             batchInstanceList: batchInstanceList,
@@ -66,14 +63,6 @@ class BatchController {
 
 	@Secured(['ROLE_NCS_IT'])
 	def norcAlert = {
-		def referenceDate = params.referenceDate
-		def midnight = new LocalTime(0, 0)
-
-		if ( ! referenceDate ) {
-			referenceDate = new LocalDate()
-		} else {
-			referenceDate = new LocalDate(referenceDate)
-		}
 
 		// get the time range for yesterday (or whatever reference date)
 		def dateRange = emailService.getFullDayRange(params?.referenceDate)
@@ -108,8 +97,6 @@ class BatchController {
 				if (batchLinkInstance && ! batchLinkInstance.dateNorcNotified) {
 					// removing batch...
 					batchInstanceList.add(b)
-				} else {
-				
 				}
 			}
 		}
