@@ -30,6 +30,7 @@
 					<li id="report-admin">Report Admin</li>
 				</g:ifAnyGranted>
 				<li id="report">Reporting</li>
+				<li id="tools">Tools</li>
 				<li id="about">About</li>			
 			</ul>
 		</div>
@@ -105,8 +106,8 @@
 						<dd>Search for dwelling units, or people and view information
 						about them</dd>
 						
-						<dt><a href="https://secure.ncs.umn.edu/ncs-segment-lookup" target="_blank">Address Lookup</a></dt>
-						<dd>Look up the recruitment eligibility of an address (opens in a new tab)</dd>
+						<dt><a href="https://secure.ncs.umn.edu/ncs-segment-lookup" target="_blank">Segment Lookup</a></dt>
+						<dd>Look up the recruitment eligibility segment of an postal address (opens in a new tab)</dd>
 					</dl>
 				</div>
 								
@@ -202,6 +203,16 @@
 						</g:each>
 			        </dl>
 			
+				</div>
+
+				<div id="tools-tab">
+					<h1>Tools</h1>
+					<dl class="menu">
+						<dt><a href="https://secure.ncs.umn.edu/secure-mail/" target="_blank">Secure Messaging</a></dt>
+							<dd>Send messages securely.  If you need to send private or confidential information
+							either inside of a message or as an attachment, this is a rather simple solution.  You
+							can send a message to any individual as long as they have an email address.</dd>
+					</dl>
 				</div>
 				
 				<div id="about-tab">
