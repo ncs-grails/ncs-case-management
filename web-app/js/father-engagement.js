@@ -1,5 +1,5 @@
 
-var debug = false;
+var debug = true;
 
 $(document).ready(function(){
 	if (debug) {
@@ -92,7 +92,7 @@ $(document).ready(function(){
         else {
         	$('#person-info').hide();        	
         }
-        
+        return false;
     });
 	
 });
@@ -113,6 +113,7 @@ function validateForm() {
 }
 
 //Disable form submit on ENTER key press
+/*
 function stopRKey(evt) {
   var evt = (evt) ? evt : ((event) ? event : null);
   var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
@@ -122,3 +123,4 @@ function stopRKey(evt) {
 }
 
 document.onkeypress = stopRKey;
+ */

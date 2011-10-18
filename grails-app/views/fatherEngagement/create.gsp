@@ -27,16 +27,35 @@
 		<div id="errorDiv" class="errors">
 			<label id="errorLabel"></label>
 		</div>
-		
-		<g:form action="save" method="post" onsubmit="return validateForm();" >
-			<div class="dialog">
 
+		<div id="formContainer" >		
+			<g:form>	
+				<div class="prop">
+				    <span class="name">
+				        <label for="trackedItemId">Tracked Item ID</label>
+				    </span>
+				    <span class="value">
+				    	<g:textField name="trackedItemId" value="" />
+				    	<g:submitToRemote value="Find"
+				    		url="[controller:'fatherEngagement', action:'updatePersonInfo']"
+				    		update="formContainer"
+				    		onSuccess="showPersonInfo()"
+				    		onFailure="" />
+				    </span>		
+				</div>
+			</g:form>
+		</div>		
+
+		<%--
+		<g:form action="save" method="post" onsubmit="return validateForm();" >
+			<g:hiddenField name="trackedItem" value="" />
+
+			<div class="dialog">
 				<div id="person-info" class="prop">
 				    <span class="name">
 				        <label for="personInfo">Participant Name (mother)</label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'trackedItem', 'errors')}">
-				        <%--<label id="person-info-status" for="personInfo"></label> --%>
 						<div id="resultLog" class="grid_12" ></div>
 				    </span>
 				</div>
@@ -48,7 +67,7 @@
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'trackedItem', 'errors')}">
 				    	<g:textField name="trackedItem" value="" />
 				    </span>
-				</div>
+				</div>  
 				
 				<div class="prop">
 				    <span class="name">
@@ -68,14 +87,14 @@
 				    </span>
 				</div>
 				
-				<%--<div class="prop">
+				<div class="prop">
 				    <span class="name">
 				        <label for="interviewDate"><g:message code="fatherEngagement.interviewDate.label" default="Interview Date" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewDate', 'errors')}">
 				        <g:datePicker name="interviewDate" precision="day" value="${fatherEngagementInstance?.interviewDate}" noSelection="['': '']" />
 				    </span>
-				</div>  --%>
+				</div>
 				
 				<div class="prop">
 				    <span class="name">
@@ -122,7 +141,7 @@
             
 		<g:form action="getPersonInfo" name="personInfoForm">
 			<g:hiddenField name="trackedItemInstance" value="${trackedItem}" />
-		</g:form>
+		</g:form>--%>
 		
 	</div>
 </body>

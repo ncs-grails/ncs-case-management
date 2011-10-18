@@ -12,7 +12,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class FatherEngagementController {
     def fatherEngagementDataBuilderService
-	def debug = false
+	def debug = true
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -133,7 +133,7 @@ class FatherEngagementController {
         }
     }
 	
-	def getPersonInfo = {
+	def updatePersonInfo = {
 		if (debug) {
 			println "Getting person info..."
 		}
@@ -152,19 +152,20 @@ class FatherEngagementController {
 			trackedItemId: "",
 			divId: 0,
 			person: null,
-			fullName: null,
+			fullname: null,
 			resultName: false,
 			errorText: ""
 		]
 
 		// if a div ID was passed, let's save it to the result set
-		if (params?.divId) {
+		/*if (params?.divId) {
 			result.divId = params.divId
-		}
+		}*/
 
 		if (debug) {
-			println "params::trackedItem::${params?.trackedItemInstance}"				
+			println "params::trackedItem::${params?.trackedItemId}"				
 		}
+		/*
 		if (params?.id){
 			def barcodeValue = params.id
 			// Check if it has I infront. If yes remove the "I" and proceed
@@ -195,9 +196,26 @@ class FatherEngagementController {
 			// invalid tracked item!
 			result.errorText = "Invalid tracked item id"
 		}
+		*/
+		
+		def trackedItemInstance = TrackedItem.read(params?.trackedItemId.toLong())
+		if (trackedItemInstance) {
+			// we have an item
+			result.success = true
+			result.trackedItemId = trackedItemInstance.id
+			result.person = trackedItemInstance?.person
+			result.fullname = trackedItemInstance?.person.fullName
+			result.resultName = "Found tracked item"
+		} else {
+			result.errorText = "Tracked Item does not exist!"
+		}
 
-		render result as JSON
-
+		//render result as JSON
+		if (debug) {
+			println "result::${result}"
+		}
+		
+		render(template:'consentForm', model:[result:result])
 	}
 	
 	// this sends a CSV file to the user on the other end
