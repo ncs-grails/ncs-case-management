@@ -13,7 +13,7 @@
 	<div class="nav">
 		<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
 		<span class="menuButton"><g:link class="list" action="list">Father Engagement Form List</g:link></span>
-		<span class="menuButton"><g:link class="create" action="create">New Father Engagement Form</g:link></span>
+		<span class="menuButton"><g:link class="create" action="create">Enter Father Engagement Form</g:link></span>
 	</div>
 	<div class="body">
 		<h1>Edit Father Engagement Form</h1>
@@ -27,6 +27,7 @@
 		<g:form method="post" >			
 			<g:hiddenField name="id" value="${fatherEngagementInstance?.id}" />
 			<g:hiddenField name="version" value="${fatherEngagementInstance?.version}" />
+			<g:hiddenField name="interviewDate" value="${fatherEngagementInstance?.interviewDate}" />
 			<div class="dialog">
 				
 				<div class="prop">
@@ -62,7 +63,7 @@
 				      <label for="interviewEndTime"><g:message code="fatherEngagement.interviewEndTime.label" default="Interview End Time" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewEndTime', 'errors')}">
-				        <g:datePicker name="interviewEndTime" precision="minute" value="${fatherEngagementInstance?.interviewStartTime}" noSelection="['': '']" />
+				        <g:datePicker name="interviewEndTime" precision="minute" value="${fatherEngagementInstance?.interviewEndTime}" noSelection="['': '']" />
 				    </span>
 				</div>
 				
@@ -74,6 +75,29 @@
 				        <g:datePicker name="interviewDate" precision="day" value="${fatherEngagementInstance?.interviewDate}" noSelection="['': '']" />
 				    </span>
 				</div> --%>
+				
+				<div class="prop">
+				    <span class="name">
+				        <label for="interviewerInitials"><g:message code="fatherEngagement.interviewerInitials.label" default="Interviewer Initials" /></label>
+				    </span>
+				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewerInitials', 'errors')}">
+				        <g:textField name="interviewerInitials" value="${fatherEngagementInstance?.interviewerInitials}" />
+				    </span>
+				</div>
+		
+				<div class="prop">
+				    <span class="name">
+				        <label for="interviewer"><g:message code="fatherEngagement.interviewer.label" default="Interviewer" /></label>
+				    </span>
+				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewer', 'errors')}">
+				        <%--<g:textField name="interviewer" value="${fatherEngagementInstance?.interviewer}" /> --%>
+				        <g:select name="interviewer"
+				        	from='${memberInstanceList}'
+				        	optionKey="username"
+				        	optionValue="displayName"
+				        	value="${fatherEngagementInstance?.interviewer}" />
+				    </span>
+				</div>
 				
 				<div class="prop">
 				    <span class="name">

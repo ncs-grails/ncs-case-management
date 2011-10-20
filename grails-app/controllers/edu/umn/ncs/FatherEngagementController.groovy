@@ -2,7 +2,9 @@ package edu.umn.ncs
 
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
-
+import org.joda.time.LocalDate
+import org.joda.time.LocalTime
+import edu.umn.ad.DirectoryService
 // Let's us use security annotations
 import grails.converters.*
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
@@ -12,6 +14,8 @@ import grails.plugin.springcache.annotations.CacheFlush
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class FatherEngagementController {
     def fatherEngagementDataBuilderService
+	def directoryService
+	
 	def debug = true
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -28,7 +32,8 @@ class FatherEngagementController {
     def create = {
         def fatherEngagementInstance = new FatherEngagement()
         fatherEngagementInstance.properties = params
-        return [fatherEngagementInstance: fatherEngagementInstance]
+		
+        return [fatherEngagementInstance: fatherEngagementInstance ]
     }
 
     def save = {
@@ -41,18 +46,73 @@ class FatherEngagementController {
 				def fatherEngagementInstance = new FatherEngagement(params)
 				
 				def interviewDate = null
-				if (params.interviewStartTime) {
-					interviewDate = params.interviewStartTime
-				}
-				fatherEngagementInstance.interviewDate = interviewDate
-				
-				if (fatherEngagementInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.created.message', args: [message(code: 'fatherEngagement.label', default: 'FatherEngagement'), fatherEngagementInstance.id])}"
-					redirect(action: "show", id: fatherEngagementInstance.id)
+				def localStartDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
+				def localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+				def localStartTime = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalTime()
+				def localEndTime = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalTime()
+				def localDate = new DateTime().toLocalDate()
+	
+				if (localStartDate && localEndDate) {
+					// Set the interview date 
+					interviewDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
+					fatherEngagementInstance.interviewDate = interviewDate
+					if (debug) {
+						println "localStartDate::${localStartDate}"
+						println "localEndDate::${localEndDate}"
+						println "date_diff::${localStartDate.compareTo(localEndDate)}"
+					}
+	
+					// Verify that start date/time is not in the future
+					if (localStartDate.compareTo(localDate) < 1) {
+						// Verify that end date/time is not in the future
+						localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+						if (localEndDate.compareTo(localDate) < 1) {
+							if (debug) {
+								println "localStartTime::${localStartTime}"
+								println "localEndTime::${localEndTime}"
+								println "time_diff::${localEndTime.compareTo(localStartTime)}"
+							}
+							// compare dates for interview start and end times
+							if (localStartDate.compareTo(localEndDate) == 0) {
+								// compare start and end times (end time should be greater)
+								if (localEndTime.compareTo(localStartTime) > 0) {								
+									if (fatherEngagementInstance.save(flush: true)) {
+										if (debug) {
+											println "Saving father engagement"
+										}
+										flash.message = "Father Engagement Form Saved"
+										redirect(action: "edit", id: fatherEngagementInstance.id)
+									}
+									else {
+										render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+									}
+								}
+								else {
+									flash.message = "Interview start and end times are not consistent. Please review."
+									render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+								}
+							}
+							else {
+								flash.message = "Dates for interview start and end times are not equal. Please review."
+								render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+							}		
+						}
+						else {
+							// Stop if interview date is greater than current date
+							flash.message = "Invalid Interview End Time. Please review."
+							render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+						}	
+					}
+					else {
+						// Stop if interview date is greater than current date
+						flash.message = "Invalid Interview Start Time. Please review."
+						render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+					}
 				}
 				else {
+					flash.message = "Please enter interview start and end times. Please review."
 					render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
-				}		
+				}
 			}
 			else {
 				flash.message = "Tracked item ${params.trackedItem} not found."
@@ -83,7 +143,12 @@ class FatherEngagementController {
             redirect(action: "list")
         }
         else {
-            return [fatherEngagementInstance: fatherEngagementInstance]
+			// Get NCS group members for list of interviewers
+			def groupName = "EnHS-NCS"
+			def groupDescription = directoryService.loadUsersByGroupname(groupName)
+			def memberInstanceList = directoryService.getMembers()
+			
+            return [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName } ]
         }
     }
 
@@ -100,13 +165,77 @@ class FatherEngagementController {
                 }
             }
             fatherEngagementInstance.properties = params
-            if (!fatherEngagementInstance.hasErrors() && fatherEngagementInstance.save(flush: true)) {
-                flash.message = "${message(code: 'default.updated.message', args: [message(code: 'fatherEngagement.label', default: 'FatherEngagement'), fatherEngagementInstance.id])}"
-                redirect(action: "show", id: fatherEngagementInstance.id)
-            }
-            else {
-                render(view: "edit", model: [fatherEngagementInstance: fatherEngagementInstance])
-            }
+
+			def interviewDate = new DateTime(fatherEngagementInstance?.interviewDate).toLocalDate()
+			def localStartDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
+			def localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+			def localStartTime = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalTime()
+			def localEndTime = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalTime()
+			def localDate = new DateTime().toLocalDate()
+
+			if (localStartDate && localEndDate) {
+				if (debug) {
+					println "localStartDate::${localStartDate}"
+					println "localEndDate::${localEndDate}"
+					println "date_diff::${localStartDate.compareTo(localEndDate)}"
+				}
+
+				// update the interview date if necessary
+				if (localStartDate.compareTo(interviewDate) != 0) {
+					fatherEngagementInstance.interviewDate = fatherEngagementInstance?.interviewStartTime
+				}				
+
+				// Verify that start date/time is not in the future
+				if (localStartDate.compareTo(localDate) < 1) {
+					// Verify that end date/time is not in the future
+					localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+					if (localEndDate.compareTo(localDate) < 1) {
+						if (debug) {
+							println "localStartTime::${localStartTime}"
+							println "localEndTime::${localEndTime}"
+							println "time_diff::${localEndTime.compareTo(localStartTime)}"
+						}
+						// compare dates for interview start and end times
+						if (localStartDate.compareTo(localEndDate) == 0) {
+							// compare start and end times (end time should be greater)
+							if (localEndTime.compareTo(localStartTime) > 0) {								
+								if (!fatherEngagementInstance.hasErrors() && fatherEngagementInstance.save(flush: true)) {
+									if (debug) {
+										println "Updating father engagement"
+									}
+									flash.message = "Father Engagement Form Updated"
+									redirect(action: "edit", id: fatherEngagementInstance.id)
+								}
+								else {
+									render(view: "edit", model: [fatherEngagementInstance: fatherEngagementInstance])
+								}
+							}
+							else {
+								flash.message = "Interview start and end times are not consistent. Please review."
+								redirect(action: "edit", id: fatherEngagementInstance.id)
+							}
+						}
+						else {
+							flash.message = "Dates for interview start and end times are not equal. Please review."
+							redirect(action: "edit", id: fatherEngagementInstance.id)
+						}		
+					}
+					else {
+						// Stop if interview date is greater than current date
+						flash.message = "Invalid Interview End Time. Please review."
+						redirect(action: "edit", id: fatherEngagementInstance.id)
+					}	
+				}
+				else {
+					// Stop if interview date is greater than current date
+					flash.message = "Invalid Interview Start Time. Please review."
+					redirect(action: "edit", id: fatherEngagementInstance.id)
+				}
+			}
+			else {
+				flash.message = "Please enter interview start and end times. Please review."
+				redirect(action: "edit", id: fatherEngagementInstance.id)
+			}
         }
         else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'fatherEngagement.label', default: 'FatherEngagement'), params.id])}"
@@ -154,49 +283,18 @@ class FatherEngagementController {
 			person: null,
 			fullname: null,
 			resultName: false,
+			memberInstanceList: [:],
 			errorText: ""
 		]
 
-		// if a div ID was passed, let's save it to the result set
-		/*if (params?.divId) {
-			result.divId = params.divId
-		}*/
+		// Get NCS group members for list of interviewers
+		def groupName = "EnHS-NCS"
+		def groupDescription = directoryService.loadUsersByGroupname(groupName)
+		def memberInstanceList = directoryService.getMembers()
 
 		if (debug) {
 			println "params::trackedItem::${params?.trackedItemId}"				
 		}
-		/*
-		if (params?.id){
-			def barcodeValue = params.id
-			// Check if it has I infront. If yes remove the "I" and proceed
-			def id = null
-            if (barcodeValue[0].toUpperCase() == "I") {
-                id = barcodeValue.replace("I", "")
-            }
-			else {
-				id = params.id
-			}
-			def trackedItemInstance = TrackedItem.read(id.toLong())
-			if (debug) {
-				println "trackedItem::${trackedItemInstance}"				
-			}
-			if (trackedItemInstance) {
-				// we have an item
-				result.success = true
-	
-				result.trackedItemId = trackedItemInstance.id
-				result.person = trackedItemInstance?.person
-				result.fullName = trackedItemInstance?.person.fullName
-				result.resultName = "Found tracked item"
-
-			} else {
-				result.errorText = "Tracked Item does not exist!"
-			}
-		} else {
-			// invalid tracked item!
-			result.errorText = "Invalid tracked item id"
-		}
-		*/
 		
 		def trackedItemInstance = TrackedItem.read(params?.trackedItemId.toLong())
 		if (trackedItemInstance) {
@@ -205,6 +303,7 @@ class FatherEngagementController {
 			result.trackedItemId = trackedItemInstance.id
 			result.person = trackedItemInstance?.person
 			result.fullname = trackedItemInstance?.person.fullName
+			result.memberInstanceList = memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }
 			result.resultName = "Found tracked item"
 		} else {
 			result.errorText = "Tracked Item does not exist!"

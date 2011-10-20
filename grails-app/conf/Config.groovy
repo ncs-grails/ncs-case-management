@@ -141,3 +141,15 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
 
+// configuration settings for edu.umn.ad.DirectoryService
+umnad {
+	ldapUri = 'ldap://localhost'
+	ldapUserDn = 'enhs-hs-svc-grails@ad.umn.edu'
+	ldapUserPw = 'aeb8moshiCaiquei'
+	ldapPeopleBaseDn = 'OU=People,DC=ad,DC=umn,DC=edu'
+	ldapGroupsBaseDn = 'ou=Groups,ou=ENHS,ou=SPH,ou=Medical,ou=TC,ou=Units,dc=ad,dc=umn,dc=edu'
+	ldapMemberAttribute = 'member'
+	ldapMemberOfAttribute = 'memberOf'
+	rolePrefix = 'EnHS-'
+	roleSuffix = ''
+}
