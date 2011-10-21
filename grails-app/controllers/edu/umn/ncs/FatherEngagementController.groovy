@@ -16,7 +16,7 @@ class FatherEngagementController {
     def fatherEngagementDataBuilderService
 	def directoryService
 	
-	def debug = true
+	def debug = false
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -41,84 +41,92 @@ class FatherEngagementController {
 			// Get the tracked item
 			def trackedItemInstance = TrackedItem.read(params.trackedItem.toLong())
 			if (trackedItemInstance) {
-				params.trackedItem = trackedItemInstance
-				
-				def fatherEngagementInstance = new FatherEngagement(params)
-				
-				def interviewDate = null
-				def localStartDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
-				def localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
-				def localStartTime = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalTime()
-				def localEndTime = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalTime()
-				def localDate = new DateTime().toLocalDate()
-	
-				if (localStartDate && localEndDate) {
-					// Set the interview date 
-					interviewDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
-					fatherEngagementInstance.interviewDate = interviewDate
-					if (debug) {
-						println "localStartDate::${localStartDate}"
-						println "localEndDate::${localEndDate}"
-						println "date_diff::${localStartDate.compareTo(localEndDate)}"
-					}
-	
-					// Verify that start date/time is not in the future
-					if (localStartDate.compareTo(localDate) < 1) {
-						// Verify that end date/time is not in the future
-						localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
-						if (localEndDate.compareTo(localDate) < 1) {
-							if (debug) {
-								println "localStartTime::${localStartTime}"
-								println "localEndTime::${localEndTime}"
-								println "time_diff::${localEndTime.compareTo(localStartTime)}"
-							}
-							// compare dates for interview start and end times
-							if (localStartDate.compareTo(localEndDate) == 0) {
-								// compare start and end times (end time should be greater)
-								if (localEndTime.compareTo(localStartTime) > 0) {								
-									if (fatherEngagementInstance.save(flush: true)) {
-										if (debug) {
-											println "Saving father engagement"
+				// Determine if a father engagement form already exists for this form
+				def fatherEngagementInstance = FatherEngagement.findByTrackedItem(trackedItemInstance)
+				if (!fatherEngagementInstance) {
+					params.trackedItem = trackedItemInstance
+					
+					fatherEngagementInstance = new FatherEngagement(params)
+					
+					def interviewDate = null
+					def localStartDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
+					def localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+					def localStartTime = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalTime()
+					def localEndTime = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalTime()
+					def localDate = new DateTime().toLocalDate()
+		
+					if (localStartDate && localEndDate) {
+						// Set the interview date 
+						fatherEngagementInstance.interviewDate = fatherEngagementInstance?.interviewStartTime
+						interviewDate = new DateTime(fatherEngagementInstance?.interviewStartTime).toLocalDate()
+						if (debug) {
+							println "localStartDate::${localStartDate}"
+							println "localEndDate::${localEndDate}"
+							println "date_diff::${localStartDate.compareTo(localEndDate)}"
+						}
+		
+						// Verify that start date/time is not in the future
+						if (localStartDate.compareTo(localDate) < 1) {
+							// Verify that end date/time is not in the future
+							localEndDate = new DateTime(fatherEngagementInstance?.interviewEndTime).toLocalDate()
+							if (localEndDate.compareTo(localDate) < 1) {
+								if (debug) {
+									println "localStartTime::${localStartTime}"
+									println "localEndTime::${localEndTime}"
+									println "time_diff::${localEndTime.compareTo(localStartTime)}"
+								}
+								// compare dates for interview start and end times
+								if (localStartDate.compareTo(localEndDate) == 0) {
+									// compare start and end times (end time should be greater)
+									if (localEndTime.compareTo(localStartTime) > 0) {								
+										if (fatherEngagementInstance.save(flush: true)) {
+											if (debug) {
+												println "Saving father engagement"
+											}
+											flash.message = "Father Engagement Form Saved"
+											redirect(action: "edit", id: fatherEngagementInstance.id)
 										}
-										flash.message = "Father Engagement Form Saved"
-										redirect(action: "edit", id: fatherEngagementInstance.id)
+										else {
+											render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+										}
 									}
 									else {
+										flash.message = "Interview start and end times are not consistent. Please review."
 										render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
 									}
 								}
 								else {
-									flash.message = "Interview start and end times are not consistent. Please review."
+									flash.message = "Dates for interview start and end times are not equal. Please review."
 									render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
-								}
+								}		
 							}
 							else {
-								flash.message = "Dates for interview start and end times are not equal. Please review."
+								// Stop if interview date is greater than current date
+								flash.message = "Invalid Interview End Time. Please review."
 								render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
-							}		
+							}	
 						}
 						else {
 							// Stop if interview date is greater than current date
-							flash.message = "Invalid Interview End Time. Please review."
+							flash.message = "Invalid Interview Start Time. Please review."
 							render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
-						}	
+						}
 					}
 					else {
-						// Stop if interview date is greater than current date
-						flash.message = "Invalid Interview Start Time. Please review."
+						flash.message = "Please enter interview start and end times. Please review."
 						render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
 					}
 				}
 				else {
-					flash.message = "Please enter interview start and end times. Please review."
-					render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+					flash.message = "A father engagement form already exists for this item."
+					redirect(action: "edit", id: fatherEngagementInstance.id)
 				}
 			}
 			else {
 				flash.message = "Tracked item ${params.trackedItem} not found."
-				redirect(action: "list")	
-			}
-		}		
+				redirect(action: "list")
+			}		
+		}
         else {
             flash.message = "No tracked item specified."
             redirect(action: "list")
@@ -298,15 +306,36 @@ class FatherEngagementController {
 		
 		def trackedItemInstance = TrackedItem.read(params?.trackedItemId.toLong())
 		if (trackedItemInstance) {
-			// we have an item
-			result.success = true
-			result.trackedItemId = trackedItemInstance.id
-			result.person = trackedItemInstance?.person
-			result.fullname = trackedItemInstance?.person.fullName
-			result.memberInstanceList = memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }
-			result.resultName = "Found tracked item"
+			if (trackedItemInstance?.person) {
+				// Check to see if this person already has a father engagement form
+				def trackedItemList = TrackedItem.findAllByPerson(trackedItemInstance?.person)
+				def fatherEngagementInstance = null
+				trackedItemList.each {
+					if (FatherEngagement.findByTrackedItem(it)) {
+						fatherEngagementInstance = it
+					}
+				}
+				// we have an item
+				result.success = true
+				result.trackedItemId = trackedItemInstance.id
+				result.person = trackedItemInstance?.person
+				result.fullname = trackedItemInstance?.person.fullName
+				result.memberInstanceList = memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }
+				result.resultName = "Found tracked item"
+				if (fatherEngagementInstance) {
+					result.errorText = "A father engagement form has already been entered for ${trackedItemInstance?.person}"
+					render(template:'consentErrorForm', model:[result:result])
+					return false
+				}
+			}
+			else {
+				result.errorText = "No person associated with this tracked item"
+				render(template:'consentErrorForm', model:[result:result])
+				return false
+			}
 		} else {
-			result.errorText = "Tracked Item does not exist!"
+			render "Tracked Item does not exist!"
+			return false
 		}
 
 		//render result as JSON

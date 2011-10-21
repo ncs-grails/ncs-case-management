@@ -32,29 +32,28 @@
 				
 				<div class="prop">
 				    <span class="name">
-				      <label for="trackedItem"><g:message code="fatherEngagement.trackedItem.label" default="Lookup Mother" /></label>
+				      <label for="trackedItem"><g:message code="fatherEngagement.trackedItem.label" default="Participant (Mother)" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'trackedItem', 'errors')}">
 				        <g:link controller="person" action="show" id="${fatherEngagementInstance?.trackedItem?.person.id}" >${fatherEngagementInstance?.trackedItem?.person}</g:link>
-				        <%--<g:link controller="trackedItem" action="show" id="${fatherEngagementInstance?.trackedItem?.id}" >${fatherEngagementInstance?.trackedItem?.id}</g:link> --%>
 				    </span>
 				</div>
 				
-				<%--<div class="prop">
+				<div class="prop">
 				    <span class="name">
 				      <label for="trackedItem"><g:message code="fatherEngagement.trackedItem.label" default="Tracked Item ID" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'trackedItem', 'errors')}">
 				        <g:link controller="trackedItem" action="show" id="${fatherEngagementInstance?.trackedItem?.id}" >${fatherEngagementInstance?.trackedItem?.id}</g:link>
 				    </span>
-				</div>  --%>
+				</div>
 				
 				<div class="prop">
 				    <span class="name">
 				      <label for="interviewStartTime"><g:message code="fatherEngagement.interviewStartTime.label" default="Interview Start Time" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewStartTime', 'errors')}">
-				        <g:datePicker name="interviewStartTime" precision="minute" value="${fatherEngagementInstance?.interviewStartTime}" noSelection="['': '']" />
+				        <g:datePicker name="interviewStartTime" precision="minute" value="${fatherEngagementInstance?.interviewStartTime}" noSelection="['': '']" years="${2010..2050}" />
 				    </span>
 				</div>
 				
@@ -63,7 +62,7 @@
 				      <label for="interviewEndTime"><g:message code="fatherEngagement.interviewEndTime.label" default="Interview End Time" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewEndTime', 'errors')}">
-				        <g:datePicker name="interviewEndTime" precision="minute" value="${fatherEngagementInstance?.interviewEndTime}" noSelection="['': '']" />
+				        <g:datePicker name="interviewEndTime" precision="minute" value="${fatherEngagementInstance?.interviewEndTime}" noSelection="['': '']" years="${2010..2050}" />
 				    </span>
 				</div>
 				

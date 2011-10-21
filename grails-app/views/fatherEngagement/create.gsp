@@ -14,6 +14,7 @@
 	<div class="nav">
 		<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
 		<span class="menuButton"><g:link class="list" action="list">Father Engagement Form List</g:link></span>
+		<span class="menuButton"><g:link class="create" action="create">Enter Father Engagement Form</g:link></span>
 	</div>
 	<div class="body">
 		<h1>Enter Father Engagement Form</h1>
@@ -23,12 +24,12 @@
 		<g:hasErrors bean="${fatherEngagementInstance}">
 			<div class="errors"><g:renderErrors bean="${fatherEngagementInstance}" as="list" /></div>
 		</g:hasErrors>
-		
-		<div id="notFound" class="errors">
-			<label id="errorLabel">Item Not Found</label>
-		</div>
 
 		<div id="searching" ><strong>Searching</strong> <img src="../images/spinner.gif" title="spinner" /></div>
+		
+		<div id="notFound" class="errors">
+			<label id="errorLabel">${result?.errorText}</label>
+		</div>
 		
 		<div id="formContainer" >		
 			<g:form>	
@@ -44,7 +45,7 @@
 				    		onLoading="showSearching()"
 				    		onComplete="hideSearching()"
 				    		onSuccess=""
-				    		onFailure="showNotFound()" />
+				    		onFailure="showFailure()" />
 				    </span>		
 				</div>
 			</g:form>

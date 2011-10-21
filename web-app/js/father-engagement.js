@@ -27,17 +27,19 @@ function validateForm() {
 }
 
 function showSearching() {
+	$('#formContainter').removeClass('errors');
 	$('#notFound').hide();
 	$('#searching').show();	
 }
 
 function hideSearching() {
-	$('#searching').hide();	
+	$('#searching').hide();
 }
 
-function showNotFound() {
+function showFailure() {
 	$('#notFound').show();	
 }
+
 //Disable form submit on ENTER key press
 function stopRKey(evt) {
   var evt = (evt) ? evt : ((event) ? event : null);

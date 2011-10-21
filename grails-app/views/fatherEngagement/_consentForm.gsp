@@ -9,7 +9,7 @@
 	    	<g:textField name="trackedItemId" value="${result?.trackedItemId}" />
 	    	<g:submitToRemote url="[controller:'fatherEngagement', action:'updatePersonInfo']" 
 	    		onSuccess="" 
-	    		onFailure="showNotFound()" 
+	    		onFailure="showFailure()" 
 	    		onLoading="showSearching()"
 	    		onComplete="hideSearching()"
 	    		update="formContainer"
@@ -54,7 +54,7 @@
 		        <label for="interviewStartTime"><g:message code="fatherEngagement.interviewStartTime.label" default="Interview Start Time" /></label>
 		    </span>
 		    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewStartTime', 'errors')}">
-		        <g:datePicker name="interviewStartTime" precision="minute" value="${fatherEngagementInstance?.interviewStartTime}" noSelection="['': '']" />
+		        <g:datePicker name="interviewStartTime" precision="minute" value="${fatherEngagementInstance?.interviewStartTime}" noSelection="['': '']" years="${2010..2050}" />
 		    </span>
 		</div>
 		
@@ -63,7 +63,7 @@
 		        <label for="interviewEndTime"><g:message code="fatherEngagement.interviewEndTime.label" default="Interview End Time" /></label>
 		    </span>
 		    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewEndTime', 'errors')}">
-		        <g:datePicker name="interviewEndTime" precision="minute" default="none" noSelection="['null': '--']" />
+		        <g:datePicker name="interviewEndTime" precision="minute" years="${2010..2050}" />
 		    </span>
 		</div>
 		
