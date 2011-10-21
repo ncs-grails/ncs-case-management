@@ -5,7 +5,8 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_PROTECTED'])
 class IncentiveController {
-
+	def authenticateService
+	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -28,6 +29,49 @@ class IncentiveController {
             render(view: "create", model: [incentiveInstance: incentiveInstance])
         }
     }
+	
+    def createAppointmentIncentive = {
+        def incentiveInstance = new Incentive()
+        incentiveInstance.properties = params
+		def appointmentInstance = Appointment.read(params.appointment.id)
+        return [incentiveInstance: incentiveInstance, appointmentInstance: appointmentInstance]
+    }
+
+	def saveAppointmentIncentive = {
+		def username = authenticateService.principal().getUsername()
+		// Get the appointment
+		def appointmentInstance = Appointment.get(params?.appointment.id)
+		if (appointmentInstance) {
+			def incentiveInstance = new Incentive(params)
+			// Set the incentive date equal to the appointment date
+			incentiveInstance.incentiveDate = appointmentInstance?.startTime
+			// Set provenance data
+			incentiveInstance.userCreated = username
+			incentiveInstance.userUpdated = username
+			if (incentiveInstance.save(flush: true)) {
+				// Link the appointment to the incentive
+				def appointmentIncentive = new AppointmentIncentive(incentive:incentiveInstance,appointment:appointmentInstance).save(flush:true)
+				// Update the appointment with the new incentive
+				if (appointmentIncentive) {
+					appointmentInstance.addToIncentives(appointmentIncentive)
+					appointmentInstance.save(flush:true)
+					flash.message = "${message(code: 'default.created.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
+					redirect(controller:"appointment", action: "edit", id: appointmentInstance.id)
+				}
+				else {
+					flash.message = "Unable to link the incentive to the appointment"
+					redirect(controller:"appointment", action: "edit", id: appointmentInstance.id)
+				}
+			}
+			else {
+				render(view: "createAppointmentIncentive", model: [incentiveInstance: incentiveInstance, appointmentInstance:appointmentInstance])
+			}
+		}
+		else {
+			flash.message = "Appointment not found with id ${params?.appointment.id}"
+			redirect(controller:"mainMenu")
+		}
+	}
 
     def edit = {
         def incentiveInstance = Incentive.get(params.id)
