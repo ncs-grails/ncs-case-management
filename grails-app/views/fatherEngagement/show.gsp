@@ -36,23 +36,37 @@
 			</div>
 			
 			<div class="prop">
-			    <span class="name"><g:message code="fatherEngagement.interviewDate.label" default="Interview Date" /></span>
+			    <span class="name"><g:message code="fatherEngagement.interviewerInitials.label" default="Interviewer Initials" /></span>
 			    
-			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewDate}" format="MM/dd/yyyy" /></span>
+			    <span class="value">${fatherEngagementInstance?.interviewerInitials}</span>
 			    
 			</div>
 			
 			<div class="prop">
+			    <span class="name"><g:message code="fatherEngagement.interviewer.label" default="Interviewer" /></span>
+			    
+			    <span class="value">${fatherEngagementInstance?.interviewer}</span>
+			    
+			</div>
+			
+			<%--<div class="prop">
+			    <span class="name"><g:message code="fatherEngagement.interviewDate.label" default="Interview Date" /></span>
+			    
+			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewDate}" format="MM/dd/yyyy" /></span>
+			    
+			</div> --%>
+			
+			<div class="prop">
 			    <span class="name"><g:message code="fatherEngagement.interviewStartTime.label" default="Interview Start Time" /></span>
 			    
-			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewStartTime}" format="h:mm a" /></span>
+			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewStartTime}" format="MM/dd/yyyy h:mm a" /></span>
 			    
 			</div>
 			
 			<div class="prop">
 			    <span class="name"><g:message code="fatherEngagement.interviewEndTime.label" default="Interview End Time" /></span>
 			    
-			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewEndTime}" format="h:mm a" /></span>
+			    <span class="value"><g:formatDate date="${fatherEngagementInstance?.interviewEndTime}" format="MM/dd/yyyy h:mm a" /></span>
 			    
 			</div>
 			

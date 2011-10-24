@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 @Secured(['ROLE_NCS_PROTECTED'])
 class IncentiveController {
 	def authenticateService
+	def debug = false
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -84,6 +85,18 @@ class IncentiveController {
         }
     }
 
+    def editAppointmentIncentive = {
+        def incentiveInstance = Incentive.get(params.id)
+        if (!incentiveInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'incentive.label', default: 'Incentive'), params.id])}"
+			redirect(controller:"appointment", action: "index")
+        }
+        else {
+			def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
+            return [incentiveInstance: incentiveInstance, appointmentIncentiveInstance: appointmentIncentiveInstance]
+        }
+    }
+
     def update = {
         def incentiveInstance = Incentive.get(params.id)
         if (incentiveInstance) {
@@ -110,16 +123,68 @@ class IncentiveController {
 			redirect(controller:"appointment", action: "index")
         }
     }
+	
+	def updateAppointmentIncentive = {
+		def incentiveInstance = Incentive.get(params.id)
+		if (incentiveInstance) {
+			if (params.version) {
+				def version = params.version.toLong()
+				if (incentiveInstance.version > version) {
+					
+					incentiveInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'incentive.label', default: 'Incentive')] as Object[], "Another user has updated this Incentive while you were editing")
+					render(view: "edit", model: [incentiveInstance: incentiveInstance])
+					return
+				}
+			}
+			incentiveInstance.properties = params
+			
+			def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
+			if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
+				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
+				redirect(controller:"appointment", action: "edit", id: appointmentIncentiveInstance.appointment.id)
+			}
+			else {
+				render(view: "edit", model: [incentiveInstance: incentiveInstance, appointmentIncentiveInstance: appointmentIncentiveInstance])
+			}
+		}
+		else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'incentive.label', default: 'Incentive'), params.id])}"
+			redirect(controller:"appointment", action: "index")
+		}
+	}
 
     def delete = {
         def incentiveInstance = Incentive.get(params.id)
         if (incentiveInstance) {
             try {
-				def appointmentInstance = incentiveInstance.appointment
+				def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
+				def appointmentId = appointmentIncentiveInstance?.appointment?.id
+				if (debug) {
+					println "appointmentId::${appointmentId}"
+				}
+				if (appointmentIncentiveInstance) {
+					def appointmentInstance = Appointment.get(appointmentId)
+					if (debug) {
+						println "appointmentInstance::${appointmentInstance}"
+					}
+					// Remove incentive link from the appointment
+					appointmentInstance.removeFromIncentives(appointmentIncentiveInstance)
+					appointmentInstance.save()
+					if (debug) {
+						println "Removed incentive from appointment"
+					}
+					appointmentIncentiveInstance.delete()					
+					if (debug) {
+						println "Deleted appointment incentive"
+					}
+				}
                 incentiveInstance.delete(flush: true)
+				if (debug) {
+					println "Deleted incentive"
+				}
                 flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'incentive.label', default: 'Incentive'), params.id])}"
 				
-				redirect(controller:"appointment", action: "edit", id: appointmentInstance.id)
+				redirect(controller:"appointment", action: "edit", id: appointmentId)
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'incentive.label', default: 'Incentive'), params.id])}"
@@ -131,4 +196,5 @@ class IncentiveController {
 			redirect(controller:"appointment", action: "edit", id: incentiveInstance.appointment.id)
         }
     }
+
 }
