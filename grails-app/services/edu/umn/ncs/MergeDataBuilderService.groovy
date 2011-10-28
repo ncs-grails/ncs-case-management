@@ -1,5 +1,16 @@
 package edu.umn.ncs
 
+/**
+This class will create a merge data source for a particular
+batch that was created.  It will look up the document generation
+configuration (bundle) that was associated with the batch
+and figure out what data source details are needed in order
+to complete the data set.  It appends columns
+as each set is built.  New data set options need to be added
+to this service.  There's probably a way to get this to 
+load dataset options from a user defined query, but we haven't gotten
+that far yet.
+*/
 class MergeDataBuilderService {
 
 	/*
@@ -14,6 +25,11 @@ class MergeDataBuilderService {
 	
 	def debug = false
 
+	/**
+	This returns the minimum base data set required to do a mailing.
+	It included batch generation dates, tracked items IDs, primary
+	instrument information, parentItems, etc..
+	*/
     def getBaseData(Batch batchInstance) {
         // this will be a list of map items.
         def dataSet = []
@@ -26,17 +42,21 @@ class MergeDataBuilderService {
 		// create a cache
 		def childItemCache = [:]
 		
-		// find all child items for this batch
-		def childItems = TrackedItem.executeQuery("\
-			select cti.id as childItemId, pti.id as trackedItemId \
-				from TrackedItem as cti inner join \
-				cti.parentItem as pti inner join \
-				pti.batch as b \
-			where b.id = ?", [batchInstance.id])
-		childItems.each{ row ->
-			def childItemId = row[0]
-			def trackedItemId = row[1]
-			childItemCache[trackedItemId] = childItemId 
+		// Restricting this to NORC Transmittals (at least for now...)
+		if (batchInstance.primaryInstrument.id == 19) {
+			// find all child items for this batch
+			def childItems = TrackedItem.executeQuery("\
+				select cti.id as childItemId, pti.id as trackedItemId \
+					from TrackedItem as cti inner join \
+					cti.parentItem as pti inner join \
+					pti.batch as b \
+				where b.id = ?", [batchInstance.id])
+
+			childItems.each{ row ->
+				def childItemId = row[0]
+				def trackedItemId = row[1]
+				childItemCache[trackedItemId] = childItemId 
+			}
 		}
 		
         // loop through the items in the batch
@@ -184,6 +204,14 @@ class MergeDataBuilderService {
         return dataSet
     }
 
+	/**
+	This method adds dwelling unit data
+	to a data set if the dwelling unit is tied 
+	to a tracked item.  This data set includes
+	street address information.  If
+	the person data is added, it will OVERWRITE
+	this dataset, so DO NOT use both.
+	*/
     def addDwellingUnitData(dataSet) {
 
         dataSet.collect{ record ->
@@ -209,6 +237,14 @@ class MergeDataBuilderService {
     // Note: selectionGroup --> enrollmentType
     //  Example: address1 --> "Mc Namara" (building name), address2 --> "200 Oak St. SE Minneapolis MN 55455"
 
+	/**
+	This method adds dwelling unit data
+	to a data set if a person is tied 
+	to a tracked item.  This data set includes
+	street address information.  If
+	the dwelling unit data is added, it will OVERWRITE
+	the salutation and address, so DO NOT use both.
+	*/
     def addPersonData(dataSet) {
         
 		Study studyInstance = null
@@ -251,6 +287,10 @@ class MergeDataBuilderService {
         }
         dataSet
     }
+
+	/**
+	This adds NORC specific IDs to the data set.
+	*/
     def addNORCData(dataSet) {
 		
 		def instrumentLinkCache = [:]
@@ -402,6 +442,11 @@ class MergeDataBuilderService {
         dataSet
     }
 	
+	/**
+	This adds appointment information such
+	as appointment type, time, date, location
+	to the dataset for confirmation letters.
+	*/
 	def addAppointmentData(dataSet) {
 		dataSet.collect{record ->
 			def trackedItemInstance = TrackedItem.read(record.itemId)
@@ -425,6 +470,12 @@ class MergeDataBuilderService {
 		dataSet
 	}
 	
+	/**
+	This is the beginning of a custom dataset
+	that could be built.
+	Copy this to create your own.  Don't forget to
+	rename yours so it doesn't have the same name!
+	*/
     def addCustomData(dataSet) {
 		dataSet.collect{record ->
 			def trackedItemInstance = TrackedItem.read(record.itemId)
@@ -432,5 +483,4 @@ class MergeDataBuilderService {
 		}
 		dataSet
     }
-
 }
