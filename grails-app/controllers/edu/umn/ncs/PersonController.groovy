@@ -35,7 +35,6 @@ class PersonController {
 				}
 				order('contactDate', 'desc')
 			}
-				
 
 			def householdInstanceList = Household.createCriteria().list{
 				people {

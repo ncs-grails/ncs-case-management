@@ -16,10 +16,6 @@ class FatherEngagementDataBuilderService {
 	static def csvDateFormat = 'yyyy-MM-dd'
 	static def csvTimeFormat = 'HH:mm'
 	
-    def serviceMethod() {
-
-    }
-	
 	def generateData(List<FatherEngagement> fatherEngagementList) {
 		def dataset = []
 						

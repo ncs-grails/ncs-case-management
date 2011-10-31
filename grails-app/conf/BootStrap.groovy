@@ -67,11 +67,6 @@ class BootStrap {
         if (! personalEmail) {
             personalEmail = new EmailType(name:'personal').save()
         }
-        //EnrollmentType
-        def highIntensity = EnrollmentType.findByName('high intensity')
-        if (! highIntensity) {
-            highIntensity = new EnrollmentType(name:'high intensity').save()
-        }
         //Ethnicity
         def latino = Ethnicity.findByName('latino')
         if (! latino) {
@@ -96,6 +91,7 @@ class BootStrap {
         if (! mother) {
             mother = new RelationshipType(name:'mother').save()
         }
+
         //Study
         def ncs = Study.findByName("NCS")
         if (! ncs) {
@@ -103,7 +99,7 @@ class BootStrap {
                 fullName:"National Children's Study",
                 active:true, sponsor:'NCI/NICHD',
                 coordinator:"NICHD",
-                collaborator:"TBA",
+                collaborator:"",
                 purpose:"improving the health of america's children",
                 exclusionary: false)
             if (!ncs.save()) {
@@ -113,7 +109,56 @@ class BootStrap {
             }
         }
 
-        /*** Tracking Seciton ***/
+        // Sub-Study
+        def ncsfe = Study.findByName("NCS-FE")
+        if (! ncsfe) {
+            ncsfe = new Study(name:"NCS-FE",
+                fullName:"Father Engagement",
+                active:true, sponsor:'NCI/NICHD',
+                coordinator:"NICHD",
+                collaborator:"",
+                purpose:"",
+                exclusionary: false,
+				subStudyOf: ncs)
+            if (!ncsfe.save()) {
+                ncsfe.errors.each{
+                    println "${it}"
+                }
+            }
+        }
+
+		// Enrollment Types
+		def ncsLoI = EnrollmentType.findByName('low intensity')
+		if ( ! ncsLoI ) {
+			ncsLoI = new EnrollmentType(name:'low intensity', subEnrollment: false)
+			if ( ! ncsLoI.save() ) {
+                ncsLoI.errors.each{
+                    println "${it}"
+                }
+			}
+		}
+		def ncsHiI = EnrollmentType.findByName('high intensity')
+		if ( ! ncsHiI ) {
+			ncsHiI = new EnrollmentType(name:'high intensity', subEnrollment: false)
+			if ( ! ncsHiI.save() ) {
+                ncsHiI.errors.each{
+                    println "${it}"
+                }
+			}
+		}
+
+		// Sub-Enrollment Types
+		def ncsSubSelected = EnrollmentType.findByName('selected')
+		if ( ! ncsSubSelected ) {
+			ncsSubSelected = new EnrollmentType(name:'selected', subEnrollment: true)
+			if ( ! ncsSubSelected.save() ) {
+                ncsSubSelected.errors.each{
+                    println "${it}"
+                }
+			}
+		}
+
+        /** Tracking Seciton */
         /* Items: BatchDirection, InstrumentFormat, IsInitial, Result
          */
 
