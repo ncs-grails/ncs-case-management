@@ -20,6 +20,8 @@ class PersonController {
 			def trackedItemInstanceList = TrackedItem.findAllByPerson(personInstance)
 			
 			def appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+
+			def subjectInstanceList = Subject.findAllByPerson(personInstance)
 			
 			def callInstanceList = Call.createCriteria().list {
 				items {
@@ -77,6 +79,7 @@ class PersonController {
 
 			[personInstance: personInstance,
 				personLinkInstance: personLinkInstance,
+				subjectInstanceList: subjectInstanceList,
 				trackedItemInstanceList: trackedItemInstanceList, 
 				appointmentInstanceList: appointmentInstanceList,
 				householdInstanceList: householdInstanceList,

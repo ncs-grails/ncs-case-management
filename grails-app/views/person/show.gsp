@@ -33,6 +33,21 @@
 			</p>
 		</fieldset>
 
+		<!-- Study Subject Status --
+		<fieldset class="maroonBorder">
+			<legend class="m1">Subjects</legend>
+			<ul>
+			<g:each var="subjectInstance" in="subjectInstanceList">
+				<li>
+				<g:if test="${subjectInstance.randomized}">Eligible for </g:if>
+				<g:else>Enrolled on ${subjectInstance.selectionDate} in</g:else>
+				${subjectInstance.enrollment} arm
+				of ${subjectInstance.study} <br/>
+				Subject ID: ${subjectInstance.subjectId}
+				</li>
+			</g:each>
+			</ul>
+		</fieldset>
 		
 		<!-- Appointments -->
 		<fieldset class="maroonBorder">
