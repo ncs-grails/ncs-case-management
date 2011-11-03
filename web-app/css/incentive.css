@@ -1,0 +1,74 @@
+/**
+* CSS Stylesheet for Incentives
+*/
+
+div.scan-box {
+	padding: 2.0em;
+	margin: 1.0em 0;
+	float:left;
+	max-width: 340px;
+	width: 340px;
+	border: 1px solid #ccc;
+	text-align:center;
+}
+
+div.scan-box label {
+	/*font-weight:bold;*/
+	color:#7a0019;
+	font-size:1.4em;
+}
+
+div.arrow-box {
+	float:left;
+	padding: 2.0em 0 ;
+	max-width: 160px;
+	min-width: 100px;
+	width: 100px;
+}
+
+div.scan-row {
+	padding-bottom: 1.0em;
+}
+	
+.buttons {
+	clear:both;
+}
+
+.gift-card-box {
+	width:65%;
+}
+
+div.gift-card-row {
+	padding: 0.5em 1.0em;
+}
+h3.scanned-header {
+	padding: 1.0em;
+}
+div.grid_12 {
+	padding-bottom:2.0em;
+}
+.scan-error {
+	color:red;
+	font-weight:bold;
+}
+div.filter-buttons {
+	padding-bottom: 1.0em;
+}
+div.filter-buttons span {
+	padding: 0.5em;
+}
+div.filter-buttons span.with-select {
+	background-color:#EEE;		
+}
+div.filter-buttons input:hover {
+	cursor:pointer;
+	background: none repeat scroll 0 0 #FFCC33;	
+}
+.print {
+	padding: 0.5em 2.0em;
+	background: transparent url(../images/print_32x32.png) center  left no-repeat;
+}
+.info-header {
+	padding-bottom: 0.5em;
+}
+	

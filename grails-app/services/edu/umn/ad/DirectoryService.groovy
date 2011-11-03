@@ -1,11 +1,11 @@
 package edu.umn.ad
+import grails.plugin.springcache.annotations.Cacheable
 
 import org.apache.directory.groovyldap.LDAP
 import org.apache.directory.groovyldap.SearchScope
 import org.codehaus.groovy.grails.commons.*
 
 class DirectoryService {
-
     static transactional = true
 	static def debug = false
 
@@ -40,8 +40,8 @@ class DirectoryService {
 	private def _authorities = [] as Set
 	private def _members = [] as Set
 
-	private def getAuthorities = { _authorities }
-	private def getMembers = { _members }
+	def getAuthorities = { _authorities }
+	def getMembers = { _members }
 
 	String loadUsersByGroupname(final String groupname) {
 
@@ -156,6 +156,8 @@ class DirectoryService {
 			*/
 		}
 
+		_members = _members.sort{ it?.displayName }
+		
 		return groupDescription
 	}
 

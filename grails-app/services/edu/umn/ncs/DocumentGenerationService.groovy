@@ -1,4 +1,5 @@
 package edu.umn.ncs
+
 import groovy.sql.Sql
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime

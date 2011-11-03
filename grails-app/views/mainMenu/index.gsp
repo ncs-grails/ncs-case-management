@@ -102,6 +102,11 @@
 						<dd>Enter Appointment Dates and Times for study subjects.</dd>
 						</g:ifAnyGranted>
 
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
+						<dt><g:link controller="incentive" action="index">Incentive Tracking</g:link></dt>
+						<dd>Scan, checkout/in and assign incentives.</dd>
+						</g:ifAnyGranted>
+
 						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="eventReport">Event of Interest Reporting</g:link></dt>
 						<dd>Enter events of interest for study subjects.</dd>

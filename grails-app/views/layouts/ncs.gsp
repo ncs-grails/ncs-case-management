@@ -24,6 +24,8 @@
 	href="${resource(dir:'css/pepper-grinder',file:'jquery.ui.css')}" />
 <link rel="stylesheet" type="text/css"
 	href="${resource(dir:'css',file:'global.css')}" />
+<link rel="stylesheet" type="text/css"
+	href="${resource(dir:'css',file:'incentive.css')}" />
 <link rel="shortcut icon"
 	href="${resource(dir:'images',plugin:'ncs-web-template',file:'favicon.ico')}"
 	type="image/x-icon" />
