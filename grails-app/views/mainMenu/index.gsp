@@ -68,24 +68,34 @@
 						
 				<div id="data-mngmt-tab">
 					<dl class="menu">
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
 						<dd>Generate instrument batches either automatically or by hand.</dd>
+						</g:ifAnyGranted>
 									
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="fatherEngagement" action="create">Father Engagement Form Entry</g:link></dt>
 						<dd>
 							Enter father enhanced consent form data for father engagement participants.  
 						</dd>
+						</g:ifAnyGranted>
 
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="batch" action="listByDate">Generated Batches</g:link></dt>
 						<dd>
 							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
 						</dd>
+						</g:ifAnyGranted>
 
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
 						<dd>Enter mail dates for generated batches</dd>
+						</g:ifAnyGranted>
 
+						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="receiptItems" action="index">Receipt Items</g:link></dt>
 						<dd>Receipt documents</dd>
+						</g:ifAnyGranted>
 
 						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="appointment">Appointment Entry</g:link></dt>

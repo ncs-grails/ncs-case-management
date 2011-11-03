@@ -57,9 +57,8 @@
 
 		<g:each var="pa" in="${personInstance.streetAddresses}">
 			<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
-				<h2>Address: ${pa.id}</h2>
+				<h2>${pa.streetAddress.address}</h2>
 				<p>
-				${pa.streetAddress.address}<br />
 				${pa.streetAddress.cityStateZip}<br />
 				${pa.streetAddress.country?.name}
 				</p>
@@ -173,7 +172,7 @@
 								<g:link base="/phone" controller="report" action="item" id="${c.items.collect{it.id}.join(',')}">
 								<g:each status="s" var="i" in="${c.items}">
 									<g:if test="${s > 0}"><br/></g:if>
-									${i.batch.primaryInstrument} (${i.id})
+									${i.batch.primaryInstrument}
 								</g:each>
 								</g:link>
 							</g:ifAnyGranted>
@@ -181,7 +180,7 @@
 							<g:ifNotGranted role="ROLE_NCS_CALLING">
 								<g:each status="s" var="i" in="${c.items}">
 									<g:if test="${s > 0}"><br/></g:if>
-									${i.batch.primaryInstrument} (${i.id})
+									${i.batch.primaryInstrument}
 								</g:each>
 							</g:ifNotGranted>
 							
@@ -254,6 +253,7 @@
 						<th>Date On</th>
 						<th>Mailed</th>
 						<th>Format</th>
+						<th>Direction</th>
 						<th>Result</th>
 						<th>Received</th>
 					</tr>
@@ -264,15 +264,18 @@
 						<td>${i.id}</td>
 						<td>${i.batch.primaryInstrument.study}</td>
 						<td>${i.batch.primaryInstrument}</td>
-						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.dateCreated}" /></td>
-						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.instrumentDate}" /></td>
-						<td><g:formatDate format="MM/dd/yyyy" date="${i.batch.mailDate}" /></td>
+						<td><g:formatDate format="M/d/yyyy" date="${i.batch.dateCreated}" /></td>
+						<td><g:formatDate format="M/dd" date="${i.batch.instrumentDate}" /></td>
+						<td><g:formatDate format="M/dd" date="${i.batch.mailDate}" /></td>
 						<td>${i.batch.format}</td>
+						<td>${i.batch.direction}</td>
 						<td>${i.result?.result?.name}</td>
 						<td>${i.result?.receivedDate}</td>
 					</tr>
 					<g:each var="al" in="${resultHistoryList.findAll{it.trackedItem.id == i.id} }">
 						<tr style="background-color: #DDD; font-style: italic;">
+							<td></td>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
