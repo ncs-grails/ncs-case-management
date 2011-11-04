@@ -102,4 +102,78 @@ class StudyEnrollmentService {
 			throw MissingAppNameException
 		}
 	}
+
+	/** Enroll NCS High Intensity.
+	This method enroll study participants that are in the high intensity
+	arm of the study.  It does so by changing their EnrollmentType.
+	Right now we get this data from the norc_ppv1batch table that
+	is uploaded via their web service. */
+	def enrollNcsHighIntensity() {
+
+		// Define a few variables...
+		def now = new Date()
+		def study = Study.findByName('NCS')
+		def enrollmentType = EnrollmentType.findWhere(name:'low intensity', subEnrollment:false)
+		def randomized = true
+		def appName = grailsApplication.metadata['app.name']
+
+		// Here lies the query
+		def insertQuery = """
+			INSERT INTO subject
+				(version
+				, app_created
+				, date_created
+				, enrollment_id
+				, person_id
+				, randomized
+				, selection_date
+				, study_id
+				, subject_id
+				, user_created)
+			SELECT 0 as version
+				, :appName as app_created
+				, :now AS date_created
+				, :enrollmentId AS enrollment_id
+				, pl.person_id
+				, :randomized AS randomized
+				, nlcb.datacollection_finishtime AS selection_date
+				, :studyId AS study_id
+				, nlcb.su_id AS subject_id
+				, 'nobody' AS user_created
+			FROM norc_low_consent_batch nlcb INNER JOIN
+				person_link pl ON nlcb.su_id = pl.norc_su_id LEFT OUTER JOIN
+				subject sj ON pl.person_id = sj.person_id AND sj.study_id = :studyId
+			WHERE (nlcb.datacollection_status01 = 1)
+				AND (sj.id IS NULL)"""
+
+		if (study && enrollmentType && appName && dataSource) {
+			// build the parameters map
+			def parameters = [
+				appName: appName,
+				now: now,
+				enrollmentId: enrollmentType.id,
+				randomized: randomized,
+				studyId: study.id
+				]
+
+			// create a groovy Sql instance.
+			def sql = new Sql(dataSource)
+
+			if (sql) {
+				// Execute the query
+				sql.execute(insertQuery, parameters)
+			} else {
+				throw GroovySqlIsNullException
+			}
+
+		} else if ( ! dataSource ) {
+			throw NullDataSourceException
+		} else if ( ! study ) {
+			throw MissingStudyException
+		} else if ( ! enrollmentType ) {
+			throw MissingEnrollmentTypeException
+		} else if ( ! appName ) {
+			throw MissingAppNameException
+		}
+	}
 }

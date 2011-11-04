@@ -482,12 +482,13 @@ class ReportController {
 			if (type == 'xls') {
 				// println "Generating Excel..."
 				// reportExt = type
-				reportExt = 'xml'
+				reportExt = 'xlsx'
 				def options = birtReportService.getRenderOption(request, 'xls')
 				try {
 					def result = birtReportService.runAndRender(reportName, params, options)					
 					response.setHeader("Content-disposition", "attachment; filename=" + reportName + "." + reportExt)
-					response.contentType = 'application/xls'
+					//response.contentType = 'application/xls'
+					response.contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 					response.outputStream << result.toByteArray()
 					response.outputStream.flush()
 				}

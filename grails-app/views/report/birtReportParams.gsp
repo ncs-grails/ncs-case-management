@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
 		<g:javascript library="prototype" />
@@ -11,7 +9,7 @@
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-            <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
+            <span class="menuButton"><a class="home" href="${createLink(uri: '/')}#report-tab"><g:message code="default.list.label" args="[entityName]" /></a></span>
         </div>
         <div class="body">
             <h1>${reportInstance.title}</h1>
