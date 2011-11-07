@@ -37,9 +37,9 @@
 		<fieldset class="maroonBorder">
 			<legend class="m1">Subjects</legend>
 			<ul>
-			<g:each var="subjectInstance" in="subjectInstanceList">
+				<g:each var="subjectInstance" in="${subjectInstanceList}">
 				<li>
-				<g:if test="${subjectInstance.randomized}">Eligible for </g:if>
+				<g:if test="${subjectInstance?.randomized}">Eligible for </g:if>
 				<g:else>Enrolled on ${subjectInstance.selectionDate} in</g:else>
 				${subjectInstance.enrollment} arm
 				of ${subjectInstance.study} <br/>
@@ -246,11 +246,11 @@
 			<table>
 				<thead>
 					<tr>
-						<th>Item ID</th>
+						<th nowrap="nowrap">Item ID</th>
 						<th>Study</th>
 						<th>Instrument</th>
 						<th>Generated</th>
-						<th>Date On</th>
+						<th nowrap="nowrap">Date On</th>
 						<th>Mailed</th>
 						<th>Format</th>
 						<th>Direction</th>
