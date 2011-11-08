@@ -5,7 +5,6 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 @Secured(['ROLE_NCS_DOCGEN_MANAGE'])
 class BatchCreationConfigController {
 
-	def debug = grailsApplication.config.debug
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -28,6 +27,7 @@ class BatchCreationConfigController {
 
     def save = {
 
+        println "Save Action. batchCreationConfigInstance. params: ${params}"
         def batchCreationConfigInstance = new BatchCreationConfig(params)
         if (batchCreationConfigInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), batchCreationConfigInstance.id])}"
@@ -95,8 +95,6 @@ class BatchCreationConfigController {
     def edit = {
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
 
-
-
         if (!batchCreationConfigInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
             redirect(action: "list")
@@ -107,8 +105,6 @@ class BatchCreationConfigController {
     }
 
     def update = {
-
-        println "Updating batchCreationConfigInstance. params: ${params}"
 
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
         if (batchCreationConfigInstance) {
