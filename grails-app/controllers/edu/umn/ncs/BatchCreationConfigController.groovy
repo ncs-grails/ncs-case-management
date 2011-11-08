@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 @Secured(['ROLE_NCS_DOCGEN_MANAGE'])
 class BatchCreationConfigController {
 
+	def debug = grailsApplication.config.debug
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index = {
@@ -37,10 +38,8 @@ class BatchCreationConfigController {
         }
     }
 
-    def edit = {
-        def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+	private def getEditModel(batchCreationConfigInstance) {
 
-        // TEST CODE TEST CODE TEST CODE
         // All instruments
         def instrumentInstanceList = Instrument.list()
         def instrumentFormatInstanceList = InstrumentFormat.list()
@@ -48,8 +47,6 @@ class BatchCreationConfigController {
         def unusedInstruments = []
         def attachableInstruments = []
         
-        // TEST CODE TEST CODE TEST CODE
-
         if (batchCreationConfigInstance) {
             // config instrument
             def bccInstruments = [ batchCreationConfigInstance.instrument ]
@@ -86,18 +83,26 @@ class BatchCreationConfigController {
         // ! only show this section if the above list is not empty
         // - All instruments in batchCreationConfig and items
 
-
-        if (!batchCreationConfigInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
             return [batchCreationConfigInstance: batchCreationConfigInstance,
                 instrumentInstanceList:instrumentInstanceList,
                 instrumentFormatInstanceList: instrumentFormatInstanceList,
                 usedInstruments:usedInstruments,
                 unusedInstruments:unusedInstruments,
                 attachableInstruments:attachableInstruments]
+
+	}
+
+    def edit = {
+        def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+
+
+
+        if (!batchCreationConfigInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            return getEditModel(batchCreationConfigInstance)
         }
     }
 
@@ -117,7 +122,7 @@ class BatchCreationConfigController {
                     batchCreationConfigInstance.errors.rejectValue("version", "default.optimistic.locking.failure", 
                         [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig')] as Object[],
                         "Another user has updated this BatchCreationConfig while you were editing")
-                    render(view: "edit", model: [batchCreationConfigInstance: batchCreationConfigInstance])
+                    render(view: "edit", model: getEditModel(batchCreationConfigInstance) )
                     return
                 }
             }
@@ -144,7 +149,7 @@ class BatchCreationConfigController {
                 redirect(action: "edit", id: batchCreationConfigInstance.id)
             }
             else {
-                render(view: "edit", model: [batchCreationConfigInstance: batchCreationConfigInstance])
+                render(view: "edit", model: getEditModel(batchCreationConfigInstance) )
             }
         }
         else {

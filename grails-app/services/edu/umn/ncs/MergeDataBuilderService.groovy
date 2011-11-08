@@ -442,6 +442,91 @@ class MergeDataBuilderService {
         dataSet
     }
 	
+
+	/**
+	This adds child instruments tracked item IDs to the dataset.
+	*/
+	def addChildItems(dataSet) {
+
+        debug = true
+
+		// create a recursive closure
+		def addChildItemsToRecord
+
+		/**
+		This adds child items recursively to a record.
+		@param trackedItemInstance		This is the trackedItemInstance and it's children you want added
+		@param addedTrackedItemIdSet	This is the set of tracked item IDs already added
+		@return the record with the column and data added to it
+		*/
+		addChildItemsToRecord = { trackedItemInstance, addedTrackedItemIdSet ->
+			// If we've been here before, then let's call it quits
+			if ( addedTrackedItemIdSet.contains(trackedItemInstance.id) ) {
+				return [:]
+			} else {
+				// Add this trackeitem
+				def columnName = "child_${trackedItemInstance.batch.primaryInstrument.nickName}"
+				def newMap = [:]
+				// add this tracked item's ID to the hash map that will be returned
+				newMap[columnName] = trackedItemInstance.id
+				// add this tracked item's ID to the set of "already seen this" tracked items
+				// in this particular branch that this recursive call is walking down.
+				addedTrackedItemIdSet.add(trackedItemInstance.id)
+
+				// look up all the child items
+			    def childTrackedItemInstanceList = TrackedItem.findAllByParentItem(trackedItemInstance)
+				// add all the child items (and their children) to the newMap
+				childTrackedItemInstanceList.each{ cti ->
+
+
+					// make sure we don't traverse out side of the doc gen batch bundle
+					// This tracked item's batch must be the master batch for the child tracked item
+					// ...or
+					//      This child tracked item must have a master batch associated with it
+					//		AND the master batch amongst all the children are the same
+					if (trackedItemInstance.batch.id == cti.batch.master?.id 
+						|| ( trackedItemInstance.batch.master?.id == cti.batch.master?.id 
+							&& cti.batch.master )) {
+						// add to the newMap anything returned by the recursive call
+						newMap.putAll( addChildItemsToRecord(cti, addedTrackedItemIdSet) )
+					}
+				}
+				// return the map (containing the item ID of this tracked item and all of it's children's
+				// tracked item IDs from the doc gen bundle.
+				return newMap
+			}
+		}
+
+		// update the recordset
+		dataSet.collect{record ->
+			// Lookup the tracked item
+			def trackedItemInstance = TrackedItem.read(record.itemId)
+
+			// make sure it exists
+			if ( trackedItemInstance ) {
+				// Get the batch
+				def masterBatchInstance = trackedItemInstance.batch
+				// find all the child batches
+				def childBatchInstanceList = Batch.findAllByMaster(masterBatchInstance)
+				// Get the child instrument nickNames and add empty columns in the record
+				// incase some of the data is blank
+				def newColumnNames = childBatchInstanceList.each { b ->
+					record["child_${b.primaryInstrument.nickName}"] = ''
+				}
+
+				// create an empty collection
+				def itemSet = [] as Set
+				// add the columns using the helper 
+				record.putAll( addChildItemsToRecord(trackedItemInstance, itemSet) )
+					
+			} else {
+				println "Couldn't find trackedItem ${record.itemId}."
+			}
+		}
+		dataSet
+	}
+
+
 	/**
 	This adds appointment information such
 	as appointment type, time, date, location
@@ -465,6 +550,13 @@ class MergeDataBuilderService {
 				// TODO: Add Incentive Information
 			} else {
 				println "Couldn't find appointment using letter ID ${record.itemId}."
+				record.appointmentDate = ""
+				record.appointmentType = ""
+				record.appointmentResult = ""
+				record.appointmentLocation = ""
+				record.appointmentBillable = ""
+				record.appointmentParentAppointmentTime = ""
+				record.appointmentScheduledBy = ""
 			}
 		}
 		dataSet

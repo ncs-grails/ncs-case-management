@@ -108,6 +108,7 @@ class BatchController {
 	}
 
 	
+	// This logs mail dates for batches that have been generated
 	@Secured(['ROLE_NCS_RECEIPT'])
     def entry = {
         // reference date
@@ -129,10 +130,10 @@ class BatchController {
 
                     if (batchInstance) {
 						
-						def mailDate = new LocalDate(batchInstance.dateCreated)
-						def refDate = new LocalDate(referenceDate)
+						def genDate = new LocalDate(batchInstance.dateCreated)
+						def mailDate = new LocalDate(referenceDate)
 						
-						if (refDate.isBefore(mailDate) && !refDate.isEqual(mailDate)) {
+						if (mailDate.isBefore(genDate) && !mailDate.isEqual(genDate)) {
 							flash.message = "Mail Date must come after date generated"
 						} else {
 							// update batch mail date
@@ -140,7 +141,7 @@ class BatchController {
 							batchInstance.lastUpdated = new Date()
 							batchInstance.updatedBy = username
 							batchInstance.save(flush:true)
-							flash.message = "${batchInstance.primaryInstrument.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated."
+							flash.message = "${batchInstance.primaryInstrument?.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated as mailed on ${mailDate}."
 
 						}
 						
@@ -148,13 +149,13 @@ class BatchController {
                         flash.message = "Batch not found: ${batchId}"
                     }
 
-                } catch (Exception) {
-                    flash.message = "Invalid Batch ID: ${batchId}"
+                } catch (Exception ex) {
+                    flash.message = "Invalid Batch ID: ${batchId}\n"
+					flash.exception = ex
                 }
 
             } else {
-                println "fail..."
-                flash.message = "Invalid Batch ID ${batchId}"
+                flash.message = "Invalid Batch ID format: ${batchId}"
             }
         }
 
@@ -176,8 +177,16 @@ class BatchController {
 
         c = Batch.createCriteria()
         // all batches that don't have a mail date
+		// outgoing
+		// first class mail
         def unsentBatchInstanceList = c.list{
             and {
+				direction{
+					eqId(1)
+				}
+				format{
+					eqId(1)
+				}
                 isNull("mailDate")
                 between("dateCreated", referenceDate - 14, referenceDate + 1)
             }

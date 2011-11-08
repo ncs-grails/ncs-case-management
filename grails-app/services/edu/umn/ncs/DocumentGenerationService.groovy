@@ -730,6 +730,15 @@ class DocumentGenerationService {
 					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
 					splitTime = newSplitTime
 				}
+            } else if (it.code == "childItems") {
+				outputData = mergeDataBuilderService.addChildItems(outputData)
+				
+				if (debug) {
+					def newSplitTime = new GregorianCalendar().time.time
+					println "addChildItems"
+					println "Time since [started]:\t${splitTime - startTime}\t[last]:${newSplitTime - splitTime}"
+					splitTime = newSplitTime
+				}
 			} else {
 				println "Uknown Data Set Type: ${it.code}!"
 			}

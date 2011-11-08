@@ -146,6 +146,75 @@ class BatchControllerTests extends ControllerUnitTestCase {
 		assert bc.entry
 	}
 
+	void testEntryForValidBatch() {
+		// make some fake batches
+		def now = new Date()
+		def today = now
+		def fiveDaysAgo = now - 5
+		today.hours = 0
+		today.minutes = 0
+		today.seconds = 0
+		def yesterday = ( new Date() ) - 1
+		def outgoing = new BatchDirection(name:"outgoing")
+        def firstClass = new InstrumentFormat(name:'first class', groupName:'mail')
+		def username = "unittest"
+		def appName = "unit test"
+		def b1 = new Batch(direction:outgoing,
+			format: firstClass, 
+			batchRunBy: username, 
+			batchRunByWhat: appName,
+			dateCreated: today)
+		def b2 = new Batch(direction:outgoing,
+			format: firstClass, 
+			batchRunBy: username, 
+			batchRunByWhat: appName,
+			dateCreated: yesterday)
+		b1.id = 1
+		b2.id = 2
+
+		def batchInstanceList = [ b1, b2 ]
+
+		// mock up the createCriteria
+		def batchCriteria = [ list: {Closure cls -> []} ]
+		// get a "mockFor" for the EmailSevice
+		def batchMocker = mockFor(Batch, true)
+		// tell the mocker that the mocked object (EmailService)
+		// should return true the first five times that
+		// sendProductionReport is called.
+		batchMocker.demand.static.createCriteria(1..6) { batchCriteria }
+		// set the batch controller "emailService" variable
+		// to the mocked class ( EmailService)
+		mockDomain(Batch, batchInstanceList)
+
+		// instatiate the batch controller
+		def bc = new BatchController()
+
+		//Mock up the authenticateService
+		def principal = [ getUsername: { "unittest" } ]
+		def authService = [ principal: { principal } ]
+		bc.authenticateService = authService
+
+		// set the params
+		bc.params.id = 'B2'
+		bc.params.referenceDate = fiveDaysAgo
+
+		// execute the action and get the result
+		bc.entry()
+		assertEquals "Mail Date must come after date generated", bc.flash.message
+
+		// set the params
+		bc.params.id = 'B5'
+		bc.entry()
+		assertEquals "Batch not found: 5", bc.flash.message
+
+		// set the params
+		bc.params.id = 'NGP'
+		bc.entry()
+		assertEquals "Invalid Batch ID format: NGP", bc.flash.message
+
+
+	}
+
 	void testListExists() {
 		def bc = new BatchController()
 		assert bc.list
@@ -154,6 +223,15 @@ class BatchControllerTests extends ControllerUnitTestCase {
 	void testShowExists() {
 		def bc = new BatchController()
 		assert bc.show
+	}
+
+	void testShowRedirectIfNoMatch() {
+		// Not mocking this because it shouldn't break any other tests...
+		BatchController.metaClass.message = { LinkedHashMap arg1 -> return 'test message output'}
+		mockDomain(Batch)
+		def bc = new BatchController()
+		bc.show()
+		assertEquals "list", bc.redirectArgs.action
 	}
 
 	void testEditExists() {

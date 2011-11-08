@@ -153,3 +153,5 @@ umnad {
 	rolePrefix = 'EnHS-'
 	roleSuffix = ''
 }
+
+debug = true
