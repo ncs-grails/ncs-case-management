@@ -84,11 +84,11 @@
 			<span class="name">
 				<label for="sortOrder">
 					<g:message code="batchCreationDocument.sortOrder.label" default="Merge Source Sort Order" />
-					<p> This is a map containing the sort parameters for 
-						the dataset in the format:
-						[column1:asc, column2:desc, column3:asc]</p>
 				</label>
 			</span>
+				<p> This is a map containing the sort parameters for 
+					the dataset in the format:
+					[column1:asc, column2:desc, column3:asc]</p>
 			<span class="value">
 				<g:textField size="80" name="sortOrder" value="${d.sortOrder}" />
 			</span>
@@ -195,37 +195,47 @@
 			from="${edu.umn.ncs.BatchDirection.list()}" optionKey="id"
 			value="${i.direction?.id}" noSelection="['null': '']"/> </span></div>
 
-		<div class="prop"><span class="name"> <label
-			for="relation.id"><g:message
-			code="BatchCreationItemRelation.label" default="Relation:" /></label> </span> <span
-			class="value"> <g:select name="relation.id"
-			from="${edu.umn.ncs.BatchCreationItemRelation.list()}" optionKey="id"
-			value="${i.relation?.id}" noSelection="['null': '']"/> </span> <label for="parentInstrument"><g:message
-			code="batchCreationItem.childOf.label" default="of" /></label> <span
-			class="value"> <g:select name="parentInstrument.id"
-			from="${attachableInstruments - [i.instrument]}" optionKey="id"
-			value="${i.parentInstrument?.id}" noSelection="['null': '']"/> </span></div>
+	<div class="prop">
+		<span class="name">
+			<label for="relation.id">
+				<g:message code="BatchCreationItemRelation.label" default="Relation:" />
+			</label>
+		</span>
+		<span class="value">
+			<g:select name="relation.id" from="${edu.umn.ncs.BatchCreationItemRelation.list()}" 
+				optionKey="id" value="${i.relation?.id}" noSelection="['null': '']"/> 
+		</span>
+
+		<label for="parentInstrument">
+			<g:message code="batchCreationItem.childOf.label" default="of" />
+		</label> 
+		<span class="value"> 
+				<g:select name="parentInstrument.id" from="${attachableInstruments - [i.instrument]}" 
+					optionKey="id" value="${i.parentInstrument?.id}" noSelection="['null': '']"/> 
+			</span>
+		</div>
+		<div class="prop">
+			<span class="name">
+				<g:checkBox name="optional" value="${i?.optional}" />
+				<label for="optional">
+					<g:message code="batchCreationConfig.optional.label" default="Optional Item" />
+				</label>
+			</span>
+			<p>If this is checked, the selection query will expect a column named
+			<strong>skip_${i.instrument.nickName}</strong> that if null, will generate the item.  If it is not null,
+			the item will not be generated.</p>
+		</div>
 
 		<div class="prop">
 			<span class="name">
-				<label for="optional">
-					<g:message code="batchCreationConfig.optional.label" default="Optional Item" />
-					<p>If this is checked, the selection query will expect a column named
-					skip_INSTRUMENTNICKNAME that if null, will generate the item.  If it is not null,
-					the item will not be generated.</p>
-				</label>
-			</span>
-			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'optional', 'errors')}">
-				<g:checkBox name="optional" value="${batchCreationConfigInstance?.optional}" />
+				<label for="comment">
+					<g:message code="batchCreationItemcomment.label" default="Comment" />
+				</label> 
+			</span> 
+			<span class="value"> 
+				<g:textField size="80" name="comment" value="${i.comment}" /> 
 			</span>
 		</div>
-
-		<div class="prop"><span class="name"> <label
-			for="comment"><g:message
-			code="batchCreationItemcomment.label"
-			default="Comment" /></label> </span> <span class="value"> <g:textField
-			size="80" name="comment" value="${i.comment}" /> </span></div>
-
 
 		<g:actionSubmit action="update" value="Save" />
 		<g:actionSubmit action="delete" value="Remove" />
@@ -268,26 +278,28 @@
 
 		<div class="prop">
 			<span class="name">
+				<g:checkBox name="optional" value="${false}" />
 				<label for="optional">
-					<g:message code="batchCreationConfig.optional.label" default="Optional Item" />
+					<g:message code="BatchCreationConfig.optional.label" default="Optional Item" />
 					<p>If this is checked, the selection query will expect a column named
 					skip_INSTRUMENTNICKNAME that if null, will generate the item.  If it is not null,
 					the item will not be generated.</p>
 				</label>
 			</span>
-			<span class="value">
-				<g:checkBox name="optional" value="${false}" />
+		</div>
+
+		<div class="prop">
+			<span class="name">
+				<label for="comment">
+					<g:message code="batchCreationItemcomment.label" default="Comment" />
+				</label> 
+			</span> 
+			<span class="value"> 
+				<g:textField size="80" name="comment" value="" /> 
 			</span>
 		</div>
 
-		<div class="prop"><span class="name"> <label
-			for="comment"><g:message
-			code="batchCreationItemcomment.label"
-			default="Comment" /></label> </span> <span class="value"> <g:textField
-			size="80" name="comment" value="${i.comment}" /> </span></div>
-
-		<g:actionSubmit controller="batchCreationItem" action="save"
-			value="Add" />
+		<g:actionSubmit controller="batchCreationItem" action="save" value="Add" />
 	</g:form></div>
 </g:if> <!-- /Items --></div>
 </div>

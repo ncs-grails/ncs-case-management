@@ -108,6 +108,7 @@ class BatchCreationConfigController {
 
     def update = {
 
+        println "Updating batchCreationConfigInstance. params: ${params}"
 
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
         if (batchCreationConfigInstance) {
@@ -149,6 +150,9 @@ class BatchCreationConfigController {
                 redirect(action: "edit", id: batchCreationConfigInstance.id)
             }
             else {
+			    batchCreationConfigInstance.errors.each{
+					println "error saving batchCreationConfigInstance:${it} "
+				}
                 render(view: "edit", model: getEditModel(batchCreationConfigInstance) )
             }
         }
