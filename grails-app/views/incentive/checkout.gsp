@@ -19,7 +19,7 @@
 	</div>
 	<div class="body container_12">
 		<h1>Check Out Incentive</h1>
-		
+
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if> 
@@ -27,6 +27,10 @@
 			<div class="prop">
 				<fieldset class="gift-card-box maroonBorder">
 					<legend>Incentive Details</legend>
+					<p>If you have already added the incentives to the inventory, you <strong>do not have to</strong>
+					choose any of the "Incentive Details" options.  You only need to choose an "Interviewer" and then
+					scan in the barcodes on the incentives.</p>
+		
 					<div class="gift-card-row"><label for="receiptNumber">Receipt Number</label> <g:textField name="receiptNumber" value="" size="40" /></div>
 					<div class="gift-card-row"><label for="incentiveType">Incentive Type</label> <g:select id="incentiveTypeInstance" name="type.id" from="${edu.umn.ncs.IncentiveType.list()}" optionKey="id" optionValue="name" value="${incentiveInstance?.type?.id}" noSelection="['null': '-- Please choose --']" /><em style="color:red;"> *</em></div>
 					<div class="gift-card-row"><label for="amount">Value</label> <g:textField name="amount" value="" size="5" /></div>

@@ -14,6 +14,7 @@ $(document).ready(function() {
 	if (debug) {
 		alert('jQuery loaded');
 	}
+
 	
 //    $('#barcode').change(function() {
 	// Only do a save on enter

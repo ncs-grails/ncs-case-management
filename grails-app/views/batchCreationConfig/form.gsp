@@ -27,6 +27,15 @@
 		</div>
 
 		<div class="prop">
+			<span class="name"> <label for="description"><g:message
+						code="batchCreationConfig.description.label" default="Detailed Description" />
+			</label> </span> <span
+				class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'description', 'errors')}">
+				<g:textArea name="description" rows="6" cols="80" 
+					value="${batchCreationConfigInstance?.description}" /> </span>
+		</div>
+
+		<div class="prop">
 			<span class="name"> <label for="active"><g:message
 						code="batchCreationConfig.active.label" default="Active" />
 			</label> </span> <span
@@ -112,6 +121,24 @@
 				parent_item, expire_date, study_year</p>
 		</div>
 
+
+		<div class="prop">
+			<span class="name">
+				<g:message code="batchCreationConfig.useDwellingUnitHouseholdPerson.label" default="ID(s) Expected" />
+			</span>
+			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useDwellingUnit', 'errors')}">
+				<g:checkBox name="active" value="${batchCreationConfigInstance?.useDwellingUnit}" />
+				<label for="useDwellingUnit"><g:message code="batchCreationConfig.useDwellingUnit.label" default="dwelling_unit" /></label>
+			</span>
+			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useHousehold', 'errors')}">
+				<g:checkBox name="active" value="${batchCreationConfigInstance?.useHousehold}" />
+				<label for="useHousehold"><g:message code="batchCreationConfig.useHousehold.label" default="household" /></label>
+			</span>
+			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'usePerson', 'errors')}">
+				<g:checkBox name="active" value="${batchCreationConfigInstance?.usePerson}" />
+				<label for="usePerson"><g:message code="batchCreationConfig.usePerson.label" default="person" /></label>
+			</span>
+		</div>
 		<div class="prop">
 			<span class="name"> <label for="manualSelection"><g:message
 						code="batchCreationConfig.manualSelection.label"

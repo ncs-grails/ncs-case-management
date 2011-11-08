@@ -480,9 +480,9 @@ class ReportController {
 			
 			// Excel Generation
 			if (type == 'xls') {
-				// println "Generating Excel..."
+				// println "Generating Excel XML Spreadsheet..."
 				// reportExt = type
-				reportExt = 'xlsx'
+				reportExt = 'xml'
 				def options = birtReportService.getRenderOption(request, 'xls')
 				try {
 					def result = birtReportService.runAndRender(reportName, params, options)					

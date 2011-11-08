@@ -19,7 +19,7 @@
         <span class="menuButton"><g:link class="list" action="checkin">Check In</g:link></span>
 	</div>
 	<div class="body container_12">
-		<h1>Scan Incentives</h1>
+		<h1>Scan in New Incentives</h1>
 		
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>

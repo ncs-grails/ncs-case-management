@@ -17,7 +17,7 @@
             <span class="menuButton"><g:link class="create" action="assignIncentive">Assign to Item</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkout">Checkout</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkin">Check In</g:link></span>
-	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan a Batch</g:link></span>
+	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan in new Incentives</g:link></span>
         </div>
         <div class="body">
             <g:if test="${flash.message}">

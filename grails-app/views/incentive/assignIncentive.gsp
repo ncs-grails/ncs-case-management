@@ -8,6 +8,11 @@
         <g:set var="entityName" value="${message(code: 'incentive.label', default: 'Incentive')}" />
         <title>Assign Incentive</title>
 		<g:javascript src="incentive.js" />
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#code').focus();
+			});
+		</script>
     </head>
     <body>
         <div class="nav">

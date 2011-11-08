@@ -168,7 +168,7 @@
 													<img src="${resource(dir:'images',file:'pdf_button.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
 												</g:link>
 												<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']" class="image-link" >
-													<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
+													<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XML for Excel" alt="Export to XML for Excel" />
 												</g:link>
 											</g:else>
 										</dt>
@@ -200,7 +200,7 @@
 											</g:link>
 											<g:ifAnyGranted role="ROLE_NCS_IT">
 												<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']" class="image-link" >
-													<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
+												<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XML for Excel" alt="Export to XML for Excel" />
 												</g:link>
 											</g:ifAnyGranted>		
 										</g:else>
