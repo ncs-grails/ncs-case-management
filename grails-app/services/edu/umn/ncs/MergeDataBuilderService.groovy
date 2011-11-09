@@ -204,6 +204,32 @@ class MergeDataBuilderService {
         return dataSet
     }
 
+	// TODO: Implement
+	/** This method adds arbitrary data to a dataset based on a 
+	closure or SQL Query that is stored in a DataSetType instance.
+	 */
+	def addDataSet(DataSetType dataSetTypeInstance, dataSet) {
+		def returnDataSet = dataSet
+		// This runs a groovy closure and appends data
+		if (dataSetTypeInstance.closure) {
+			// define a groovy shell
+			def groovyShellInstance = new GroovyShell()
+			try {
+				// create the closure object
+				def dataSetTypeClosure = groovyShellInstance.evaluate(dataSetTypeInstance.closure)
+				// run the closure and get the new data
+				returnDataSet = dataSetTypeClosure(returnDataSet)
+			} catch (Exeception ex) {
+				throw InvalidDataSetTypeClosureException(returnDataSet)
+			}
+		}
+
+		if (dataSetTypeInstance.sqlQuery) {
+			throw NotImplementedException
+		}
+		return returnDataSet
+	}
+
 	/**
 	This method adds dwelling unit data
 	to a data set if the dwelling unit is tied 

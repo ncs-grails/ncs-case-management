@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<%@ page import="grails.util.Environment" %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -119,9 +119,17 @@ of M home page</a></div>
 
 <!-- BEGIN Unit Graphic Header for home page -->
 <div class="main_head">
-<h1 class="nopadding" id="nospace"><img
-	src="${resource(dir:'images',plugin:'ncs-web-template',file:'ncs_header_960x95.jpg')}"
-	alt="National Children's Study" width="960" height="95" /></h1>
+	<h1 class="nopadding" id="nospace">
+		<g:if test="${Environment.current == Environment.DEVELOPMENT}">
+			<img src="${resource(dir:'images',file:'ncs_header_devel_960x95.jpg')}"
+			alt="National Children's Study" width="960" height="95" />
+		</g:if><g:elseif test="${Environment.current == Environment.TEST}">
+			<img src="${resource(dir:'images',file:'ncs_header_test_960x95.jpg')}"
+			alt="National Children's Study" width="960" height="95" />
+		</g:elseif><g:else>
+			<img src="${resource(dir:'images',plugin:'ncs-web-template',file:'ncs_header_960x95.jpg')}"
+			alt="National Children's Study" width="960" height="95" />
+		</g:else></h1>
 </div>
 <!-- END Unit Graphic Header for home page -->
 

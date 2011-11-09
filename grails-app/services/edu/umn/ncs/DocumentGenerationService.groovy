@@ -691,6 +691,11 @@ class DocumentGenerationService {
 		}
 
         batchCreationDocumentInstance.dataSets.each{
+
+			// TODO: ajz, test and implement!
+
+			//outputDate = mergeDataBuilderService.addDataSet(it, dataSet)
+
 			if (debug) {
 				println "Dataset type: ${it.code}"
 			}
