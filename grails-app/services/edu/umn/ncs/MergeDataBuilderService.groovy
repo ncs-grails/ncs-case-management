@@ -492,9 +492,11 @@ class MergeDataBuilderService {
 			} else {
 				// Add this trackeitem
 				def columnName = "child_${trackedItemInstance.batch.primaryInstrument.nickName}"
+				def columnNameBarcode = "child_${trackedItemInstance.batch.primaryInstrument.nickName}_barcode"
 				def newMap = [:]
 				// add this tracked item's ID to the hash map that will be returned
 				newMap[columnName] = trackedItemInstance.id
+				newMap[columnNameBarcode] = '*I' + trackedItemInstance.id + '*'
 				// add this tracked item's ID to the set of "already seen this" tracked items
 				// in this particular branch that this recursive call is walking down.
 				addedTrackedItemIdSet.add(trackedItemInstance.id)
@@ -538,6 +540,7 @@ class MergeDataBuilderService {
 				// incase some of the data is blank
 				def newColumnNames = childBatchInstanceList.each { b ->
 					record["child_${b.primaryInstrument.nickName}"] = ''
+					record["child_${b.primaryInstrument.nickName}_barcode"] = ''
 				}
 
 				// create an empty collection
