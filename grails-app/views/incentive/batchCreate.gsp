@@ -17,6 +17,7 @@
     	<span class="menuButton"><g:link class="list" action="list">Incentive List</g:link></span>
     	<span class="menuButton"><g:link class="list" action="checkout">Checkout</g:link></span>
         <span class="menuButton"><g:link class="list" action="checkin">Check In</g:link></span>
+    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
 	</div>
 	<div class="body container_12">
 		<h1>Scan in New Incentives</h1>

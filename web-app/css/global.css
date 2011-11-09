@@ -280,6 +280,16 @@ dl.menu dd {
 	color: #333;
 	padding-left: 25px;
 }
+.menuButton a.give {
+	background: url(../images/handshake_24x24.png) bottom left no-repeat;
+	color: #333;
+	padding-left: 30px;
+}
+.menuButton a.infoButton {
+	background: url(../images/skin/information.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
 
 .menuButton a.lookup {
 	background: url(../images/magnifying-glass-gray_16x16.png) center left no-repeat;

@@ -10,6 +10,7 @@
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><g:link class="list" action="list">Incentive List</g:link></span>
+	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
         </div>
         <div class="body">
             <h1>Transaction Log for <g:formatNumber number="${incentiveInstance?.amount}" type="currency" currencyCode="USD" /> ${incentiveInstance?.type?.name}: <g:link action="edit" id="${incentiveInstance.id}">${incentiveInstance.id}</g:link></h1>

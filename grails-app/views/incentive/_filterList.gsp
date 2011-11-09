@@ -101,7 +101,7 @@
 
                 <td>
                 	<g:if test="${incentiveInstance?.trackedItem}">
-                		<strong>Distributed on <g:formatDate date="${incentiveInstance?.incentiveDate}" format="MM/dd/yyyy" /></strong>	
+                		<strong>Distributed <g:formatDate date="${incentiveInstance?.incentiveDate}" format="MM/dd/yyyy" /></strong>	
                 	</g:if>
                 	<g:else>
                 		<g:if test="${incentiveInstance?.checkedOut}">

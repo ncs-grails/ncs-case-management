@@ -786,7 +786,7 @@ class IncentiveController {
 
 	def printableIncentiveList = {
 		if (params?.id) {
-			def incentiveInstanceList = Incentive.findAllByCheckedOutToWhom(params?.id)
+			def incentiveInstanceList = Incentive.findAllByCheckedOutToWhomAndTrackedItem(params?.id, null)
 			// Get NCS group members for list of interviewers
 			//def groupName = "EnHS-NCS"
 			

@@ -14,10 +14,11 @@
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-            <span class="menuButton"><g:link class="create" action="assignIncentive">Assign to Item</g:link></span>
+            <span class="menuButton"><g:link class="give" action="assignIncentive">Assign to Item</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkout">Checkout</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkin">Check In</g:link></span>
 	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan in new Incentives</g:link></span>
+	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
         </div>
         <div class="body">
             <g:if test="${flash.message}">
@@ -125,7 +126,7 @@
 	
 	                            <td>
 	                            	<g:if test="${incentiveInstance?.trackedItem}">
-	                            		<strong>Distributed on <g:formatDate date="${incentiveInstance?.incentiveDate}" format="MM/dd/yyyy" /></strong>	
+	                            		<strong>Distributed <g:formatDate date="${incentiveInstance?.incentiveDate}" format="MM/dd/yyyy" /></strong>	
 	                            	</g:if>
 	                            	<g:else>
 	                            		<g:if test="${incentiveInstance?.checkedOut}">
