@@ -219,7 +219,7 @@ class MergeDataBuilderService {
 				def dataSetTypeClosure = groovyShellInstance.evaluate(dataSetTypeInstance.closure)
 				// run the closure and get the new data
 				returnDataSet = dataSetTypeClosure(returnDataSet)
-			} catch (Exeception ex) {
+			} catch (Exception ex) {
 				throw InvalidDataSetTypeClosureException(returnDataSet)
 			}
 		}
