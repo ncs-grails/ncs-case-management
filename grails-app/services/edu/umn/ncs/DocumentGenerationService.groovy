@@ -829,7 +829,14 @@ class DocumentGenerationService {
         }
 		
 		// TODO: add custom sorting from the batchCreationDocumentInstance.sortOrder field
-        outputData = outputData.sort{ it.itemId }
+		if (batchCreationDocumentInstance.sortOrder) {
+			def sortOrder = "{ row -> ${batchCreationDocumentInstance.sortOrder} }".toString()
+			def gs = new GroovyShell()
+			def sortOrderClosure = gs.evaluate(sortOrder)
+        	outputData = outputData.sort( sortOrderClosure )
+		} else {
+        	outputData = outputData.sort{ row -> row.itemId }
+		}
 		
 		if (debug) {
 			def newSplitTime = new GregorianCalendar().time.time

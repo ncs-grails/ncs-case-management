@@ -87,8 +87,12 @@
 				</label>
 			</span>
 				<p> This is a map containing the sort parameters for 
-					the dataset in the format:
-					[column1:'asc', column2:'desc', column3:'asc']</p>
+					the dataset.  Examples are:
+					<ul>
+						<li>row.zipCode</li>
+						<li>row.itemId</li>
+						<li>row.lastName + row.firstName</li>
+					</ul>
 			<span class="value">
 				<g:textField size="80" name="sortOrder" value="${d.sortOrder}" />
 			</span>
