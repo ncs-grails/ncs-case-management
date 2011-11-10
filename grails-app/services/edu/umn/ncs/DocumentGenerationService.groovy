@@ -17,9 +17,13 @@ class DocumentGenerationService {
     def dataSource
     def mergeDataBuilderService
 
+    def attachmentOf = BatchCreationItemRelation.findByName('attachment')
+    def childOf = BatchCreationItemRelation.findByName('child')
+    def sisterOf = BatchCreationItemRelation.findByName('sister')
+
     def appName = 'ncs-case-management'
 	
-	static def debug = false
+	static def debug = true
 	
 	static def csvDateFormat = 'yyyy-MM-dd HH:mm:ss'
     
@@ -178,6 +182,7 @@ class DocumentGenerationService {
 		def username = params.username
 		def batchInfoList = []
 		def masterBatch = null
+		def now = new Date()
 
 		///////////////////////////////////////////////////////
 		// Create Primary Batch
@@ -211,7 +216,7 @@ class DocumentGenerationService {
 			maxResults(1)
 		}
 
-		def v = instrumentHistoryInstance.itemVersion ?: 1
+		def v = instrumentHistoryInstance?.itemVersion ?: 1
 
 		// Assign Primary Instrment Type to Batch
 		masterBatch.addToInstruments(isPrimary: true,
@@ -376,7 +381,29 @@ class DocumentGenerationService {
 	}
 
 	/** This generates all the tracked items for a set of batches */
-	private generateTrackedItems(BatchCreationConfig batchCreationConfigInstance, batchInfoList, results) {
+	private generateTrackedItems(BatchCreationConfig batchCreationConfigInstance, batchInfoList, results, params) {
+
+		def username = params.username
+
+		// default reason, instructions and comments for each item
+        def reason = null
+        def instructions = null
+        def comments = null       
+        
+		if (params.manual) {
+			// default reason, instructions and comments come from config for auto generation.
+			if (!params.reason)  {
+				reason = batchCreationConfigInstance.defaultReason
+			}
+			if (!params.instructions)  {
+				instructions = batchCreationConfigInstance.defaultInstructions
+			}
+			if (!params.comments)  {
+				comments = batchCreationConfigInstance.defaultComments
+			}
+		}
+
+
 		// validating recordset
 		results.each{ row ->
 
@@ -570,6 +597,7 @@ class DocumentGenerationService {
 		}
 	}
 
+	/** This runs any postGeneration queries or closures if the bundle requires it. */
 	private void runPostGenerationLogic(BatchCreationConfig batchCreationConfigInstance, Batch masterBatch) {
 		// Run Post-Generation SQL
 		if (batchCreationConfigInstance.postGenerationQuery) {
@@ -601,35 +629,33 @@ class DocumentGenerationService {
 		}
 	}
 
+	/** This is the core method for generating a "document bundle".
+	*/
     def generateMailing(Map params) {
 
-        def now = new Date()
         // the master batch for the run
         Batch masterBatch = null
         /*
          * Params should contain...
-         *	config		: BatchCreationConfig
+         *	config			: BatchCreationConfig
          *	username        : String
-         *	mailDate	: Date
+         *	mailDate		: Date
          *	instrumentDate  : Date
-         *	maxPieces	: Integer
-         *	manual		: Boolean
-         *	reason		: String
+         *	maxPieces		: Integer
+         *	manual			: Boolean
+         *	reason			: String
          *	instructions    : String
-         *	comments	: String
+         *	comments		: String
          *
          **/
 
         // We'll use these later...
-        def attachmentOf = BatchCreationItemRelation.findByName('attachment')
-        def childOf = BatchCreationItemRelation.findByName('child')
-        def sisterOf = BatchCreationItemRelation.findByName('sister')
-        
-		// default reason, instructions and comments for each item
-        def reason = null
-        def instructions = null
-        def comments = null       
-        
+		/*
+        attachmentOf = BatchCreationItemRelation.findByName('attachment')
+        childOf = BatchCreationItemRelation.findByName('child')
+        sisterOf = BatchCreationItemRelation.findByName('sister')
+        */
+
 		// if no mail date was passed, set the default
         if (!params.mailDate) {
             params.mailDate = null
@@ -676,17 +702,6 @@ class DocumentGenerationService {
 					loadManualSelectionDataSet(batchCreationConfigInstance, username)
                 } else {
 
-					// default reason, instructions and comments come from config for auto generation.
-                    if (!params.reason)  {
-                        reason = batchCreationConfigInstance.defaultReason
-                    }
-                    if (!params.instructions)  {
-                        instructions = batchCreationConfigInstance.defaultInstructions
-                    }
-                    if (!params.comments)  {
-                        comments = batchCreationConfigInstance.defaultComments
-                    }
-
 					// Load the "to be generated" dataset
                     results = loadAutomaticSelectionDataSet(batchCreationConfigInstance, params)
                 }
@@ -694,14 +709,14 @@ class DocumentGenerationService {
 				if (results ) {
 					// generate the batches, and get back
 					// the batch metadata as a collection of maps
-					batchInfoList = generateBatches(batchCreationConfigInstance, params)
+					def batchInfoList = generateBatches(batchCreationConfigInstance, params)
 
 					// get the master batch out of the batchInfoList collection
 					masterBatch = batchInfoList.find{ it.master }
 
 					// generate all the tracked items per the selection criteria and tie
 					// them to the batches that we created.
-					generateTrackedItems(batchCreationConfigInstance, batchInfoList, results)
+					generateTrackedItems(batchCreationConfigInstance, batchInfoList, results, params)
 					
 					// run any post-generation code that needs to be run
 					runPostGenerationLogic(batchCreationConfigInstance, masterBatch)
