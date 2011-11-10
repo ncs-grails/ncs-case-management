@@ -94,20 +94,25 @@
 			</span>
 		</div>
 
-		<div class="prop"><span class="name"> 
-			<g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" /> </span> <span class="value"> 
+		<div class="prop">
+			<span class="name"> 
+				<g:message code="batchCreationDocument.dataSets.label" default="Merge Data Sources" /> </span> <span class="value"> 
 				<g:each var="msg" in="${DataSetType.list()}">
 					<g:if test="${d.dataSets.find{ it.id == msg.id}}">
 						<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" checked="checked" />
 					</g:if>
-			<g:else>
-				<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" />
-			</g:else>
-
-			<label for="dataSet-${msg.id}">
-			${msg.name}
-			</label>
-		</g:each> </span></div>
+					<g:else>
+						<input type="checkbox" name="dataSets.id" id="dataSet-${msg.id}" value="${msg.id}" />
+					</g:else>
+					<label for="dataSet-${msg.id}">
+						${msg.name}
+					</label>
+				</g:each>
+			</span>
+			<p>
+				<g:link controller="dataSetType" action="list">Manage Data Set Types</g:link>
+			</p>
+		</div>
 
 		<div class="prop"><span class="name"> <label
 			for="comment"><g:message

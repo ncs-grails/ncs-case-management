@@ -26,21 +26,10 @@ class DataSetTypeController {
         def dataSetTypeInstance = new DataSetType(params)
         if (dataSetTypeInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'dataSetType.label', default: 'DataSetType'), dataSetTypeInstance.id])}"
-            redirect(action: "show", id: dataSetTypeInstance.id)
+            redirect(action: "edit", id: dataSetTypeInstance.id)
         }
         else {
             render(view: "create", model: [dataSetTypeInstance: dataSetTypeInstance])
-        }
-    }
-
-    def show = {
-        def dataSetTypeInstance = DataSetType.get(params.id)
-        if (!dataSetTypeInstance) {
-            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataSetType.label', default: 'DataSetType'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [dataSetTypeInstance: dataSetTypeInstance]
         }
     }
 
@@ -70,7 +59,7 @@ class DataSetTypeController {
             dataSetTypeInstance.properties = params
             if (!dataSetTypeInstance.hasErrors() && dataSetTypeInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'dataSetType.label', default: 'DataSetType'), dataSetTypeInstance.id])}"
-                redirect(action: "show", id: dataSetTypeInstance.id)
+                redirect(action: "edit", id: dataSetTypeInstance.id)
             }
             else {
                 render(view: "edit", model: [dataSetTypeInstance: dataSetTypeInstance])
@@ -92,7 +81,7 @@ class DataSetTypeController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'dataSetType.label', default: 'DataSetType'), params.id])}"
-                redirect(action: "show", id: params.id)
+                redirect(action: "edit", id: params.id)
             }
         }
         else {

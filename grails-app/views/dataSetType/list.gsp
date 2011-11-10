@@ -25,37 +25,17 @@
 <table>
 	<thead>
 		<tr>
-			
-                            <g:sortableColumn property="id" title="${message(code: 'dataSetType.id.label', default: 'Id')}" />
-                        
-                            <g:sortableColumn property="name" title="${message(code: 'dataSetType.name.label', default: 'Name')}" />
-                        
-                            <g:sortableColumn property="code" title="${message(code: 'dataSetType.code.label', default: 'Code')}" />
-                        
-                            <g:sortableColumn property="closure" title="${message(code: 'dataSetType.closure.label', default: 'Closure')}" />
-                        
-                            <g:sortableColumn property="sqlQuery" title="${message(code: 'dataSetType.sqlQuery.label', default: 'Sql Query')}" />
-                        
-                            <g:sortableColumn property="closureTested" title="${message(code: 'dataSetType.closureTested.label', default: 'Closure Tested')}" />
-                        
+			<g:sortableColumn property="id" title="${message(code: 'dataSetType.id.label', default: 'Id')}" />
+			<g:sortableColumn property="name" title="${message(code: 'dataSetType.name.label', default: 'Name')}" />
+			<g:sortableColumn property="code" title="${message(code: 'dataSetType.code.label', default: 'Code')}" />
 		</tr>
 	</thead>
 	<tbody>
 		<g:each in="${dataSetTypeInstanceList}" status="i" var="dataSetTypeInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				
-                            <td><g:link action="show" id="${dataSetTypeInstance.id}">${fieldValue(bean: dataSetTypeInstance, field: "id")}</g:link></td>
-                        
-                            <td>${fieldValue(bean: dataSetTypeInstance, field: "name")}</td>
-                        
-                            <td>${fieldValue(bean: dataSetTypeInstance, field: "code")}</td>
-                        
-                            <td>${fieldValue(bean: dataSetTypeInstance, field: "closure")}</td>
-                        
-                            <td>${fieldValue(bean: dataSetTypeInstance, field: "sqlQuery")}</td>
-                        
-                            <td><g:formatBoolean boolean="${dataSetTypeInstance.closureTested}" /></td>
-                        
+				<td><g:link action="edit" id="${dataSetTypeInstance.id}">${fieldValue(bean: dataSetTypeInstance, field: "id")}</g:link></td>
+				<td>${fieldValue(bean: dataSetTypeInstance, field: "name")}</td>
+				<td>${fieldValue(bean: dataSetTypeInstance, field: "code")}</td>
 			</tr>
 		</g:each>
 	</tbody>

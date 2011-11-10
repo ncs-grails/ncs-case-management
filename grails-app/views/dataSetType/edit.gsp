@@ -49,21 +49,24 @@
 		<div class="prop">
 			<span class="name">
 			  <label for="closure"><g:message code="dataSetType.closure.label" default="Closure" /></label>
-			  <p>this is the closure containing the groovy code that adds the required fields to the dataset. It MUST take a dataSet as a parameter, and return the altered dataset. If this is not provided, the closure or equivalent must exist in the respective service that builds the data source.</p>
-			  <p>Example:
-			  <pre>{ dataSet ->
-		dataSet.collect{record ->
-			def trackedItemInstance = TrackedItem.read(record.itemId)
-			def personInstance = trackedItemInstance.person
-			record.newField = "my new data"
-		}
-		dataSet
-	}
-</pre>
-			  </p>
 			</span>
+			<div class="prop-description">
+			  <p>this is the closure containing the groovy code that adds the required fields to the dataset. It MUST take a dataSet as a parameter, and return the altered dataset. If this is not provided, the closure or equivalent must exist in the respective service that builds the data source.</p>
+			  <p>
+			  <strong>Example:</strong> 
+			  <pre>{ dataSet -&gt;
+  dataSet.collect{record -&gt;
+    def trackedItemInstance = TrackedItem.read(record.itemId)
+    def personInstance = trackedItemInstance.person
+    record.newField = "my new data"
+  }
+  dataSet
+}
+</pre>
+			  </div>
+			  </p>
 			<span class="value ${hasErrors(bean: dataSetTypeInstance, field: 'closure', 'errors')}">
-				<g:textArea name="closure" cols="40" rows="5" value="${dataSetTypeInstance?.closure}" />
+				<g:textArea name="closure" cols="120" rows="12" value="${dataSetTypeInstance?.closure}" style="font-family: monospace;" />
 			</span>
 		</div>
 		<div class="prop">
@@ -76,6 +79,8 @@
 		<div class="prop">
 			<span class="name">
 			  <label for="sqlQuery"><g:message code="dataSetType.sqlQuery.label" default="Sql Query" /></label>
+			</span>
+			<div class="prop-description">
 			  <p>This is the field containing the sql query
 			   that adds the required fields to the dataset. It MUST take
 				:batchId as a parameter, and return the tracked_item as well as additional fields.</p>
@@ -86,9 +91,9 @@ FROM batch b INNER JOIN
 WHERE (b.id = :batchId)
 				</pre>
 				Adds a column named "app_created" to the dataset.</p>
-			</span>
+			</div>
 			<span class="value ${hasErrors(bean: dataSetTypeInstance, field: 'sqlQuery', 'errors')}">
-				<g:textArea name="sqlQuery" cols="40" rows="5" value="${dataSetTypeInstance?.sqlQuery}" />
+				<g:textArea name="sqlQuery" cols="120" rows="12" value="${dataSetTypeInstance?.sqlQuery}" style="font-family: monospace;" />
 			</span>
 		</div>
 		<div class="prop">

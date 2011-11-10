@@ -49,6 +49,18 @@ class DocumentGenerationService {
 		
 		return parentTrackedItemInstance
 	}
+
+	def flushPrintQueue(String username) {
+		// setup a print queue if the user doesn't have one
+		def printQueue = BatchQueue.findByUsername(username)
+		if (!printQueue) {
+			printQueue = new BatchQueue(username:username, appCreated: appName).save(flush:true)
+		}
+		// clear print queue
+		printQueue.items = []
+		printQueue.save(flush:true)
+		return printQueue
+	}
 	
     // Loads an existing mailing into the print queue
     def reQueueMailing(Batch batchInstance, String username) {
@@ -60,27 +72,15 @@ class DocumentGenerationService {
             }
 
             // setup a print queue if the user doesn't have one
-            def printQueue = BatchQueue.findByUsername(params.username)
-            if (!printQueue) {
-                printQueue = new BatchQueue(username:params.username, appCreated: appName).save(flush:true)
-            }
-            // clear print queue
-            printQueue.items = []
-            printQueue.save(flush:true)
+            def printQueue = flushPrintQueue(params.username)
 
-
-            batchInstance.items.each{
-                printQueue.addToItems(it)
-            }
+            batchInstance.items.each{ printQueue.addToItems(it) }
 
             subBatches = Batch.findAllByMaster(batchInstance).each{ subBatch ->
-                subBatch.items.each{
-                    printQueue.addToItems(it)
-                }
+                subBatch.items.each{ printQueue.addToItems(it) }
             }
 
             printQueue.save(flush:true)
-            
         }
         return batchInstance
     }
@@ -403,6 +403,8 @@ class DocumentGenerationService {
 			}
 		}
 
+		// setup a print queue if the user doesn't have one
+		def printQueue = flushPrintQueue(params.username)
 
 		// validating recordset
 		results.each{ row ->
@@ -443,14 +445,24 @@ class DocumentGenerationService {
 					// This is the magical branching logic that we needed!
 					// if the instrument is optional...
 					if (b.optional) {
-						def skipColumn = "skip_${b.instrument.nickName}"
+						if (debug) { println "DocGen:: ${b.instrument} is optional." }
+
+						// NOTE: the toString() at the end of the GString.
+						// This is required for the containsKey call to function properly
+						def skipColumn = "skip_${b.instrument.nickName}".toString()
 						// ... and the "skip" column exists in the recordset ...
-						if ( record.keySet.contains(skipColumn) ) {
+						if ( row.containsKey(skipColumn) ) {
 							// ... and the skip column is not null ...
-							if ( record[skipColumn] ) {
+							if ( row[skipColumn] ) {
 								// ... then DO NOT GENERATE THIS TRACKED ITEM!!!
+								if (debug) { println "DocGen::row[${skipColumn}] contains: '${row[skipColumn]}', skipping." }
 								generateItem = false
+							} else if (debug) {
+								println "DocGen::row[${skipColumn}] contains: '${row[skipColumn]}', generating."
 							}
+						} else if (debug) {
+							println "DocGen::row does NOT contain ${skipColumn}."
+							println "DocGen::row	${row}"
 						}
 					}
 
@@ -590,11 +602,16 @@ class DocumentGenerationService {
 			}
 		}
 
+		def masterBatch = null
+
 		// save all the batches in their dependent order!
 		batchInfoList.sort{it.sortOrder}.each{ b ->
 			b.batch.save(flush:true)
 			printQueue.save(flush:true)
+			if (b.master) { masterBatch = b.batch }
 		}
+
+		return masterBatch
 	}
 
 	/** This runs any postGeneration queries or closures if the bundle requires it. */
@@ -649,28 +666,12 @@ class DocumentGenerationService {
          *
          **/
 
-        // We'll use these later...
-		/*
-        attachmentOf = BatchCreationItemRelation.findByName('attachment')
-        childOf = BatchCreationItemRelation.findByName('child')
-        sisterOf = BatchCreationItemRelation.findByName('sister')
-        */
-
 		// if no mail date was passed, set the default
         if (!params.mailDate) {
             params.mailDate = null
         }
 
         if (params.config && params.username) {
-
-            // setup a print queue if the user doesn't have one
-            def printQueue = BatchQueue.findByUsername(params.username)
-            if (!printQueue) {
-                printQueue = new BatchQueue(username:params.username, appCreated: appName).save(flush:true)
-            }
-            // clear print queue
-            printQueue.items = []
-            printQueue.save(flush:true)
 
 
             def batchCreationConfigInstance = BatchCreationConfig.get(params.config.id)
@@ -699,25 +700,21 @@ class DocumentGenerationService {
                 
                 if (manualSelection) {
 					// Load the "to be generated" dataset
-					loadManualSelectionDataSet(batchCreationConfigInstance, username)
+					results = loadManualSelectionDataSet(batchCreationConfigInstance, username)
                 } else {
-
 					// Load the "to be generated" dataset
                     results = loadAutomaticSelectionDataSet(batchCreationConfigInstance, params)
                 }
 
-				if (results ) {
+				if (results) {
 					// generate the batches, and get back
 					// the batch metadata as a collection of maps
 					def batchInfoList = generateBatches(batchCreationConfigInstance, params)
 
-					// get the master batch out of the batchInfoList collection
-					masterBatch = batchInfoList.find{ it.master }
-
 					// generate all the tracked items per the selection criteria and tie
 					// them to the batches that we created.
-					generateTrackedItems(batchCreationConfigInstance, batchInfoList, results, params)
-					
+					masterBatch = generateTrackedItems(batchCreationConfigInstance, batchInfoList, results, params)
+
 					// run any post-generation code that needs to be run
 					runPostGenerationLogic(batchCreationConfigInstance, masterBatch)
                 } else {
@@ -731,9 +728,8 @@ class DocumentGenerationService {
 
 	/** This creates a merge data source for a particular batch and document combination */
     def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
-		// build a date/time format that is MS Word "safe"
-		def fmt = DateTimeFormat.forPattern(csvDateFormat)
 		
+		def mergeSourceContents = null
 		def startTime = new GregorianCalendar().time.time
 		def splitTime = startTime
 		
@@ -872,7 +868,9 @@ class DocumentGenerationService {
    		a string buffer containing the CSV version of
 		the data */
 	def dataSetToCsv(outputData) {
-
+		// build a date/time format that is MS Word "safe"
+		def fmt = DateTimeFormat.forPattern(csvDateFormat)
+		
 		// the stuff to write to the file
 		def mergeSourceContents = new StringBuffer()
 	
