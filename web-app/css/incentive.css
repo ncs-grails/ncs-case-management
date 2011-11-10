@@ -60,9 +60,12 @@ div.filter-buttons span {
 div.filter-buttons span.with-select {
 	background-color:#EEE;		
 }
-div.filter-buttons input:hover {
+div.filter-buttons input[type="button"]:hover {
 	cursor:pointer;
 	background: none repeat scroll 0 0 #FFCC33;	
+}
+div.filter-buttons-row {
+	padding-bottom: 1.0em;
 }
 .print {
 	padding: 0.5em 2.0em;

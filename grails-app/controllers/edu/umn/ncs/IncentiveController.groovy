@@ -10,7 +10,7 @@ import edu.umn.ad.DirectoryService
 // Let's us use security annotations
 import org.codehaus.groovy.grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_NCS_PROTECTED'])
+@Secured(['ROLE_NCS_INCENTIVES'])
 class IncentiveController {
 	def authenticateService
 	def directoryService
@@ -107,6 +107,15 @@ class IncentiveController {
 				result.incentiveInstanceList = incentiveInstanceList
 				result.incentiveInstanceTotal = incentiveInstanceList.size()
 				result.interviewer = user?.username
+			}
+			filterName = "Incentives with Receipt#: "
+			if (filterId == '6') {
+				filterName += params?.receiptNumber
+				incentiveInstanceList = Incentive.findAllByReceiptNumber(params?.receiptNumber)
+				result.success = true
+				result.filterName = filterName
+				result.incentiveInstanceList = incentiveInstanceList
+				result.incentiveInstanceTotal = incentiveInstanceList.size()
 			}
 			render(template:'filterList', model:[result:result])
 		}
@@ -296,7 +305,7 @@ class IncentiveController {
                     return
                 }
             }
-			params.UserUpdated = username
+			params.userUpdated = username
 			// Perform a test on the incentive date to make sure it is not in the future
 			def localDate = new DateTime().toLocalDate()
 			def localIncentiveDate = new DateTime(params?.incentiveDate).toLocalDate()

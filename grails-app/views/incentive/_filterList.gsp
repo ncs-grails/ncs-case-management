@@ -4,57 +4,71 @@
     <div class="filter-buttons">
     <%--BUTTONS TO FILTER LIST - ALL (DEFAULT), DISTRIBUTED, CHECKED IN, CHECKED OUT, AND CHECKED OUT TO --%>
     	<g:form>
-            <span class="button">
-				<g:submitToRemote value="All"
-					url="[controller:'incentive', action:'list', id:'1']"
-					update="formContainer"
-					onLoading="showSearching()"
-					onComplete="hideSearching()"
-					onSuccess=""
-					onFailure="showFailure()" />
-           </span>
-           <span class="button">
-			 	<g:submitToRemote value="Distributed"
-					url="[controller:'incentive', action:'list', id:'2']"
-					update="formContainer"
-					onLoading="showSearching()"
-					onComplete="hideSearching()"
-					onSuccess=""
-					onFailure="showFailure()" />
-           </span>
-           <span class="button">
-				<g:submitToRemote value="Checked In"
-					url="[controller:'incentive', action:'list', id:'3']"
-					update="formContainer"
-					onLoading="showSearching()"
-					onComplete="hideSearching()"
-					onSuccess=""
-					onFailure="showFailure()" />
-           </span>
-           <span class="button">
-				<g:submitToRemote value="Checked Out"
-					url="[controller:'incentive', action:'list', id:'4']"
-					update="formContainer"
-					onLoading="showSearching()"
-					onComplete="hideSearching()"
-					onSuccess=""
-					onFailure="showFailure()" />
-            </span>
-           <span class="button with-select">
-				<g:submitToRemote value="Checked Out To"
-					url="[controller:'incentive', action:'list', id:'5']"
-					update="formContainer"
-					onLoading="showSearching()"
-					onComplete="hideSearching()"
-					onSuccess=""
-					onFailure="showFailure()" />
-			    <g:select name="interviewer"
-			    	from='${result?.memberInstanceList}'
-			    	optionKey="username"
-			    	optionValue="displayName"
-			    	value="${result?.interviewer}" />
-            </span>
-    	
+    		<div class="filter-buttons-row">
+    			<label>View  </label>
+	            <span class="button">
+					<g:submitToRemote value="All"
+						url="[controller:'incentive', action:'list', id:'1']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+	           </span>
+	           <span class="button">
+				 	<g:submitToRemote value="Distributed"
+						url="[controller:'incentive', action:'list', id:'2']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+	           </span>
+	           <span class="button">
+					<g:submitToRemote value="Checked In"
+						url="[controller:'incentive', action:'list', id:'3']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+	           </span>
+	           <span class="button">
+					<g:submitToRemote value="Checked Out"
+						url="[controller:'incentive', action:'list', id:'4']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+	            </span>
+            </div>
+            <div>
+	           <span class="button with-select">
+					<g:submitToRemote value="Checked Out To"
+						url="[controller:'incentive', action:'list', id:'5']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+				    <g:select name="interviewer"
+				    	from='${result?.memberInstanceList}'
+				    	optionKey="username"
+				    	optionValue="displayName"
+				    	value="${result?.interviewer}" />
+	            </span>
+	            <span class="button with-select">
+					<g:submitToRemote value="With Receipt #"
+						url="[controller:'incentive', action:'list', id:'6']"
+						update="formContainer"
+						onLoading="showSearching()"
+						onComplete="hideSearching()"
+						onSuccess=""
+						onFailure="showFailure()" />
+					<g:textField name="receiptNumber" value="" />
+	             </span>		                  
+    		</div>
     	</g:form>
     </div>	
 	<div class="info-header">Showing ${result?.incentiveInstanceTotal} incentive(s)
