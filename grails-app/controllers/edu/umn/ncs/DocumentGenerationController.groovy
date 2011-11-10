@@ -282,7 +282,7 @@ class DocumentGenerationController {
 			
 			if (parentItemInstance) {
 				if (batchCreationConfigInstance.oneBatchEventParentItem) {
-					def item = documentGenerationService.getItemByParentAndConfig(parentItemInstance, batchCreationConfigInstance)
+					def item = documentGenerationService.getItemByParentAndConfig(parentItemInstance, batchCreationConfigInstancei.instrument)
 					if (item) {
 						itemInfo.errorText = "It's already been generated!"
 						itemInfo.youCanDoIt = false
