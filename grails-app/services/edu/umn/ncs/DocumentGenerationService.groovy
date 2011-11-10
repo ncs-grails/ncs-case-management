@@ -684,8 +684,8 @@ class DocumentGenerationService {
         return masterBatch
     }
 
+	/** This creates a merge data source for a particular batch and document combination */
     def generateMergeData(Batch batchInstance, BatchCreationDocument batchCreationDocumentInstance) {
-
 		// build a date/time format that is MS Word "safe"
 		def fmt = DateTimeFormat.forPattern(csvDateFormat)
 		
@@ -740,8 +740,6 @@ class DocumentGenerationService {
 			}
 		}
 
-
-
 		// TODO: replace this looping with calls
 		// can process the 'closure' or 'sqlQuery' 
 		// if it is provided.
@@ -750,11 +748,11 @@ class DocumentGenerationService {
 		// two don't exist.
         batchCreationDocumentInstance.dataSets.each{
 
-
 			if (debug) {
 				println "Dataset type: ${it.code}"
 			}
             if (it.code == "norc") {
+			// TODO: Move this to SQL DataSetType attributes
                 outputData = mergeDataBuilderService.addNORCData(outputData)
 				
 				if (debug) {
@@ -764,6 +762,7 @@ class DocumentGenerationService {
 					splitTime = newSplitTime
 				}
             } else if (it.code == "appointment") {
+			// TODO: Move this to SQL DataSetType attributes
 				outputData = mergeDataBuilderService.addAppointmentData(outputData)
 				
 				if (debug) {
@@ -773,6 +772,7 @@ class DocumentGenerationService {
 					splitTime = newSplitTime
 				}
             } else if (it.code == "childItems") {
+			// TODO: Move this to SQL DataSetType attributes
 				outputData = mergeDataBuilderService.addChildItems(outputData)
 				
 				if (debug) {
@@ -782,7 +782,7 @@ class DocumentGenerationService {
 					splitTime = newSplitTime
 				}
 			} else {
-				// chain custom dataset on
+				// chain custom dataset on from closure in DataSetType
 				outputData = mergeDataBuilderService.addDataSet(it, outputData)
 			}
         }
@@ -810,7 +810,7 @@ class DocumentGenerationService {
 		 def batchCreationConfig = ""
          if (outputData) {
 			 // convert the data set to a CSV format
-			 batchCreationConfig = dataSetToCsv(outputData)
+			 mergeSourceContents = dataSetToCsv(outputData)
 		 }
 		 if (debug) {
 			 def newSplitTime = new GregorianCalendar().time.time
