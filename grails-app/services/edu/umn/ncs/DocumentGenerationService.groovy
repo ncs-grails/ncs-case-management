@@ -248,6 +248,7 @@ class DocumentGenerationService {
 				instrument:masterBatch.primaryInstrument,
 				childOfInstrument:null,
 				childOfBatch:null,
+				optional: false,
 				master:true,
 				sortOrder:1])
 
@@ -300,6 +301,7 @@ class DocumentGenerationService {
 
 			batchInfoList.add([batch:subBatch,
 					instrument:bci.instrument,
+					optional: bci.optional,
 					childOfInstrument:bci.childOf,
 					childOfBatch:null,
 					master:false,
@@ -404,136 +406,164 @@ class DocumentGenerationService {
 				// VERY IMPORTANT to sort this so the dependent batches show up first!!!
 				// Should be sorted by childOfBatch
 
+				// sort it according to parent instrument dependency
 				batchInfoList = batchInfoList.sort{ it.sortOrder }
 
 				batchInfoList.each{ b ->
 
-					def trackedItem = new TrackedItem(person:bcq.person,
-						household:bcq.household,
-						dwellingUnit:bcq.dwellingUnit)
+					def generateItem = true
 
-					if (b.master) {
-						if (instructions) {
-							trackedItem.addToComments(subject: 'instructions', text: instructions, userCreated: username, appCreated: appName)
+					// This is the magical branching logic that we needed!
+					// if the instrument is optional...
+					if (b.optional) {
+						def skipColumn = "skip_${b.instrument.nickName}"
+						// ... and the "skip" column exists in the recordset ...
+						if ( record.keySet.contains(skipColumn) ) {
+							// ... and the skip column is not null ...
+							if ( record[skipColumn] ) {
+								// ... then DO NOT GENERATE THIS TRACKED ITEM!!!
+								generateItem = false
+							}
 						}
-						if (comments) {
-							trackedItem.addToComments(text: comments, userCreated: username, appCreated: appName)
-						}
-						if (reason) {
-							trackedItem.addToComments(subject: 'reason', text: reason, userCreated: username, appCreated: appName)
-						}                                        
 					}
 
-					// add sister batches as well as master batches,
-					// because they both become child of parent items
-					// if doc gen is configured as such...
-					if (!b.childOfBatch && batchCreationConfigInstance.useParentItem && row.containsKey('parent_item')) {
-						def parent = TrackedItem.read(row.parent_item)
-						if (parent) {
-							trackedItem.parentItem = parent
-						} else {
-							println "WARNING: Parent Item ID: ${row.parent_item} not found!"
-							//throw new DocumentGenerationException("Can't find parent tracked item for master batch.")
+					if (generateItem) {
+						// Create an "unattached tracked item"
+						// Note: this may be discarded if the item is optional, and 
+						// the selection criteria deems that it should not be generated
+						def trackedItem = new TrackedItem(person:bcq.person,
+							household:bcq.household,
+							dwellingUnit:bcq.dwellingUnit)
+
+						// consitency states that comments, of all types, are only added to the master
+						// item in the batch
+						if (b.master) {
+							if (instructions) {
+								trackedItem.addToComments(subject: 'instructions', text: instructions, userCreated: username, appCreated: appName)
+							}
+							if (comments) {
+								trackedItem.addToComments(text: comments, userCreated: username, appCreated: appName)
+							}
+							if (reason) {
+								trackedItem.addToComments(subject: 'reason', text: reason, userCreated: username, appCreated: appName)
+							}                                        
 						}
-					} else if (! b.master && b.childOfBatch) {
-						// This sid is the child of another sid in the same run!
-						def parent = trackedItemList.find{ it.batch == b.childOfBatch }
-						if (parent) {
-							trackedItem.parentItem = parent
-						} else {
-							println "ERROR: Something went horribly wrong! (We couldn't find the parent tracked item)"
-							//throw new DocumentGenerationException("Can't find parent tracked item of sister/parent/master batch.")
-						}
 
-					} else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
-						&& !row.containsKey('parent_item')
-						&& batchCreationConfigInstance.parentInstrument  
-						&& batchCreationConfigInstance.parentDirection  
-						&& batchCreationConfigInstance.parentFormat  
-						&& batchCreationConfigInstance.isInitial ) {
+						// add sister batches as well as master batches,
+						// because they both become child of parent items
+						// if doc gen is configured as such...
+						//   master/sister batch    && useParentItem                             && parent_item was passed
+						if (!b.childOfBatch && batchCreationConfigInstance.useParentItem && row.containsKey('parent_item')) {
+							def parent = TrackedItem.read(row.parent_item)
+							if (parent) {
+								trackedItem.parentItem = parent
+							} else {
+								println "WARNING: Parent Item ID: ${row.parent_item} not found!"
+								//throw new DocumentGenerationException("Can't find parent tracked item for master batch.")
+							}
+						} else if (! b.master && b.childOfBatch) {
+							// This sid is the child of another sid in the same run!
+							def parent = trackedItemList.find{ it.batch == b.childOfBatch }
+							if (parent) {
+								trackedItem.parentItem = parent
+							} else {
+								println "ERROR: Something went horribly wrong! (We couldn't find the parent tracked item)"
+								//throw new DocumentGenerationException("Can't find parent tracked item of sister/parent/master batch.")
+							}
 
-						// WARNING!
-						// This method is slow as it creates one query per record, so
-						// a mailing of 2000 will run 2000 queries (or more)
+						} else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
+							&& !row.containsKey('parent_item')
+							&& batchCreationConfigInstance.parentInstrument  
+							&& batchCreationConfigInstance.parentDirection  
+							&& batchCreationConfigInstance.parentFormat  
+							&& batchCreationConfigInstance.isInitial ) {
 
-						// we should hunt for the parent sid
-						def cti = TrackedItem.createCriteria()
-						def trackedItemInstanceList = cti.list{
-							batch{
-								and {
-									instruments{
-										and {
-											instrument{
-												eq("id", batchCreationConfigInstance.parentInstrument?.id)
-											}
-											isInitial{
-												eq("id", batchCreationConfigInstance.isInitial?.id)
+							// WARNING!
+							// This method is slow as it creates one query per record, so
+							// a mailing of 2000 will run 2000 queries (or more)
+
+							// we should hunt for the parent sid
+							def cti = TrackedItem.createCriteria()
+							def trackedItemInstanceList = cti.list{
+								batch{
+									and {
+										instruments{
+											and {
+												instrument{
+													eq("id", batchCreationConfigInstance.parentInstrument?.id)
+												}
+												isInitial{
+													eq("id", batchCreationConfigInstance.isInitial?.id)
+												}
 											}
 										}
-									}
-									direction{
-										eq("id", batchCreationConfigInstance.parentDirection?.id)
-									}
-									format{
-										eq("id", batchCreationConfigInstance.parentFormat?.id)
+										direction{
+											eq("id", batchCreationConfigInstance.parentDirection?.id)
+										}
+										format{
+											eq("id", batchCreationConfigInstance.parentFormat?.id)
+										}
 									}
 								}
 							}
+
+							if (trackedItemInstanceList) {
+								// grab the first one.
+								parent = trackedItemInstanceList[0]
+							}
+
+							if (parent) {
+								trackedItem.parentItem = parent
+							} else {
+								println "WARNING: Parent Item ID not found for: ${row}"
+								//throw new DocumentGenerationException("Can't find parent tracked item using implied information.")
+							}
+						} else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
+							&& !row.containsKey('parent_item') ) {
+							println "ERROR: Someone set the batch config to require a parent_item, but didn't specify the tracked_item.id AS parent_item"
+							//throw new DocumentGenerationException("Can't find parent_item column in data source even though config requires it.")
 						}
 
-						if (trackedItemInstanceList) {
-							// grab the first one.
-							parent = trackedItemInstanceList[0]
+						if (batchCreationConfigInstance.useExpiration && row.containsKey('expire_date')) {
+							def expireDate = row.expire_date
+							if (expireDate) {
+								trackedItem.expiration = expireDate
+							} else {
+								println "NOTE: No expiration date found for item: ${trackedItem}!"
+							}
 						}
 
-						if (parent) {
-							trackedItem.parentItem = parent
-						} else {
-							println "WARNING: Parent Item ID not found for: ${row}"
-							//throw new DocumentGenerationException("Can't find parent tracked item using implied information.")
+						if (batchCreationConfigInstance.useStudyYear && row.containsKey('study_year')) {
+							def studyYear = row.study_year
+							if (studyYear) {
+								trackedItem.studyYear = studyYear
+							} else {
+								println "NOTE: No study year found for item: ${trackedItem}!"
+							}
 						}
-					} else if (!b.childOfBatch && batchCreationConfigInstance.useParentItem
-						&& !row.containsKey('parent_item') ) {
-						println "ERROR: Someone set the batch config to require a parent_item, but didn't specify the tracked_item.id AS parent_item"
-						//throw new DocumentGenerationException("Can't find parent_item column in data source even though config requires it.")
+
+						// TODO: If row.containsKey('calling_item') Then someService.putInCallSystem()
+
+						b.batch.addToItems(trackedItem)
+						printQueue.addToItems(trackedItem)
+						// Removed this in leu of a faster version below
+						// that writes the sids to the DB in one fell swoop
+						//b.batch.save(flush:true)
+						//trackedItem.save(flush:true)
+						//println " + Created SID: ${trackedItem.id} (v2)"
+
+						trackedItemList.add(trackedItem)
+					} else if (debug) {
+						println "this item (${bcq}) skipped due to 'skip_${b.instrument.nickName}' clause."
 					}
-
-					if (batchCreationConfigInstance.useExpiration && row.containsKey('expire_date')) {
-						def expireDate = row.expire_date
-						if (expireDate) {
-							trackedItem.expiration = expireDate
-						} else {
-							println "NOTE: No expiration date found for item: ${trackedItem}!"
-						}
-					}
-
-					if (batchCreationConfigInstance.useStudyYear && row.containsKey('study_year')) {
-						def studyYear = row.study_year
-						if (studyYear) {
-							trackedItem.studyYear = studyYear
-						} else {
-							println "NOTE: No study year found for item: ${trackedItem}!"
-						}
-					}
-
-					// TODO: If row.containsKey('calling_item') Then someService.putInCallSystem()
-
-					b.batch.addToItems(trackedItem)
-					printQueue.addToItems(trackedItem)
-					// Removed this in leu of a faster version below
-					// that writes the sids to the DB in one fell swoop
-					//b.batch.save(flush:true)
-					//trackedItem.save(flush:true)
-					//println " + Created SID: ${trackedItem.id} (v2)"
-
-					trackedItemList.add(trackedItem)
 				}
 			} else {
 				println "Invalid Batch Creation Queue Record"
+				throw InvalidBatchCreationQueueRecordException
 			}
 		}
 
-		// save all the batches!
+		// save all the batches in their dependent order!
 		batchInfoList.sort{it.sortOrder}.each{ b ->
 			b.batch.save(flush:true)
 			printQueue.save(flush:true)
