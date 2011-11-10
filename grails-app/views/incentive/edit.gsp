@@ -21,6 +21,9 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
+            <g:if test="${renderError}">
+            <div class="message">${renderError}</div>
+            </g:if>
             <g:hasErrors bean="${incentiveInstance}">
             <div class="errors">
                 <g:renderErrors bean="${incentiveInstance}" as="list" />

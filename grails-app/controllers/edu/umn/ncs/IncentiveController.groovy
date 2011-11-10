@@ -17,6 +17,7 @@ class IncentiveController {
 	def memberInstanceList
 	def groupName = "EnHS-NCS-Interviewer"
 	def debug = false
+	static def appName = "ncs-incentive-mailing"
 	
 	static def dateFormat = DateTimeFormat.forPattern("MM/dd/yyyy")
 	
@@ -190,7 +191,6 @@ class IncentiveController {
 	def saveIncentiveBatch = {
 		// Mechanism for saving a batch of incentives in one session (e.g. gift cards)
 		def username = authenticateService.principal().getUsername()
-		def appName = "ncs-incentive-mailing"
 		
 		// Delay Code, used to test out of sequence responses
 		/*
@@ -235,15 +235,17 @@ class IncentiveController {
 				}
 				
 				// Check for incentive with current barcode
-				def incentiveInstance = Incentive.findByBarcode(barcodeValue)
+				def incentiveInstance = Incentive.findByBarcodeAndType(barcodeValue, type)
 				if (incentiveInstance) {
 					// barcode already scanned
-					result.errorText = "An incentive already exists with this barcode"
+					result.errorText = "An incentive already exists with this barcode and type"
 				}
 				else {
 					// Create the incentive
 					//incentiveInstance = new Incentive(barcode:barcodeValue,receiptNumber:receiptNumber,amount:amount,incentiveDate:new Date(),type:type,userCreated:username,userUpdated:username)
-					incentiveInstance = new Incentive(barcode:barcodeValue,receiptNumber:receiptNumber,amount:amount,type:type,userCreated:username,userUpdated:username)
+					incentiveInstance = new Incentive(barcode:barcodeValue
+						,receiptNumber:receiptNumber, amount:amount
+						,type:type, userCreated:username, userUpdated:username)
 					
 					// Try to save the incentive
 					if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
@@ -312,21 +314,29 @@ class IncentiveController {
 			if (localIncentiveDate.compareTo(localDate) < 1) {
 				// Check to see if the transaction log needs to be updated
 				if ((params?.checkedOut && !incentiveInstance?.checkedOut) || (!params?.checkedOut && incentiveInstance?.checkedOut)) {
-					// Update checkout log information
-					new IncentiveTransactionLog(incentive:incentiveInstance,transactionDate:new Date(),checkedOutInToWhom:incentiveInstance?.checkedOutToWhom,checkedOutInByWhom:username).save(flush:true)
+					if (incentiveInstance.checkedOutToWhom) {
+						// Update checkout log information
+						new IncentiveTransactionLog(incentive:incentiveInstance
+							,transactionDate:new Date()
+							,checkedOutInToWhom: incentiveInstance.checkedOutToWhom
+							,checkedOutInByWhom: username).save(flush:true)
+					}
 				} 
 				incentiveInstance.properties = params
 				if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
-					flash.message = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
-					render(view: "edit", model: [incentiveInstance: incentiveInstance])
+					// todo
+					def renderError = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
+					
+					render(view: "edit", model: [incentiveInstance: incentiveInstance, renderError: renderError])
 				}
 				else {
 					render(view: "edit", model: [incentiveInstance: incentiveInstance])
 				}
 			}
 			else {
-				flash.message = "Save Failed: An inconsistent incentive date was entered. Please try again."
-				render(view: "edit", model: [incentiveInstance: incentiveInstance])
+				// todo
+				def renderError = "Save Failed: An inconsistent incentive date was entered. Please try again."
+				render(view: "edit", model: [incentiveInstance: incentiveInstance, renderError: renderError])
 			}
         }
         else {
@@ -334,8 +344,10 @@ class IncentiveController {
 			redirect(controller:"appointment", action: "index")
         }
     }
-	
+	// TODO: Move these into an AppointmentIncentiveController...  some day???
 	def updateAppointmentIncentive = {
+		
+		def username = authenticateService.principal().getUsername()
 		def incentiveInstance = Incentive.get(params.id)
 		if (incentiveInstance) {
 			if (params.version) {
@@ -348,6 +360,8 @@ class IncentiveController {
 				}
 			}
 			incentiveInstance.properties = params
+			incentiveInstance.userUpdated = username
+			
 			
 			def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
 			if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
@@ -408,6 +422,7 @@ class IncentiveController {
 				}
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
+				// TODO: flash.no.render
                 flash.message = "${message(code: 'default.not.deleted.message', args: [message(code: 'incentive.label', default: 'Incentive'), params.id])}"
                 render(view: "edit", model: [incentiveInstance: incentiveInstance])
             }
@@ -439,7 +454,6 @@ class IncentiveController {
 		 * corresponding provenance data.
 		 */
 		def username = authenticateService.principal().getUsername()
-		def appName = "ncs-incentive-mailing"
 		def checkedOutDate = null
 		def checkedOutTo = null
 		
@@ -516,16 +530,14 @@ class IncentiveController {
 						}
 					}	
 				}
-			}
-			else {
+			} else {
 				// Get incentive details
 				def receiptNumber = params.receiptNumberInstance
 				def amount = params.amountInstance
 				def type = null
 				try {
 					type = IncentiveType.read(params.incentiveTypeInstance)
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					if (debug) {
 						println "Error getting incentive type. ${e}"
 					}
@@ -537,7 +549,15 @@ class IncentiveController {
 							
 						// Try to create the incentive
 						//incentiveInstance = new Incentive(barcode:barcodeValue,receiptNumber:receiptNumber,amount:amount,type:type,checkedOut:true,checkedOutToWhom:checkedOutTo,checkedOutByWhom:username,incentiveDate:new Date(),dateCheckedOut:new Date(),userCreated:username,userUpdated:username)
-						incentiveInstance = new Incentive(barcode:barcodeValue,receiptNumber:receiptNumber,amount:amount,type:type,checkedOut:true,checkedOutToWhom:checkedOutTo,checkedOutByWhom:username,dateCheckedOut:new Date(),userCreated:username,userUpdated:username)
+						incentiveInstance = new Incentive(barcode:barcodeValue
+							,receiptNumber:receiptNumber
+							,amount:amount
+							,type:type,checkedOut:true
+							,checkedOutToWhom:checkedOutTo
+							,checkedOutByWhom:username
+							,dateCheckedOut:new Date()
+							,userCreated:username
+							,userUpdated:username)
 						
 						// Try to save the incentive
 						if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
@@ -569,7 +589,6 @@ class IncentiveController {
 	def checkinIncentive = {
 		
 		def username = authenticateService.principal().getUsername()
-		def appName = "ncs-incentive-mailing"
 		
 		// Delay Code, used to test out of sequence responses
 		/*
@@ -648,13 +667,11 @@ class IncentiveController {
 
 	}
 
-	def assignIncentive= {
-	
-	}
+	def assignIncentive = { }
 	
 	def assignIncentiveToItem = {
 		def username = authenticateService.principal().getUsername()
-		def appName = "ncs-incentive-mailing"
+
 		// prep all the things we'll need to send back
 		def result = [
 			success: false,
@@ -693,7 +710,12 @@ class IncentiveController {
 				else {
 					// Get the tracked item
 					if (params?.trackedItemId) {
-						trackedItemInstance = TrackedItem.read(params?.trackedItemId?.toLong())
+						try {
+							trackedItemInstance = TrackedItem.read(params?.trackedItemId?.toUpperCase()?.replace('I','')?.toLong())							
+						}
+						catch (e) {
+							trackedItemInstance = null
+						}
 					}
 					if (trackedItemInstance) {
 						// Verify that the tracked item is linked to a person
@@ -701,8 +723,8 @@ class IncentiveController {
 							// Attempt to update the incentive assigning it to tracked item
 							incentiveInstance.userUpdated = username
 							incentiveInstance.trackedItem = trackedItemInstance
-							if (trackedItemInstance?.batch?.instrumentDate) {
-								incentiveInstance.incentiveDate = trackedItemInstance?.batch?.instrumentDate
+							if (trackedItemInstance.batch.instrumentDate || trackedItemInstance.batch.dateCreated) {
+								incentiveInstance.incentiveDate = trackedItemInstance?.batch?.instrumentDate ?: trackedItemInstance.batch.dateCreated
 							}
 							else {
 								incentiveInstance.incentiveDate = new Date()
@@ -721,6 +743,7 @@ class IncentiveController {
 							}
 							else {
 								// Search for an appointment associated with the parent item of the current tracked item
+								// TODO: Warning, this only goes one deep
 								if (trackedItemInstance?.parentItem) {
 									appointmentInstance = Appointment.findByLetter(trackedItemInstance?.parentItem)
 									if (appointmentInstance) {
@@ -730,6 +753,7 @@ class IncentiveController {
 									}
 								}
 							}
+							
 							// Attempt to save
 							if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
 								result.success = true
@@ -788,8 +812,10 @@ class IncentiveController {
 			redirect(action: "list")
 		}
 		else {
-			def incentiveTransactionLogList = IncentiveTransactionLog.findAllByIncentive(incentiveInstance)
-			return [incentiveInstance: incentiveInstance, incentiveTransactionLogList: incentiveTransactionLogList.sort{ a,b -> b?.transactionDate <=> a?.transactionDate }, incentiveTransactionLogTotal: incentiveTransactionLogList.size()]
+			def incentiveTransactionLogList = incentiveInstance.transactionLogs
+			return [incentiveInstance: incentiveInstance
+				, incentiveTransactionLogList: incentiveTransactionLogList.sort{ a,b -> b?.transactionDate <=> a?.transactionDate }
+				, incentiveTransactionLogTotal: incentiveTransactionLogList.size() ]
 		}
 	}
 
@@ -804,7 +830,8 @@ class IncentiveController {
 				directoryService.loadUsersByGroupname(groupName)
 				memberInstanceList = directoryService.getMembers()
 			}
-			return [incentiveInstanceList: incentiveInstanceList, interviewer: memberInstanceList.find{ it.username == params?.id }]
+			return [incentiveInstanceList: incentiveInstanceList
+				, interviewer: memberInstanceList.find{ it.username == params?.id }]
 		}
 	}
 
