@@ -117,8 +117,12 @@
 				class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'selectionQuery', 'errors')}">
 				<g:textArea name="selectionQuery" cols="80" rows="5"
 					value="${batchCreationConfigInstance?.selectionQuery}" /> </span>
-			<p>Columns that are processed: dwelling_unit, person, household,
-				parent_item, expire_date, study_year</p>
+				<p>Columns that are expected: <ul>
+					<g:each var="col" in="${batchCreationConfigInstance?.requiredColumns}">
+					<li>${col}</li>
+					</g:each>
+				</ul> </p>
+
 		</div>
 
 
