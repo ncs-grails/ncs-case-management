@@ -88,7 +88,7 @@
 			</span>
 				<p> This is a map containing the sort parameters for 
 					the dataset in the format:
-					[column1:asc, column2:desc, column3:asc]</p>
+					[column1:'asc', column2:'desc', column3:'asc']</p>
 			<span class="value">
 				<g:textField size="80" name="sortOrder" value="${d.sortOrder}" />
 			</span>
@@ -147,6 +147,12 @@
 		${msg.name}
 		</label>
 	</g:each> </span></div>
+
+	<div class="prop"><span class="name"> <label
+		for="message
+		code="batchCreationDocument.comment.label"
+		default="Comment" /></label> </span> <span class="value"> <g:textField
+		size="80" name="comment" value="" /> </span></div>
 
 	<g:actionSubmit controller="batchCreationDocument" action="save"
 		value="Add" />

@@ -127,15 +127,15 @@
 				<g:message code="batchCreationConfig.useDwellingUnitHouseholdPerson.label" default="ID(s) Expected" />
 			</span>
 			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useDwellingUnit', 'errors')}">
-				<g:checkBox name="active" value="${batchCreationConfigInstance?.useDwellingUnit}" />
+				<g:checkBox name="useDwellingUnit" value="${batchCreationConfigInstance?.useDwellingUnit}" />
 				<label for="useDwellingUnit"><g:message code="batchCreationConfig.useDwellingUnit.label" default="dwelling_unit" /></label>
 			</span>
 			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useHousehold', 'errors')}">
-				<g:checkBox name="active" value="${batchCreationConfigInstance?.useHousehold}" />
+				<g:checkBox name="useHousehold" value="${batchCreationConfigInstance?.useHousehold}" />
 				<label for="useHousehold"><g:message code="batchCreationConfig.useHousehold.label" default="household" /></label>
 			</span>
 			<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'usePerson', 'errors')}">
-				<g:checkBox name="active" value="${batchCreationConfigInstance?.usePerson}" />
+				<g:checkBox name="usePerson" value="${batchCreationConfigInstance?.usePerson}" />
 				<label for="usePerson"><g:message code="batchCreationConfig.usePerson.label" default="person" /></label>
 			</span>
 		</div>
