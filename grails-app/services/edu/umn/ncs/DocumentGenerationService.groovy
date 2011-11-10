@@ -23,7 +23,7 @@ class DocumentGenerationService {
 
     def appName = 'ncs-case-management'
 	
-	static def debug = true
+	static def debug = false
 	
 	static def csvDateFormat = 'yyyy-MM-dd HH:mm:ss'
     
