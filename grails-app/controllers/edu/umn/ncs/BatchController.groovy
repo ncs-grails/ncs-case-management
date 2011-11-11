@@ -182,10 +182,10 @@ class BatchController {
         def unsentBatchInstanceList = c.list{
             and {
 				direction{
-					idEq(1)
+					idEq(1L)
 				}
 				format{
-					idEq(1)
+					idEq(1L)
 				}
                 isNull("mailDate")
                 between("dateCreated", referenceDate - 14, referenceDate + 1)
