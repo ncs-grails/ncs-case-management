@@ -100,7 +100,7 @@ class DocumentGenerationService {
 			FROM batch_creation_queue
 			WHERE (username = ?)"""
 
-			results = sql.rows(selectionQuery, [params.username])
+			results = sql.rows(selectionQuery, [username])
 		}
 		return results
 	}
@@ -640,6 +640,7 @@ class DocumentGenerationService {
 					// emailService.sendErrorReport(message, ip, username)
 					println "Invalid Post-Generation Query (or error somwhere along those lines...)"
 					println "The query was: ${batchCreationConfigInstance.postGenerationQuery}"
+					println "Exception: ${ex}"
 					throw InvalidPostGenerationQueryException
 				}
 			}
