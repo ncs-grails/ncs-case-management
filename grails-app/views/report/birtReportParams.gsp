@@ -1,10 +1,11 @@
 <html>
     <head>
 		<g:javascript library="prototype" />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="ncs" />
-        <g:set var="entityName" value="${message(code: 'report.label', default: 'Report')}" />
-        <title>Report Parameters</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="layout" content="ncs" />
+		<g:set var="entityName" value="${message(code: 'report.label', default: 'Report')}" />
+		<title>Report Parameters</title>
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'reports.css')}" />
     </head>
     <body>
         <div class="nav">

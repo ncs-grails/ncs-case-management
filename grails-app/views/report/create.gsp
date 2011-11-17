@@ -8,6 +8,7 @@
         <g:set var="entityName" value="${message(code: 'report.label', default: 'Report')}" />
         <title>Create a Report</title>
         <g:javascript src="reports.js" />
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'reports.css')}" />
     </head>
     <body>
         <div class="nav">

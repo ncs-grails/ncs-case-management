@@ -1,58 +1,41 @@
 <%@ page import="grails.util.Environment" %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title><g:layoutTitle default="Batch Tracking" /></title>
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_reset.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_text.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_template.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_optional.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_grails.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${createLink(controller:'css',action:'template')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_print.css')}"
-	media="print" />
-<link rel="stylesheet" type="text/css"
-	href="${createLink(controller:'css',action:'print')}" media="print" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css/pepper-grinder',file:'jquery.ui.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'global.css')}" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'incentive.css')}" />
-<link rel="shortcut icon"
-	href="${resource(dir:'images',plugin:'ncs-web-template',file:'favicon.ico')}"
-	type="image/x-icon" />
-<link rel="stylesheet" type="text/css"
-	href="${resource(dir:'css',file:'reports.css')}" />
-<g:javascript plugin="ncs-web-template" src="umn_searchfield.js" />
-<g:javascript library="jquery" plugin="jquery" />
-<g:javascript src="jquery/jquery.ui.js" />
-<g:javascript src="jquery/jquery.tablesorter.min.js" />
-<g:javascript src="jquery/jquery.tools.min.js" />
+  <html xmlns="http://www.w3.org/1999/xhtml">
+	  <head>
+		  <title><g:layoutTitle default="Batch Tracking" /></title>
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_reset.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_text.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_template.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_optional.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_grails.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${createLink(controller:'css',action:'template')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',plugin:'ncs-web-template',file:'umn_print.css')}" media="print" />
+		  <link rel="stylesheet" type="text/css" href="${createLink(controller:'css',action:'print')}" media="print" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css/pepper-grinder',file:'jquery.ui.css')}" />
+		  <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'global.css')}" />
+		  <link rel="shortcut icon" href="${resource(dir:'images',plugin:'ncs-web-template',file:'favicon.ico')}" type="image/x-icon" />
+		  <g:javascript plugin="ncs-web-template" src="umn_searchfield.js" />
+		  <g:javascript library="jquery" plugin="jquery" />
+		  <g:javascript src="jquery/jquery.ui.js" />
+		  <g:javascript src="jquery/jquery.tablesorter.min.js" />
+		  <g:javascript src="jquery/jquery.tools.min.js" />
 
-<style type="text/css">
-#main_wrapper {
-	width: 95%;
-	max-width: 1280px;
-	min-width: 720px
-}
-</style>
+		  <style type="text/css">
+			  #main_wrapper {
+			  width: 95%;
+			  max-width: 1280px;
+			  min-width: 720px
+			  }
+		  </style>
 
-<!-- STYLE SHEETS TO FIX THE EVIL IE -->
-<!--[if IE 6]>
-	  <style type="text/css" media="screen">
-		@import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE6.css')}");
-	  </style>
-	<![endif]-->
-<!--[if IE 7]>
-	  <style type="text/css" media="screen">
+		  <!-- STYLE SHEETS TO FIX THE EVIL IE -->
+		  <!--[if IE 6]>
+		  <style type="text/css" media="screen">
+			  @import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE6.css')}");
+		  </style>
+		  <![endif]-->
+		  <!--[if IE 7]>
+		  <style type="text/css" media="screen">
 	    @import url("${resource(dir:'css',plugin:'ncs-web-template',file:'umn_IE7.css')}");
 	  </style>
 	<![endif]-->

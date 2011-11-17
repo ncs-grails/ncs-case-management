@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -7,6 +5,7 @@
         <g:set var="entityName" value="${message(code: 'report.label', default: 'Report')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
         <g:javascript src="reports.js" />
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'reports.css')}" />
     </head>
     <body>
         <div class="nav">

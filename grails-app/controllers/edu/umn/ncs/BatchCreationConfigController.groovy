@@ -14,8 +14,7 @@ class BatchCreationConfigController {
     def form = {}
 	
     def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [batchCreationConfigInstanceList: BatchCreationConfig.list(params), batchCreationConfigInstanceTotal: BatchCreationConfig.count()]
+        [batchCreationConfigInstanceList: BatchCreationConfig.list(params)]
     }
 
     def create = {

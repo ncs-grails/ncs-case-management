@@ -5,6 +5,7 @@
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'incentive.label', default: 'Incentive')}" />
         <title>Edit Appointment Incentive</title>
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'incentive.css')}" />
     </head>
     <body>
         <div class="nav">

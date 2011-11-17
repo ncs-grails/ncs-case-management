@@ -79,9 +79,5 @@
 	</tbody>
 </table>
 </div>
-
-<div class="paginateButtons"><g:paginate
-	total="${batchCreationConfigInstanceTotal}" /></div>
-</div>
 </body>
 </html>

@@ -115,13 +115,16 @@
 						default="Selection Query" />
 			</label> </span> <span
 				class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'selectionQuery', 'errors')}">
-				<g:textArea name="selectionQuery" cols="80" rows="5"
+				<g:textArea name="selectionQuery" cols="120" rows="10"
 					value="${batchCreationConfigInstance?.selectionQuery}" /> </span>
-				<p>Columns that are expected: <ul>
-					<g:each var="col" in="${batchCreationConfigInstance?.requiredColumns}">
-					<li>${col}</li>
-					</g:each>
-				</ul> </p>
+				<p>Columns that are expected:
+				<div class="message">
+					<ul></ul>
+						<g:each var="col" in="${batchCreationConfigInstance?.requiredColumns}">
+						<li>${col}</li>
+						</g:each>
+					</ul> </p>
+				</div>
 
 		</div>
 
@@ -142,6 +145,14 @@
 				<g:checkBox name="usePerson" value="${batchCreationConfigInstance?.usePerson}" />
 				<label for="usePerson"><g:message code="batchCreationConfig.usePerson.label" default="person" /></label>
 			</span>
+			<div class="message">
+				<p>
+				<g:if test="${batchCreationConfigInstance?.usePerson}">The "Person"</g:if>
+				<g:elseif test="${batchCreationConfigInstance?.useHousehold}">The "Household"</g:elseif>
+				<g:elseif test="${batchCreationConfigInstance?.useDwellingUnit}">The "Dwelling Unit"</g:elseif>
+				<g:else>No extra</g:else>
+				data set will be appended to your merge data.  </p>
+			</div>
 		</div>
 		<div class="prop">
 			<span class="name"> <label for="manualSelection"><g:message
@@ -178,16 +189,19 @@
 	</div>
 	<div id="tabs-parent">
 		<div class="prop">
-			<span class="name"> <label for="useParentItem"> <g:message
-						code="batchCreationConfig.useParentItem.label"
-						default="Use Parent Item" /> </label> - If you check this, you have to
+			<span class="name">
+					<span class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useParentItem', 'errors')}">
+					<g:checkBox name="useParentItem" value="${batchCreationConfigInstance?.useParentItem}" />
+				</span>
+				<label for="useParentItem">
+					<g:message code="batchCreationConfig.useParentItem.label" default="Use Parent Item" />
+				</label>
+			</span>
+			<div class="message"><p>If you check "Use Parent Item", you have to
 				pass the column 'parent_item' in the selection criteria... OR, you
 				have to fill in as many of the options below. Passing the
-				'parent_item' is preferred because it is faster and more accurate. </span>
-			<span
-				class="value ${hasErrors(bean: batchCreationConfigInstance, field: 'useParentItem', 'errors')}">
-				<g:checkBox name="useParentItem"
-					value="${batchCreationConfigInstance?.useParentItem}" /> </span>
+				'parent_item' is preferred because it is faster and more accurate.</p>
+			</div>
 		</div>
 
 		<p>You only have to specify the following options if you checked

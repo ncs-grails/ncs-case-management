@@ -40,7 +40,14 @@ class DataSetTypeController {
             redirect(action: "list")
         }
         else {
-            return [dataSetTypeInstance: dataSetTypeInstance]
+			def batchCreationDocumentInstanceList = BatchCreationDocument.createCriteria().list{
+				dataSets {
+					idEq(dataSetTypeInstance.id)
+				}
+			}
+
+            return [dataSetTypeInstance: dataSetTypeInstance,
+				batchCreationDocumentInstanceList: batchCreationDocumentInstanceList ]
         }
     }
 

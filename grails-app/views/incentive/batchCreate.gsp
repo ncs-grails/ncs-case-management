@@ -9,6 +9,7 @@
 	<meta name="layout" content="ncs" />
 	<g:set var="entityName" value="${message(code: 'giftCard.label', default: 'Scan Gift Cards')}" />
 	<title>Scan Incentives</title>
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'incentive.css')}" />
 	<g:javascript src="incentive.js" />
 </head>
 <body>

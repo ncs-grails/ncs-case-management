@@ -296,11 +296,11 @@
 				<g:checkBox name="optional" value="${false}" />
 				<label for="optional">
 					<g:message code="BatchCreationConfig.optional.label" default="Optional Item" />
-					<p>If this is checked, the selection query will expect a column named
-					skip_INSTRUMENTNICKNAME that if null, will generate the item.  If it is not null,
-					the item will not be generated.</p>
 				</label>
 			</span>
+			<p>If this is checked, the selection query will expect a column named
+			skip_INSTRUMENTNICKNAME that if null, will generate the item.  If it is not null,
+			the item will not be generated.</p>
 		</div>
 
 		<div class="prop">

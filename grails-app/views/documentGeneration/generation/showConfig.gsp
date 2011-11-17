@@ -30,74 +30,74 @@ ${batchCreationConfigInstance?.name}
 	</div>
 </g:if>
 
-<fieldset class="maroonBorder"><legend
-	style="margin-left: 0.5em;">Recently Generated Batches</legend>
-<div class="list">
-  <g:form method="post" controller="documentGeneration">
-	<g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
+<fieldset class="maroonBorder">
+	<legend style="margin-left: 0.5em;">Recently Generated Batches</legend>
+	<g:form method="post" controller="documentGeneration">
+	<div class="list batchList">
+		<g:hiddenField name="batchCreationConfig.id" value="${batchCreationConfigInstance?.id}" />
 
-	<table class="batchList">
-		<thead>
-			<tr>
-				<th><input type="radio" disabled="disabled" /></th>
-				<th>
-				${message(code: 'batch.label', default: 'Batch ID')}
-				</th>
-				<th>
-				${message(code: 'study.nickName.label', default: 'Study')}
-				</th>
-				<th>
-				${message(code: 'instrument.name.label', default: 'Instrument')}
-				</th>
-				<th>
-				${message(code: 'dateCreated.name.label', default: 'Date Created')}
-				</th>
-				<th>
-				${message(code: 'instrumentDate.name.label', default: 'Instrument Date')}
-				</th>
-				<th>Pieces</th>
-			</tr>
-		</thead>
-		<tbody>
-			<g:each in="${batchInstanceList}" status="i" var="batchInstance">
+		<table>
+			<thead>
+				<tr>
+					<th><input type="radio" disabled="disabled" /></th>
+					<th>
+						${message(code: 'batch.label', default: 'Batch ID')}
+					</th>
+					<th>
+						${message(code: 'study.nickName.label', default: 'Study')}
+					</th>
+					<th>
+						${message(code: 'instrument.name.label', default: 'Instrument')}
+					</th>
+					<th>
+						${message(code: 'dateCreated.name.label', default: 'Date Created')}
+					</th>
+					<th>
+						${message(code: 'instrumentDate.name.label', default: 'Instrument Date')}
+					</th>
+					<th>Pieces</th>
+				</tr>
+			</thead>
+			<tbody>
+				<g:each in="${batchInstanceList}" status="i" var="batchInstance">
 
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td><g:radio id="batchId-${batchInstance.id}" name="batch.id" value="${batchInstance.id}" /></td>
 
 					<td><label for="batchId-${batchInstance.id}">
-					${batchInstance.id}
+							${batchInstance.id}
 					</label></td>
 
 					<td><label for="batchId-${batchInstance.id}">
-					${batchInstance?.primaryInstrument?.study?.name}
+							${batchInstance?.primaryInstrument?.study?.name}
 					</label></td>
 
 					<td><label for="batchId-${batchInstance.id}">
-					${batchInstance?.primaryInstrument?.name}
+							${batchInstance?.primaryInstrument?.name}
 					</label></td>
 
 					<td><label for="batchId-${batchInstance.id}"><g:formatDate
-						format="MM/dd/yyyy" date="${batchInstance?.dateCreated}" /></label></td>
+							format="MM/dd/yyyy" date="${batchInstance?.dateCreated}" /></label></td>
 
 					<td><label for="batchId-${batchInstance.id}"><g:formatDate
-						format="MM/dd/yyyy" date="${batchInstance?.instrumentDate}" /></label></td>
+							format="MM/dd/yyyy" date="${batchInstance?.instrumentDate}" /></label></td>
 
 					<td><label for="batchId-${batchInstance.id}">
-					${batchInstance?.pieces}
+							${batchInstance?.pieces}
 					</label></td>
 				</tr>
-			</g:each>
-		</tbody>
-	</table>
+				</g:each>
+			</tbody>
+		</table>
+	</div>
 
 	<!-- Reprint Button -->
 	<g:actionSubmit action="printDetails" id="printDetails" value="Reprint Document(s)" />
 	<!-- Batch Report Button -->
 	<g:actionSubmit action="batchReport" id="batchReport" value="View Batch Report" />
-  </g:form>
-</div>
-  
+	</g:form>
 </fieldset>
+
 <fieldset class="maroonBorder"><legend
 	style="margin-left: 0.5em;">Generate a New Batch</legend> 
     <g:form action="generation">

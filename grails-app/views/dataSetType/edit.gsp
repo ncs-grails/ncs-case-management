@@ -104,6 +104,16 @@ WHERE (b.id = :batchId)
 		</div>
                         
 	</div>
+
+	<fieldset class="maroonBorder">
+		<legend>Used by Documents:</legend>
+		<ul>
+			<g:each var="d" in="${batchCreationDocumentInstanceList}">
+			<li><g:link controller="batchCreationConfig" action="edit" id="${d.batchCreationConfig.id}">${d}</g:link></li>
+			</g:each>
+		</ul>
+	</fieldset>
+
 	<div class="buttons"><span class="button"><g:actionSubmit
 		class="save" action="update"
 		value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>

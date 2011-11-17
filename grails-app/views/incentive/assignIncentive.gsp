@@ -7,6 +7,7 @@
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'incentive.label', default: 'Incentive')}" />
         <title>Assign Incentive</title>
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'incentive.css')}" />
 		<g:javascript src="incentive.js" />
 		<script type="text/javascript">
 			$(document).ready(function() {

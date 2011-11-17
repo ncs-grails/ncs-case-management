@@ -8,6 +8,7 @@
 	<g:set var="entityName" value="${message(code: 'giftCard.label', default: 'Scan Gift Cards')}" />
 	<title>Checkout Incentive</title>
 	<g:javascript src="incentive.js" />
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'incentive.css')}" />
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#checkoutBarcode').focus();

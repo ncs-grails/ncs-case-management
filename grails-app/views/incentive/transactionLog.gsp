@@ -4,6 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'incentiveInstance.label', default: 'Incentive')}" />
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'incentive.css')}" />
         <title>Incentive Transaction Log</title>
     </head>
     <body>

@@ -35,3 +35,7 @@
 
 }
 
+div.batchList {
+	max-height: 14em;
+	overflow-y: scroll;
+}
