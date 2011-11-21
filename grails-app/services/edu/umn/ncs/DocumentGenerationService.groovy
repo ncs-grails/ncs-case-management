@@ -368,8 +368,10 @@ class DocumentGenerationService {
 		}
 
 		if (debug) {
-			batchInfoList.sort{it.sortOrder}.each{ bil ->
-				println "ngp debug; sortOrder: ${bil.sortOrder} "
+
+			println "DEBUG: batchInfoList:"
+			batchInfoList.each{ bil ->
+				println "sortOrder: ${bil.sortOrder} "
 				println "       childOfBatch: ${bil.childOfBatch} "
 				println "       childOfInstrument: ${bil.childOfInstrument} "
 				println "       instrument: ${bil.instrument} "
@@ -408,7 +410,8 @@ class DocumentGenerationService {
 		// validating recordset
 		results.each{ row ->
 
-			if (maxPieces && itemCount < maxPieces ) {
+			if ( ( ! maxPieces) ||
+				   ( maxPieces && itemCount < maxPieces ) ) {
 				def bcq = new BatchCreationQueue()
 
 				if (row.containsKey('person')) {
@@ -434,6 +437,7 @@ class DocumentGenerationService {
 				if (bcq.validate()) {
 					// VERY IMPORTANT to sort this so the dependent batches show up first!!!
 					// Should be sorted by childOfBatch
+					if (debug) { println "DEBUG:generateTrackedItems:: read record: ${row}" }
 
 					// sort it according to parent instrument dependency
 					batchInfoList = batchInfoList.sort{ it.sortOrder }
@@ -591,6 +595,7 @@ class DocumentGenerationService {
 							//trackedItem.save(flush:true)
 							//println " + Created SID: ${trackedItem.id} (v2)"
 
+							if (debug) { println "Adding tracked item: ${trackedItem}" } 
 							trackedItemList.add(trackedItem)
 						} else if (debug) {
 							println "this item (${bcq}) skipped due to 'skip_${b.instrument.nickName}' clause."
@@ -710,13 +715,17 @@ class DocumentGenerationService {
 				if (results) {
 					// generate the batches, and get back
 					// the batch metadata as a collection of maps
+					if (debug) { println "calling: generateBatches(${batchCreationConfigInstance}, ${params})" }
 					def batchInfoList = generateBatches(batchCreationConfigInstance, params)
 
+					if (debug) { println "DEBUG: Expecting ${results.size()} to generate items." }
 					// generate all the tracked items per the selection criteria and tie
 					// them to the batches that we created.
+					if (debug) { println "calling: generateTrackedItems(${batchCreationConfigInstance}, batchInfoList, results, ${params})" }
 					masterBatch = generateTrackedItems(batchCreationConfigInstance, batchInfoList, results, params)
 
 					// run any post-generation code that needs to be run
+					if (debug) { println "calling: runPostGenerationLogic(${batchCreationConfigInstance}, ${params})" }
 					runPostGenerationLogic(batchCreationConfigInstance, masterBatch)
                 } else {
 					println "Nothing to generate!"
