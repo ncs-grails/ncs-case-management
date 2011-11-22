@@ -23,7 +23,6 @@
 
 <fieldset class="maroonBorder">
 	<legend class="m1">1. Data Sources To Save...</legend>
-		<p class="padl">Right-Click and choose "Save Link As...", then save it to ${saveLocation}</p>	
 		<div class="list">
 			<table>
                 <tbody>
