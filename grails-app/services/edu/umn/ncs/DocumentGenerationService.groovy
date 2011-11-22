@@ -410,9 +410,12 @@ class DocumentGenerationService {
 		// validating recordset
 		results.each{ row ->
 
-			if ( ( ! maxPieces) ||
+			if ( ( ! maxPieces ) ||
 				   ( maxPieces && itemCount < maxPieces ) ) {
 				def bcq = new BatchCreationQueue()
+
+				// load the username
+				bcq.username = username
 
 				if (row.containsKey('person')) {
 					bcq.person = Person.read(row.person)
@@ -429,8 +432,6 @@ class DocumentGenerationService {
 				} else if (row.containsKey('dwelling_unit_id')) {
 					bcq.dwellingUnit = DwellingUnit.read(row.dwelling_unit_id)
 				}
-				bcq.username = username
-
 
 				def trackedItemList = []
 
