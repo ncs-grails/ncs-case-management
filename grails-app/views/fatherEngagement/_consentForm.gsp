@@ -1,3 +1,4 @@
+<g:setProvider library="jquery" />
 <g:form action="save" method="post" onsubmit="return validateForm();" >
 	<g:hiddenField name="trackedItem" value="${result?.trackedItemId}" />
 	
@@ -29,7 +30,7 @@
 		
 		<div class="prop">
 		    <span class="name">
-		        <label for="interviewerInitials"><g:message code="fatherEngagement.interviewerInitials.label" default="Interviewer Initials" /></label>
+		        <label for="interviewerInitials"><g:message code="fatherEngagement.interviewerInitials.label" default="Interviewer Initials (Example: AST)" /></label>
 		    </span>
 		    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'interviewerInitials', 'errors')}">
 		        <g:textField name="interviewerInitials" value="${fatherEngagementInstance?.interviewerInitials}" />

@@ -91,6 +91,8 @@
 
                 <g:sortableColumn property="receiptNumber" title="${message(code: 'incentive.receiptNumber.label', default: 'Receipt #')}" />
 
+                <g:sortableColumn property="activated" title="${message(code: 'incentive.activated.label', default: 'Activated')}" />	
+
                 <g:sortableColumn property="lastUpdated" title="${message(code: 'incentive.lastUpdated.label', default: 'Last Updated')}" />
 
                 <th><strong>Status</strong></th>
@@ -110,6 +112,8 @@
                 <td>${incentiveInstance?.barcode}</td>
 
                 <td>${incentiveInstance?.receiptNumber}</td>
+
+                <td><g:formatBoolean boolean="${incentiveInstance?.activated}" true="Yes" false="No" /></td>
 
                 <td><g:formatDate date="${incentiveInstance?.lastUpdated}" format="MM/dd/yyyy h:mm a" /></td>
 

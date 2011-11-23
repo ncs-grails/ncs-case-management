@@ -22,6 +22,8 @@
             <span class="menuButton"><g:link class="create" action="checkout">Checkout</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkin">Check In</g:link></span>
 	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan a Batch</g:link></span>
+	        <span class="menuButton"><g:link class="create" action="activateIncentives">Activate</g:link></span>
+	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
         </div>
         <div class="body">
             <h1>Assign Incentive to Item</h1>

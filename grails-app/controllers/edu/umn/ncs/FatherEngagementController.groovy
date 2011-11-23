@@ -15,8 +15,9 @@ import grails.plugin.springcache.annotations.CacheFlush
 class FatherEngagementController {
     def fatherEngagementDataBuilderService
 	def directoryService
-	
+	def memberInstanceList
 	def debug = false
+	def groupName = "EnHS-NCS-Interviewer"
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -37,10 +38,21 @@ class FatherEngagementController {
     }
 
     def save = {
+		def errorMessage = ""
 		if (params.trackedItem) {
 			// Get the tracked item
 			def trackedItemInstance = TrackedItem.read(params.trackedItem.toLong())
 			if (trackedItemInstance) {
+				// Get NCS group members for list of interviewers
+				memberInstanceList = directoryService.getMembers()
+				if ( ! memberInstanceList ) {
+					if (debug) {
+						println "Populating user list"
+					}
+					directoryService.loadUsersByGroupname(groupName)
+					//memberInstanceList = directoryService.members
+					memberInstanceList = directoryService.getMembers()
+				}
 				// Determine if a father engagement form already exists for this form
 				def fatherEngagementInstance = FatherEngagement.findByTrackedItem(trackedItemInstance)
 				if (!fatherEngagementInstance) {
@@ -87,34 +99,34 @@ class FatherEngagementController {
 											redirect(action: "edit", id: fatherEngagementInstance.id)
 										}
 										else {
-											render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+											render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName } ])
 										}
 									}
 									else {
-										flash.message = "Interview start and end times are not consistent. Please review."
-										render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+										errorMessage = "Interview start and end times are not consistent. Please review."
+										render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }, errorMessage: errorMessage ])
 									}
 								}
 								else {
-									flash.message = "Dates for interview start and end times are not equal. Please review."
-									render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+									errorMessage = "Dates for interview start and end times are not equal. Please review."
+									render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }, errorMessage: errorMessage ])
 								}		
 							}
 							else {
 								// Stop if interview date is greater than current date
-								flash.message = "Invalid Interview End Time. Please review."
-								render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+								errorMessage = "Invalid Interview End Time. Please review."
+								render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }, errorMessage: errorMessage ])
 							}	
 						}
 						else {
 							// Stop if interview date is greater than current date
-							flash.message = "Invalid Interview Start Time. Please review."
-							render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+							errorMessage = "Invalid Interview Start Time. Please review."
+							render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }, errorMessage: errorMessage ])
 						}
 					}
 					else {
-						flash.message = "Please enter interview start and end times. Please review."
-						render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance])
+						errorMessage = "Please enter interview start and end times. Please review."
+						render(view: "create", model: [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName }, errorMessage: errorMessage ])
 					}
 				}
 				else {
@@ -152,9 +164,15 @@ class FatherEngagementController {
         }
         else {
 			// Get NCS group members for list of interviewers
-			def groupName = "EnHS-NCS"
-			def groupDescription = directoryService.loadUsersByGroupname(groupName)
-			def memberInstanceList = directoryService.getMembers()
+			memberInstanceList = directoryService.getMembers()
+			if ( ! memberInstanceList ) {
+				if (debug) {
+					println "Populating user list"
+				}
+				directoryService.loadUsersByGroupname(groupName)
+				//memberInstanceList = directoryService.members
+				memberInstanceList = directoryService.getMembers()
+			}
 			
             return [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList.sort { a,b -> a.displayName <=> b.displayName } ]
         }
@@ -296,15 +314,29 @@ class FatherEngagementController {
 		]
 
 		// Get NCS group members for list of interviewers
-		def groupName = "EnHS-NCS"
-		def groupDescription = directoryService.loadUsersByGroupname(groupName)
-		def memberInstanceList = directoryService.getMembers()
+		memberInstanceList = directoryService.getMembers()
+		if ( ! memberInstanceList ) {
+			if (debug) {
+				println "Populating user list"
+			}
+			directoryService.loadUsersByGroupname(groupName)
+			//memberInstanceList = directoryService.members
+			memberInstanceList = directoryService.getMembers()
+		}
 
 		if (debug) {
 			println "params::trackedItem::${params?.trackedItemId}"				
 		}
-		
-		def trackedItemInstance = TrackedItem.read(params?.trackedItemId.toLong())
+		def trackedItemId = null
+		try {
+			trackedItemId = params?.trackedItemId.toLong()
+		}
+		catch (e) {
+			result.errorText = "Error: ${e}, Invalid tracked item ID: ${params?.trackedItemId}"
+			render(template:'consentErrorForm', model:[result:result])
+			return false
+		}
+		def trackedItemInstance = TrackedItem.read(trackedItemId)
 		if (trackedItemInstance) {
 			if (trackedItemInstance?.person) {
 				// Check to see if this person already has a father engagement form
@@ -327,6 +359,14 @@ class FatherEngagementController {
 					render(template:'consentErrorForm', model:[result:result])
 					return false
 				}
+				else {
+					//render result as JSON
+					if (debug) {
+						println "result::${result}"
+					}
+					
+					render(template:'consentForm', model:[result:result])			
+				}
 			}
 			else {
 				result.errorText = "No person associated with this tracked item"
@@ -337,13 +377,6 @@ class FatherEngagementController {
 			render "Tracked Item does not exist!"
 			return false
 		}
-
-		//render result as JSON
-		if (debug) {
-			println "result::${result}"
-		}
-		
-		render(template:'consentForm', model:[result:result])
 	}
 	
 	// this sends a CSV file to the user on the other end

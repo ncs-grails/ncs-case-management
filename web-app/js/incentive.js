@@ -302,6 +302,88 @@ $(document).ready(function() {
 	    //alert(barcodeValue);
 	    return false;
     });
+
+    $('#receiptNumber').keyup(function(event) {
+        // get the value entered in the field
+        var receiptNumber = $(this).val();
+    	if (event.keyCode == '13' && receiptNumber != "") {
+	    	$('.scanned-header').show();
+	
+	        // clear the input
+	        $(this).val("");
+	        // set the focus back to the input field
+	        $(this).focus();
+	
+	        var divId = incentiveElementId;
+	        // create an element stating that we are trying to receipt it
+	        var strHtml = '<div id="scan-' + incentiveElementId + '" class="item-' + receiptNumber + '">';
+	        //strHtml += barcodeValue;
+	        strHtml += '<span style="padding-left:3em;;" id="scan-' + incentiveElementId + '-status">...Processing</span></div>';
+	
+	        $('#resultLog').prepend(strHtml);
+	
+	        ///////////////////////////
+	        // send the ajax request //
+	        ///////////////////////////
+	
+	        // get the URL to send it to
+	        var url = $('form[name="incentiveForm"]').attr("action");
+	        // build the data
+	        var data = { "id": receiptNumber, "divId": incentiveElementId };
+	
+	        $.getJSON(url, data, function(data, textStatus){
+	
+	            // Possible outcomes of textStatus are:
+	            // "success"
+	            // "timeout"
+	            // "error"
+	            // "notmodified"
+	            // "parsererror"
+	
+	            if (textStatus == "success") {
+	                var resultDivId = data.divId
+	
+	                if (data.success) {
+                    	$('.scanned-header').html("Incentives Activated by Receipt Number");                		
+	                	
+	                    var resultText = "Activated " + data.incentiveCount;
+	                    alert("incentiveCount::" + parseInt(data.incentiveCount));
+	                    if (parseInt(data.incentiveCount) == 1) {
+	                    	resultText += " incentive ";
+	                    }
+	                    else {
+	                    	resultText += " incentives ";	                    	
+	                    }
+	                    resultText += "with Receipt Number: " + data.receiptNumber;                    	
+	
+	                    $("#scan-" + resultDivId + "-status").html(resultText);
+	                } else {
+	                    $("#scan-" + divId + "-status").addClass('scan-error');
+	                    $("#scan-" + resultDivId + "-status").html("Failed to activate incentives: " + data.errorText);
+	                }
+	
+	            } else if (textStatus == "timeout") {
+	                alert(2);
+	                $("#scan-" + divId + "-status").addClass('scan-error');
+	                $("#scan-" + divId + "-status").html("Request timed out.");
+	            } else if (textStatus == "parsererror") {
+	                alert(3);
+	                $("#scan-" + divId + "-status").addClass('scan-error');
+	                $("#scan-" + divId + "-status").html("Error parsing response from server, please retry.");
+	            } else if (textStatus == "notmodified") {
+	                alert(4);
+	                $("#scan-" + divId + "-status").html("What? Not modified? OK.");
+	            } else {
+	                alert(5);
+	                $("#scan-" + divId + "-status").addClass('scan-error');
+	                $("#scan-" + divId + "-status").html("An error occured on the server.");
+	            }
+	        });        
+		}
+	
+	    //alert(barcodeValue);
+	    return false;
+    });
     
 	$('#code').keyup(function(event){
 		if ($('#code').val()) {

@@ -19,6 +19,7 @@
             <span class="menuButton"><g:link class="create" action="checkout">Checkout</g:link></span>
             <span class="menuButton"><g:link class="create" action="checkin">Check In</g:link></span>
 	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan in new Incentives</g:link></span>
+            <span class="menuButton"><g:link class="create" action="activateIncentives">Activate</g:link></span>
 	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
         </div>
         <div class="body">
@@ -116,6 +117,8 @@
 	                            <g:sortableColumn property="barcode" title="${message(code: 'incentive.barcode.label', default: 'Barcode')}" />
 	
 	                            <g:sortableColumn property="receiptNumber" title="${message(code: 'incentive.receiptNumber.label', default: 'Receipt #')}" />
+
+	                            <g:sortableColumn property="activated" title="${message(code: 'incentive.activated.label', default: 'Activated')}" />	
 	
 	                            <g:sortableColumn property="lastUpdated" title="${message(code: 'incentive.lastUpdated.label', default: 'Last Updated')}" />
 	
@@ -136,6 +139,8 @@
 	                            <td>${incentiveInstance?.barcode}</td>
 	
 	                            <td>${incentiveInstance?.receiptNumber}</td>
+
+	                            <td><g:formatBoolean boolean="${incentiveInstance?.activated}" true="Yes" false="No" /></td>
 	
 	                            <td><g:formatDate date="${incentiveInstance?.lastUpdated}" format="MM/dd/yyyy h:mm a" /></td>
 	

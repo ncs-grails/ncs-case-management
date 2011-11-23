@@ -1,4 +1,4 @@
-<div id="notFound" class="errors">
+<div id="errorDiv" class="errors">
 	<label id="errorLabel">${result?.errorText}</label>
 </div>
 <g:if test="${result?.person}">

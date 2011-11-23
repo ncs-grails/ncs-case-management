@@ -323,6 +323,15 @@ class IncentiveController {
 					}
 				} 
 				incentiveInstance.properties = params
+				// If incentive has been activated, set the activation date
+				if (incentiveInstance?.activated) {
+					if (!incentiveInstance?.dateActivated) {
+						incentiveInstance.dateActivated = new Date()
+					}
+				}
+				else {
+					incentiveInstance.dateActivated = null
+				}
 				if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
 					// todo
 					def renderError = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
@@ -870,6 +879,72 @@ class IncentiveController {
 		}
 
 		render result as JSON
+	}
+	
+	def activateIncentives = { }
+	
+	def activateByReceiptNumber = {
+		/**
+		 * Activate all incentives with a given receipt number
+		 */
+		def username = authenticateService.principal().getUsername()
+		
+		// Delay Code, used to test out of sequence responses
+		/*
+		def sleepTime = rand.nextInt(3000)
+		print "Waiting...${sleepTime}"
+		sleep(sleepTime)
+		println "...Done."
+		 */
+
+		// prep all the things we'll need to send back
+		def result = [
+			success: false,
+			receiptNumber: "",
+			incentiveCount:0,
+			divId: 0,
+			errorText: ""
+		]
+
+		// if a div ID was passed, let's save it to the result set
+		if (params?.divId) {
+			result.divId = params.divId
+		}
+
+		if (params?.id){
+			def receiptNumber = params?.id
+			def incentiveCount = 0
+			if (receiptNumber) {
+				def incentiveInstanceList = Incentive.findAllByReceiptNumber(receiptNumber)
+				if (incentiveInstanceList) {
+					incentiveInstanceList.each {
+						if (!it?.activated) {
+							it.activated = true
+							it.dateActivated = new Date()
+							it.userUpdated = username
+							it.lastUpdated = new Date()
+							if (it.save(flush: true)) {
+								incentiveCount++
+							}
+						}
+					}
+					result.success = true
+					result.receiptNumber = receiptNumber
+					result.incentiveCount = incentiveCount
+				}
+				else {
+					result.errorText = "No incentives found with receipt number: ${params?.id}"					
+				}
+			}
+		}
+		else {
+			result.errorText = "Invalid receipt number:${params?.id}"
+		}
+		if (debug) {
+			println "activate incentive result::${result}"
+		}
+		render result as JSON
+
 	}
 
 }
