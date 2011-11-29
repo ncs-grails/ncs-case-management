@@ -63,10 +63,17 @@
 	</div>
 </fieldset>
 
-<fieldset class="maroonBorder">
-	<legend style="margin-left: 0.5em;">3. Print the Batch Report</legend>
-	<g:link class="report" controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">Open the batch report...</g:link>
-</fieldset>
+	<fieldset class="maroonBorder">
+		<legend style="margin-left: 0.5em;">
+			<g:if test="${batchCreationConfigInstance.batchReportsToPrint}">
+				3. Print the Batch Report
+			</g:if>
+			<g:else>
+				(Optional) Batch Report Available if desired.
+			</g:else>
+		</legend>
+		<g:link class="report" controller="documentGeneration" action="batchReport" id="${batchInstance?.id}">View or Print Batch Report</g:link>
+	</fieldset>
 
 </div>
 </body>
