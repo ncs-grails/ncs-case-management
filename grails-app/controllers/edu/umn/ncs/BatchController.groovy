@@ -10,7 +10,7 @@ import grails.plugin.springcache.annotations.Cacheable
 @Secured(['ROLE_NCS'])
 class BatchController {
 
-    private boolean debug = true
+    private boolean debug = false 
 
     def emailService
     def authenticateService
@@ -115,7 +115,8 @@ class BatchController {
         def referenceDate = params?.referenceDate
 		def username = authenticateService?.principal()?.getUsername()
 		
-
+		println "debug: ${debug}"
+	
         // look for batch ID
         def batchId = params.id
 
@@ -133,15 +134,39 @@ class BatchController {
 						def genDate = new LocalDate(batchInstance.dateCreated)
 						def mailDate = new LocalDate(referenceDate)
 						
+					if (debug){
+						println "NGP debug; genDate: ${genDate}"
+						println "NGP debug; referenceDate: ${mailDate}"
+
+					}
 						if (mailDate.isBefore(genDate) && !mailDate.isEqual(genDate)) {
 							flash.message = "Mail Date must come after date generated"
 						} else {
+							if (genDate.isEqual(mailDate)) {
+								//  pass mailDate validator if the date diff is only the time portion
+								referenceDate = batchInstance.dateCreated
+							}
+							
 							// update batch mail date
 							batchInstance.mailDate = referenceDate
 							batchInstance.lastUpdated = new Date()
 							batchInstance.updatedBy = username
-							batchInstance.save(flush:true)
-							flash.message = "${batchInstance.primaryInstrument?.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated as mailed on ${mailDate}."
+
+							if (batchInstance.validate()){
+								batchInstance.save(flush:true)
+
+								flash.message = "${batchInstance.primaryInstrument?.study} ${batchInstance.primaryInstrument} generated on ${batchInstance.dateCreated} has been updated as mailed on ${mailDate}."
+
+							} else {
+								
+								flash.message = "Failed saving Mail Date. Batch ID: ${batchId}"
+
+								if (debug){
+									batchInstance.errors.each{
+										println "NGP debug; Errors saving batchInstance: ${it}"
+									}							
+								}
+							}
 
 						}
 						
@@ -150,6 +175,9 @@ class BatchController {
                     }
 
                 } catch (Exception ex) {
+					if (debug){
+						println "NGP debug; ${ex}"
+					}
                     flash.message = "Invalid Batch ID: ${batchId}\n"
 					flash.exception = ex
                 }
@@ -339,6 +367,8 @@ class BatchController {
 			def referenceDateYear = batchDate.year
 			def yearRange = (referenceDateYear..(referenceDateYear+1))
 			
+
+
             // check date order here
 
 			// TODO: Add messages to messages.properties in grails-app/i18n/
@@ -361,6 +391,9 @@ class BatchController {
 					return
 			}
 			
+
+
+
 			if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
 				batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly")
 					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
@@ -389,6 +422,8 @@ class BatchController {
 					return
 				}
 			}
+
+
 			batchInstance.properties = params
 			if (!batchInstance.hasErrors() && batchInstance.save(flush: true)) {
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
@@ -654,68 +689,13 @@ class BatchController {
 	// used by editDates
 	@Secured(['ROLE_NCS_RECEIPT'])
     def updateDates = {
+
         def batchInstance = Batch.get(params.id)
         if (batchInstance) {
 			
-			def dateCreated = new LocalDate(batchInstance.dateCreated)
-			def mailDate = new LocalDate(params.mailDate)
-			def calledCampusCourierDate = new LocalDate(params.calledCampusCourierDate)
-			def addressAndMailingDate = new LocalDate(params.addressAndMailingDate)
-			def trackingReturnDate = new LocalDate(params.trackingReturnDate)
-
-            def batchDate = new LocalDate(batchInstance.dateCreated)
-            def referenceDateMonth = batchDate.monthOfYear
-            def referenceDateYear = batchDate.year
-            def yearRange = (referenceDateYear..(referenceDateYear+1))
-
-            // check date order here
-
-			// This should be done via contstraints in the domain class.  DRY!  =)
-            if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
-                batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Campus Courier Date must come after date generated")
-                    render(view: "editDates", model: [ batchInstance: batchInstance,
-                        referenceDateMonth: referenceDateMonth,
-                        referenceDateYear: referenceDateYear,
-                        yearRange: yearRange])
-                    return
-            }
-
-            if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
-                batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Address and Mailing Date must come after date generated")
-                    render(view: "editDates", model: [batchInstance: batchInstance,
-                        referenceDateMonth: referenceDateMonth,
-                        referenceDateYear: referenceDateYear,
-                        yearRange: yearRange])
-                    return
-            }
-			
-            if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
-                batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Mailing Date must come after date generated")
-                    render(view: "editDates", model: [ batchInstance: batchInstance,
-                        referenceDateMonth: referenceDateMonth,
-                        referenceDateYear: referenceDateYear,
-                        yearRange: yearRange])
-                    return
-            }
-
-
-            if (trackingReturnDate && trackingReturnDate.isBefore(dateCreated) && !trackingReturnDate.isEqual(dateCreated)) {
-                batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after date generated")
-                    render(view: "editDates", model: [ batchInstance: batchInstance,
-                        referenceDateMonth: referenceDateMonth,
-                        referenceDateYear: referenceDateYear,
-                        yearRange: yearRange])
-                    return
-            }
-
-            if (mailDate && trackingReturnDate && mailDate.isBefore(trackingReturnDate) && mailDate.isEqual(trackingReturnDate)) {
-                batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
-                    render(view: "editDates", model: [ batchInstance: batchInstance,
-                        referenceDateMonth: referenceDateMonth,
-                        referenceDateYear: referenceDateYear,
-                        yearRange: yearRange])
-                    return
-            }
+			if (debug) {
+				println "NGP debug; params: ${params}"
+			}
 
             if (params.version) {
                 def version = params.version.toLong()
@@ -726,8 +706,23 @@ class BatchController {
                     return
                 }
             }
+
             batchInstance.properties = params
-            if (!batchInstance.hasErrors() && batchInstance.save(flush: true)) {
+		    
+			def dateCreated = new LocalDate(batchInstance.dateCreated)
+			def mailDate = new LocalDate(params.mailDate)
+			
+			if (mailDate.isEqual(dateCreated)) {
+				//  pass mailDate validator if the date diff is only the time portion
+				batchInstance.mailDate = batchInstance.dateCreated
+			}
+
+			if (debug) {
+				println "NGP debug; batchInstance.mailDate: ${ batchInstance.mailDate}"
+				println "NGP debug; batchInstance.dateCreated: ${ batchInstance.dateCreated}"
+			}
+            
+			if (!batchInstance.hasErrors() && batchInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'batch.label', default: 'Batch'), batchInstance.id])}"
                 redirect(action: "editDates", id: batchInstance.id)
             }

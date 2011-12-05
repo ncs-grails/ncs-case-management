@@ -38,8 +38,8 @@
 
 	<fieldset class="maroonBorder"><legend
 		style="margin-left: 0.5em;">Choose the mail date for the
-	batch you are scanning</legend> <label for="referenceDate">Mail date: </label> <g:datePicker
-		name="referenceDate" value="${referenceDate}" precision="day" /></fieldset>
+		batch you are scanning</legend> <label for="referenceDate">Mail date: </label> 
+	<g:datePicker name="referenceDate" value="${referenceDate}" precision="day" /></fieldset>
 
 </g:form>
 

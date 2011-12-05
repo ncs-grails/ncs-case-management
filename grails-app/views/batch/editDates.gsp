@@ -16,7 +16,6 @@
         </div>
         <div class="body">
             <h1>Editing Batch # ${batchInstance?.id}</h1>
-
             <h3>${referenceDateYear}</h3>
 
             <g:if test="${flash.message}">
