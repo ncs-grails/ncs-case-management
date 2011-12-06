@@ -112,7 +112,7 @@
 				      <label for="fatherPresent"><g:message code="fatherEngagement.fatherPresent.label" default="Was the father (or partner) present during the consent visit?" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'fatherPresent', 'errors')}">
-				        <g:checkBox name="fatherPresent" value="${fatherEngagementInstance?.fatherPresent}" />
+				        <g:checkBox name="fatherPresent" value="${fatherEngagementInstance?.fatherPresent}" /> (check if Yes)
 				    </span>
 				</div>
 				
@@ -121,7 +121,7 @@
 				        <label for="discussNeedToKnow">Did you review and discuss the "WHAT FATHER AND SIGNIFICANT OTHERS NEED TO KNOW ABOUT<br /> THE NCS" document with the father (or partner)?</label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'discussNeedToKnow', 'errors')}">
-				        <g:checkBox name="discussNeedToKnow" value="${fatherEngagementInstance?.discussNeedToKnow}" />
+				        <g:checkBox name="discussNeedToKnow" value="${fatherEngagementInstance?.discussNeedToKnow}" /> (check if Yes)
 				    </span>
 				</div>
 				
@@ -130,7 +130,7 @@
 				      <label for="signAsWitness"><g:message code="fatherEngagement.signAsWitness.label" default="Did the father sign the consent form as a witness?" /></label>
 				    </span>
 				    <span class="value ${hasErrors(bean: fatherEngagementInstance, field: 'signAsWitness', 'errors')}">
-				        <g:checkBox name="signAsWitness" value="${fatherEngagementInstance?.signAsWitness}" />
+				        <g:checkBox name="signAsWitness" value="${fatherEngagementInstance?.signAsWitness}" /> (check if Yes)
 				    </span>
 				</div>
                         

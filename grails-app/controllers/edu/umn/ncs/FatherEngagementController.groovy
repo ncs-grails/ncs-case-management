@@ -329,7 +329,7 @@ class FatherEngagementController {
 		}
 		def trackedItemId = null
 		try {
-			trackedItemId = params?.trackedItemId.toLong()
+			trackedItemId = params?.trackedItemId?.toUpperCase()?.replace('I','')?.toLong()
 		}
 		catch (e) {
 			result.errorText = "Error: ${e}, Invalid tracked item ID: ${params?.trackedItemId}"
