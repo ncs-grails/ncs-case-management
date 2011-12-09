@@ -101,7 +101,7 @@ class AppointmentController {
 				day.dayOfMonth = cursorLocalDate.dayOfMonth
 				day.date = cursorDate
 				
-				day.appointments = appointmentInstanceList.find{ (it.startTime.compareTo(cursorDate) == 1) && ( it.startTime.compareTo(tomorrow) == -1 ) }
+				day.appointments = appointmentInstanceList.findAll{ (it.startTime.compareTo(cursorDate) == 1) && ( it.startTime.compareTo(tomorrow) == -1 ) }
 				
 				if (referenceDate.monthOfYear == cursorLocalDate.monthOfYear) {
 					day.cssShadow = ""
