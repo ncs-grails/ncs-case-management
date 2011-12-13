@@ -285,6 +285,11 @@ dl.menu dd {
 	color: #333;
 	padding-left: 30px;
 }
+.menuButton a.return {
+	background: url(../images/return-arrow_16x16.png) center left no-repeat;
+	color: #333;
+	padding-left: 30px;
+}
 .menuButton a.infoButton {
 	background: url(../images/skin/information.png) center left no-repeat;
 	color: #333;
@@ -296,6 +301,38 @@ dl.menu dd {
 	color: #333;
 	padding-left: 25px;
 }
+.menuButton a.more {
+	background: url(../images/down-arrow_16x16.png) center left no-repeat;
+	color: #333;
+	padding-left: 15px;
+}
+/* DROPDOWN MENU */
+
+.drop-down-menu {
+	display:none; 
+}
+span.drop-down ul {
+	margin:0;
+	padding:0;
+	position: absolute;
+	width:15em;
+	top: 215px;
+	/*left: 850px;*/
+	right: 0px;
+	border: solid 1px #ccc;
+	background: #fff;
+	list-style-type: none;
+}
+span.drop-down:hover > ul {
+	display: block;
+}
+span.drop-down li {
+	padding:0.3em 0;
+}
+span.drop-down li:hover {
+	background-color:#F6F6F6;
+}
+
 /* MAIN PAGE */
 .title-bar {
 	background-color:#f6f6f6; /*#ffe264; /*#ffcc33;*/
@@ -442,4 +479,23 @@ div.dialog {
 }
 div.eoi-header{
 	padding:1.0em;
+}
+.left-box {
+	float:left;
+}
+.transaction-log-box {
+	width:39%;
+	float:right;
+	border: 1px dotted #ccc;
+}
+.transaction-log-box h3{
+	text-align: center;
+	font-style: normal;
+	background: #FFCC33;
+	padding: 0.5em;
+	border-bottom: 1px dotted #ccc;
+}
+
+.transaction-row {
+	padding: 0.3em;
 }

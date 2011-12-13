@@ -516,6 +516,19 @@ $(document).ready(function() {
     	}
 	    return false;
 	});
+
+	$('#incentiveBarcode').keyup(function(event){
+    	if (event.keyCode == '13') {
+    		if ($('#incentiveBarcode').val()) {
+				incentive = true;
+    			$('#incentiveForm').submit();
+    		}
+    		else {
+		        $('#incentiveBarcode').focus();
+    		} 
+		}
+		return false;
+	});		
 	
 });
 

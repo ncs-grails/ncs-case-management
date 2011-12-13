@@ -20,7 +20,14 @@
             <span class="menuButton"><g:link class="create" action="checkin">Check In</g:link></span>
 	    	<span class="menuButton"><g:link class="create" action="batchCreate">Scan in new Incentives</g:link></span>
             <span class="menuButton"><g:link class="create" action="activateIncentives">Activate</g:link></span>
-	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
+            <span class="menuButton drop-down"><g:link class="more" action="">More</g:link>
+            <ul class="drop-down-menu">
+            	<li><span class="menuButton"><g:link class="return" action="unassignIncentive">Unassign Incentive</g:link></span></li>
+            	<li><span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton last" title="help" >Help</a></span></li>
+            </ul>
+            </span>
+            <%--<span class="menuButton"><g:link class="return" action="unassignIncentive">Unassign Incentive</g:link></span>
+	    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span> --%>
         </div>
         <div class="body">
             <g:if test="${flash.message}">

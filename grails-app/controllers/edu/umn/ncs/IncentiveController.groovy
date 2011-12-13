@@ -276,9 +276,14 @@ class IncentiveController {
 			redirect(controller:"appointment", action: "edit", id: incentiveInstance.appointment.id)
         }
         else {
+			// Get transaction log
+			def incentiveTransactionLogList = incentiveInstance.transactionLogs
+
 			// Search for appointment 
 			def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
-            return [incentiveInstance: incentiveInstance, appointmentIncentiveInstance: appointmentIncentiveInstance]
+            return [incentiveInstance: incentiveInstance
+				, incentiveTransactionLogList: incentiveTransactionLogList.sort{ a,b -> b?.transactionDate <=> a?.transactionDate }
+				, appointmentIncentiveInstance: appointmentIncentiveInstance]
         }
     }
 
@@ -527,7 +532,7 @@ class IncentiveController {
 								result.success = true
 								
 								// Update checkout log information
-								new IncentiveTransactionLog(incentive:incentiveInstance,transactionDate:incentiveInstance.dateCheckedOut,checkedOutInToWhom:incentiveInstance?.checkedOutToWhom,checkedOutInByWhom:username).save(flush:true)
+								new IncentiveTransactionLog(incentive:incentiveInstance,transactionDate:incentiveInstance.dateCheckedOut,checkedOut:true,checkedOutInToWhom:incentiveInstance?.checkedOutToWhom,checkedOutInByWhom:username).save(flush:true)
 								
 							}
 							else {
@@ -814,6 +819,93 @@ class IncentiveController {
 	
 	}
 
+	def unassignIncentive = { }
+	
+	def unassignIncentiveFromItem = { 
+		def username = authenticateService.principal().getUsername()
+		
+		// prep all the things we'll need to send back
+		def result = [
+			success: false,
+			incentiveId: "",
+			incentiveBarcode: "",
+			incentiveVersion: 0,
+			trackedItemId: "",
+			person: null,
+			resultName: false,
+			errorText: ""
+		]
+	
+		def incentiveInstance = null
+		def trackedItemInstance = null
+		
+		// Get the incentive barcode
+		def barcode = params?.incentiveBarcode
+		if (debug) {
+			println "params::barcode::${barcode}"
+		}
+		if (barcode) {
+			// Get incentive
+			incentiveInstance = Incentive.findByBarcode(barcode)
+			if (incentiveInstance) {
+				// Determine if incentive has been assigned
+				if (incentiveInstance?.trackedItem) {
+					def msg = "${incentiveInstance?.type?.name}  unassigned from ${incentiveInstance?.trackedItem?.person} for item ${incentiveInstance?.trackedItem?.id}: ${incentiveInstance?.trackedItem?.batch?.primaryBatchInstrument?.instrument?.name}"
+					result.incentiveId = incentiveInstance?.id
+					result.resultName = "Unassigning from tracked item"
+					result.incentiveBarcode = barcode
+					result.incentiveVersion = incentiveInstance.version
+					result.trackedItemId = incentiveInstance?.trackedItem.id
+
+					// Attempt to update the incentive by removing the tracked item link
+					incentiveInstance.trackedItem = null
+					incentiveInstance.incentiveDate = null
+					incentiveInstance.checkedOutToWhom = null
+					incentiveInstance.checkedOutByWhom = null
+					incentiveInstance.dateCheckedOut = null
+					incentiveInstance.userUpdated = username					
+
+					// Attempt to save
+					if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
+						result.success = true
+						// Update transaction log
+						new IncentiveTransactionLog(incentive:incentiveInstance,transactionDate:new Date(),givenToPerson:false,checkedOutInToWhom:"unassigned",checkedOutInByWhom:username).save(flush:true)
+						
+						//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
+						flash.message = msg
+						redirect(action: "unassignIncentive")
+					}
+					else {
+						result.success = false
+						result.errorText = "An error occurred. Incentive could not be unassigned."
+						render(view: "assignIncentive", model:[result:result])
+						return
+					}
+				}
+				else {
+						result.errorText = "This incentive has not been assigned. Nothing to do."
+						//render(template:'assignErrorForm', model:[result:result])
+						result.incentiveBarcode = barcode
+						render(view: "assignIncentive", model:[result:result])
+						return false
+				}
+			}
+			else {
+				result.errorText = "Incentive not found with barcode: ${barcode}"
+				//render(template:'assignErrorForm', model:[result:result])
+				render(view: "assignIncentive", model:[result:result])
+				return false
+			}
+		}
+		else {
+			result.errorText = "No incentive barcode entered. Please try again"
+			//render(template:'assignErrorForm', model:[result:result])
+			render(view: "assignIncentive", model:[result:result])
+			return false
+		}
+		
+	}
+	
 	def transactionLog = {
 		def incentiveInstance = Incentive.get(params.id)
 		if (!incentiveInstance) {

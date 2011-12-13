@@ -19,11 +19,16 @@
 	<div class="nav">
 		<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
     	<span class="menuButton"><g:link class="list" action="list">Incentive List</g:link></span>
-        <span class="menuButton"><g:link class="create" action="assignIncentive">Assign to Item</g:link></span>
+        <span class="menuButton"><g:link class="give" action="assignIncentive">Assign to Item</g:link></span>
         <span class="menuButton"><g:link class="list" action="checkin">Check In</g:link></span>
     	<span class="menuButton"><g:link class="create" action="batchCreate">Scan a Batch</g:link></span>
         <span class="menuButton"><g:link class="create" action="activateIncentives">Activate</g:link></span>
-    	<span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton" title="help" >Help</a></span>
+        <span class="menuButton drop-down"><g:link class="more" action="">More</g:link>
+	        <ul class="drop-down-menu">
+	        	<li><span class="menuButton"><g:link class="return" action="unassignIncentive">Unassign Incentive</g:link></span></li>
+	        	<li><span class="menuButton"><a href="https://wiki.umn.edu/NcsInternal/IncentiveTrackingUserGuide" target="_blank" class="infoButton last" title="help" >Help</a></span></li>
+	        </ul>
+        </span>
 	</div>
 	<div class="body container_12">
 		<h1>Check Out Incentive</h1>
