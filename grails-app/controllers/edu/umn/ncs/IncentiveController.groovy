@@ -15,7 +15,7 @@ class IncentiveController {
 	def authenticateService
 	def directoryService
 	def memberInstanceList
-	def groupName = "EnHS-NCS-Interviewer"
+	static groupName = "EnHS-NCS-Interviewer"
 	def debug = false
 	static def appName = "ncs-incentive-mailing"
 	
@@ -277,12 +277,13 @@ class IncentiveController {
         }
         else {
 			// Get transaction log
-			def incentiveTransactionLogList = incentiveInstance.transactionLogs
+			def incentiveTransactionLogList = incentiveInstance
+				.transactionLogs.sort{ a,b -> b?.transactionDate <=> a?.transactionDate }
 
 			// Search for appointment 
 			def appointmentIncentiveInstance = AppointmentIncentive.findByIncentive(incentiveInstance)
             return [incentiveInstance: incentiveInstance
-				, incentiveTransactionLogList: incentiveTransactionLogList.sort{ a,b -> b?.transactionDate <=> a?.transactionDate }
+				, incentiveTransactionLogList: incentiveTransactionLogList
 				, appointmentIncentiveInstance: appointmentIncentiveInstance]
         }
     }
@@ -863,41 +864,41 @@ class IncentiveController {
 					incentiveInstance.checkedOutToWhom = null
 					incentiveInstance.checkedOutByWhom = null
 					incentiveInstance.dateCheckedOut = null
-					incentiveInstance.userUpdated = username					
+					incentiveInstance.userUpdated = username
 
 					// Attempt to save
 					if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
 						result.success = true
 						// Update transaction log
-						new IncentiveTransactionLog(incentive:incentiveInstance,transactionDate:new Date(),givenToPerson:false,checkedOutInToWhom:"unassigned",checkedOutInByWhom:username).save(flush:true)
+						new IncentiveTransactionLog(incentive:incentiveInstance, 
+							transactionDate:new Date(),
+							givenToPerson:false,
+							checkedOutInToWhom:"unassigned",
+							checkedOutInByWhom:username).save(flush:true)
 						
 						//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
 						flash.message = msg
 						redirect(action: "unassignIncentive")
-					}
-					else {
+					} else {
 						result.success = false
 						result.errorText = "An error occurred. Incentive could not be unassigned."
 						render(view: "assignIncentive", model:[result:result])
-						return
+						return false
 					}
-				}
-				else {
+				} else {
 						result.errorText = "This incentive has not been assigned. Nothing to do."
 						//render(template:'assignErrorForm', model:[result:result])
 						result.incentiveBarcode = barcode
 						render(view: "assignIncentive", model:[result:result])
 						return false
 				}
-			}
-			else {
+			} else {
 				result.errorText = "Incentive not found with barcode: ${barcode}"
 				//render(template:'assignErrorForm', model:[result:result])
 				render(view: "assignIncentive", model:[result:result])
 				return false
 			}
-		}
-		else {
+		} else {
 			result.errorText = "No incentive barcode entered. Please try again"
 			//render(template:'assignErrorForm', model:[result:result])
 			render(view: "assignIncentive", model:[result:result])
