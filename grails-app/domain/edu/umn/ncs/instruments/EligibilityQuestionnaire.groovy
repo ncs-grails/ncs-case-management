@@ -110,13 +110,22 @@ class EligibilityQuestionnaire {
 		}
 	}
 
+	/** This validator ensure that either a first or last name is entered */
+	static mustHaveFirstOrLastName = { val, obj ->
+		if ( obj.properties['firstName'] || obj.properties['lastName'] ) {
+			return true
+		} else {
+			return 'eligibilityQuestionnaire.firstorlast.required'
+		}
+	}
+
 	/** these are the constraint definitions. */
     static constraints = {
 		trackedItem(unique:true, nullable:true)
 		title(nullable:true, maxSize:10)
-		firstName(maxSize:30)
+		firstName(nullable:true, maxSize:30, validator: mustHaveFirstOrLastName)
 		middleName(nullable:true, maxSize:20)
-		lastName(maxSize:30)
+		lastName(nullable:true, maxSize:30, validator: mustHaveFirstOrLastName)
 		suffix(nullable:true, maxSize:10)
 		gender(nullable:true)
 		useExistingStreetAddress(nullable:true, validator: mustHaveAnAddressValidator)

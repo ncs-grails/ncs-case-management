@@ -37,7 +37,6 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 
 		minimumAttributeMap = [
 			firstName: 'Aaron',
-			lastName: 'Zirbes',
 			userCreated: 'fake user', 
 			appCreated: 'fake app', 
 			useExistingStreetAddress: streetAddressInstance ]
@@ -66,7 +65,6 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		assertFalse eq1.validate()
 
 		eq1.firstName = 'Aaron'
-		eq1.lastName = 'Zirbes'
 		eq1.userCreated = 'fake user'
 		eq1.appCreated = 'fake app'
 		eq1.useExistingStreetAddress = streetAddressInstance
@@ -78,7 +76,6 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		assertFalse eq2.validate()
 
 		eq2.firstName = 'Aaron'
-		eq2.lastName = 'Zirbes'
 		eq2.userCreated = 'fake user'
 		eq2.appCreated = 'fake app'
 		eq2.address = '123 Elm St'
@@ -87,6 +84,24 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		assertTrue eq2.validate()
 		eqSaved = eq2.save()
 		assert eqSaved.id > 0
+
+	}
+
+	void testFirstOrLastValidator() {
+		def eq = new EligibilityQuestionnaire(minimumAttributeMap)
+
+		eq.firstName = null
+		eq.lastName = null
+		assertFalse eq.validate()
+		eq.firstName = 'Aaron'
+		eq.lastName = null
+		assertTrue eq.validate()
+		eq.firstName = null
+		eq.lastName = 'Zirbes'
+		assertTrue eq.validate()
+		eq.firstName = 'Aaron'
+		eq.lastName = 'Zirbes'
+		assertTrue eq.validate()
 
 	}
 
@@ -104,8 +119,10 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 	void testFirstNameConstraint() {
 		def eq = new EligibilityQuestionnaire(minimumAttributeMap)
 
+		eq.lastName = 'Zirbes'
+
 		eq.firstName = null
-		assertFalse eq.validate()
+		assertTrue eq.validate()
 		eq.firstName = '123456789012345678901234567890'
 		assertTrue eq.validate()
 		eq.firstName = '123456789012345678901234567890+'
@@ -115,8 +132,10 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 	void testLastNameConstraint() {
 		def eq = new EligibilityQuestionnaire(minimumAttributeMap)
 
+		eq.firstName = 'Aaron'
+
 		eq.lastName = null
-		assertFalse eq.validate()
+		assertTrue eq.validate()
 		eq.lastName = '123456789012345678901234567890'
 		assertTrue eq.validate()
 		eq.lastName = '123456789012345678901234567890+'
