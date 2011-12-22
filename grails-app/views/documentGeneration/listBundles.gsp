@@ -20,7 +20,7 @@
 				<g:link class="list" action="generation">Document Generation</g:link>
 			</span>
 		</div>
-		<div class="body">
+		<div class="bundles">
 			<h1> Document Generation Bundles </h1>
 
 			<g:each var="bcc" in="${batchCreationConfigInstanceList}">

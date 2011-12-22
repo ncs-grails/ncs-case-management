@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="edu.umn.ncs.Incentive" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -14,7 +15,7 @@
 		
 		<h1>Person Details</h1>
 		
-		<fieldset class="maroonBorder"><legend class="m1">Person: ${personInstance.id}</legend>
+		<fieldset class="maroonBorder"><legend class="m1">Person ID: ${personInstance.id}</legend>
 			<g:ifAnyGranted role="ROLE_NCS_CALLING">
 				<div style="float:right;">
 				<g:link base="/phone" controller="logCall" action="newCallToPerson" id="${personInstance.id}">
@@ -54,31 +55,6 @@
 			<legend class="m1">Appointments</legend>
 			<g:include controller="appointment" action="list" params="${[ person: [id: personInstance.id ] ] }" />
 		</fieldset>
-
-		<!-- Street Addresses -->
-		<g:each var="pa" in="${personInstance.streetAddresses.sort{ it.preferredOrder} }">
-			<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
-				<h2>${pa.streetAddress.address}</h2>
-				<p>
-				${pa.streetAddress.cityStateZip}<br />
-				${pa.streetAddress.country?.name}
-				</p>
-			</fieldset>
-		</g:each>
-
-		<!-- Phone Numbers -->
-		<g:each var="pn" in="${personInstance.phoneNumbers.sort{ it.preferredOrder} }">
-			<fieldset class="maroonBorder"><legend class="m1">Phone Numbers</legend>
-				<h2>${pn.phoneNumber}</h2>
-			</fieldset>
-		</g:each>
-
-		<!-- Email Addresses -->
-		<g:each var="ea" in="${personInstance.emailAddresses.sort{ it.preferredOrder} }">
-			<fieldset class="maroonBorder"><legend class="m1">Email Addresses</legend>
-				<h2>${ea.emailAddress}</h2>
-			</fieldset>
-		</g:each>
 
 		<!-- Events -->
 		<g:if test="${eventReportInstanceList}">
@@ -292,13 +268,10 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td>Incentive:</td>
+							<td colspan="2">Incentive:</td>
 							<td>&#36;${inc.amount}</td>
-							<td>${inc.type}</td>
-							<td>${inc.barcode}</td>
+							<td colspan="2"><g:link controller="incentive" action="edit" id="${inc.id}">${inc.type}</g:link></td>
+							<td colspan="2">${inc.barcode}</td>
 						</tr>
 					</g:each>
 					<g:each var="al" in="${resultHistoryList.findAll{it.trackedItem.id == i.id} }">
@@ -319,6 +292,37 @@
 			</table>
 		
 		</fieldset>
+		<!-- Street Addresses -->
+		<g:if test="${personInstance.streetAddresses}">
+		<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
+			<g:each var="pa" in="${personInstance.streetAddresses.sort{ it.preferredOrder} }">
+			<h2>${pa.streetAddress.address}</h2>
+			<p> ${pa.streetAddress.cityStateZip}<br />
+			${pa.streetAddress.country?.name} </p>
+			</g:each>
+		</fieldset>
+		</g:if>
+
+		<!-- Phone Numbers -->
+		<g:if test="${personInstance.phoneNumbers}">
+		<fieldset class="maroonBorder"><legend class="m1">Phone Numbers</legend>
+		<g:each var="pn" in="${personInstance.phoneNumbers.sort{ it.preferredOrder} }">
+			<h2>${pn.phoneType.toString().capitalize()}</h2>
+			<p>${pn.phoneNumber}</p>
+		</g:each>
+		</fieldset>
+		</g:if>
+
+		<!-- Email Addresses -->
+		<g:if test="${personInstance.emailAddresses}">
+		<fieldset class="maroonBorder"><legend class="m1">Email Addresses</legend>
+			<g:each var="ea" in="${personInstance.emailAddresses.sort{ it.preferredOrder} }">
+			<h2>${ea.emailType.toString().capitalize()}</h2>
+			<p>${ea.emailAddress.emailAddress.toLowerCase()}(<a href="mailto:${ea.emailAddress.emailAddress.toLowerCase()}">send mail</a>)</p>
+			</g:each>
+		</fieldset>
+		</g:if>
+
 		</div>
 	</body>
 </html>

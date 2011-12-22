@@ -11,7 +11,7 @@ class DocumentGenerationController {
     def authenticateService
 	def grailsApplication
 
-	private boolean debug = true
+	private boolean debug = false
 
 	def downloadDocument = {
 		
@@ -73,9 +73,10 @@ class DocumentGenerationController {
 			if (debug) { println "fileLocation: ${fileLocation}" }
             def lastModifiedTime = new File(fileLocation).lastModified()
 			if (debug) { println "lastModifiedTime: ${lastModifiedTime}" }
-            def lastModifiedDate = new Date(lastModifiedTime)
-
-			render lastModifiedDate.format('M/d/yyyy')
+			if (lastModifiedTime) {
+				def lastModifiedDate = new Date(lastModifiedTime)
+				render lastModifiedDate.format('M/d/yyyy')
+			} else { "MISSING" }
         } else {
             render ""
         }

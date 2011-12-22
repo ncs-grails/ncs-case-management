@@ -26,7 +26,9 @@
 				<td>${i.instrument}</td>
 				<td>${i.direction}</td>
 				<td>${i.format}</td>
-				<td>${i.relation}</td>
+				<td>${i.relation}
+					<g:if test="${i.optional}">(optional)</g:if>
+				</td>
 			</tr>
 			<g:if test="${i.comment}">
 			<tr><td/><td colspan="4" class="message">${i.comment}</td></tr>
@@ -45,9 +47,9 @@
 		<tbody>
 			<g:each var="d" in="${batchCreationConfigInstance.documents}">
 			<tr>
-				<td><g:link action="downloadDocument" id="${d.id}">${d.documentLocation}</g:link></td>
-				<td>${d.mergeSourceFile}</td>
-				<td><g:include action="documentLastModified" id="${d.id}" /></td>
+				<td style="font-size: 0.9em;"><g:link action="downloadDocument" id="${d.id}">${d.documentLocation}</g:link></td>
+				<td style="font-size: 0.9em;">${d.mergeSourceFile}</td>
+				<td><g:include controller="documentGeneration" action="documentLastModified" id="${d.id}" /></td>
 			</tr>
 			<g:if test="${d.comment}">
 			<tr><td colspan="3" class="message">${d.comment}</td></tr>
