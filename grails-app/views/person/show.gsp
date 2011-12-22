@@ -55,13 +55,28 @@
 			<g:include controller="appointment" action="list" params="${[ person: [id: personInstance.id ] ] }" />
 		</fieldset>
 
-		<g:each var="pa" in="${personInstance.streetAddresses}">
+		<!-- Street Addresses -->
+		<g:each var="pa" in="${personInstance.streetAddresses.sort{ it.preferredOrder} }">
 			<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
 				<h2>${pa.streetAddress.address}</h2>
 				<p>
 				${pa.streetAddress.cityStateZip}<br />
 				${pa.streetAddress.country?.name}
 				</p>
+			</fieldset>
+		</g:each>
+
+		<!-- Phone Numbers -->
+		<g:each var="pn" in="${personInstance.phoneNumbers.sort{ it.preferredOrder} }">
+			<fieldset class="maroonBorder"><legend class="m1">Phone Numbers</legend>
+				<h2>${pn.phoneNumber}</h2>
+			</fieldset>
+		</g:each>
+
+		<!-- Email Addresses -->
+		<g:each var="ea" in="${personInstance.emailAddresses.sort{ it.preferredOrder} }">
+			<fieldset class="maroonBorder"><legend class="m1">Email Addresses</legend>
+				<h2>${ea.emailAddress}</h2>
 			</fieldset>
 		</g:each>
 
@@ -272,6 +287,20 @@
 						<td>${i.result?.result?.name}</td>
 						<td>${i.result?.receivedDate}</td>
 					</tr>
+					<g:each var="inc" in="${Incentive.findAllByTrackedItem(i)}">
+						<tr style="background-color: #DFD; font-style: italic;">
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td>Incentive:</td>
+							<td>&#36;${inc.amount}</td>
+							<td>${inc.type}</td>
+							<td>${inc.barcode}</td>
+						</tr>
+					</g:each>
 					<g:each var="al" in="${resultHistoryList.findAll{it.trackedItem.id == i.id} }">
 						<tr style="background-color: #DDD; font-style: italic;">
 							<td></td>

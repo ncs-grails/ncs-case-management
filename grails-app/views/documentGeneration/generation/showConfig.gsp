@@ -133,6 +133,9 @@ ${batchCreationConfigInstance?.name}
 	</g:if>
     </g:form>
 </fieldset>
+
+<g:render template="/batchCreationConfig/info" bean="${batchCreationConfigInstance}" var="batchCreationConfig" />
+
 </div>
 </body>
 </html>
