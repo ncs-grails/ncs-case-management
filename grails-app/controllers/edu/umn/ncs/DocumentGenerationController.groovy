@@ -10,8 +10,9 @@ class DocumentGenerationController {
     def documentGenerationService
     def authenticateService
 	def grailsApplication
+
 	private boolean debug = true
-	
+
 	def downloadDocument = {
 		
 		def config = grailsApplication.config.ncs
@@ -48,6 +49,37 @@ class DocumentGenerationController {
 		}
 		 
 	}
+	
+	def listBundles = {
+		def batchCreationConfigInstanceList = BatchCreationConfig.list()
+
+		[ batchCreationConfigInstanceList: batchCreationConfigInstanceList ]
+	}
+
+	def documentLastModified = {
+        //println "params in downloadDataset --> ${params}"
+
+		def config = grailsApplication.config.ncs
+
+        def batchCreationDocumentInstance = BatchCreationDocument.read(params?.id)
+
+        // make sure the required params were passed
+        if (batchCreationDocumentInstance) {
+
+            // the file name... we should trim off the file name from the end of
+            // the path.  (q:\stuff\data.csv --> data.csv)
+			def fileLocation = "${config.documents}/${batchCreationDocumentInstance.documentLocation}"
+
+			if (debug) { println "fileLocation: ${fileLocation}" }
+            def lastModifiedTime = new File(fileLocation).lastModified()
+			if (debug) { println "lastModifiedTime: ${lastModifiedTime}" }
+            def lastModifiedDate = new Date(lastModifiedTime)
+
+			render lastModifiedDate.format('M/d/yyyy')
+        } else {
+            render ""
+        }
+    }
 	
     // this sends a CSV file to the user on the other end
     def downloadDataset = {
