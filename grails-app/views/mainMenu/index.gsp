@@ -73,17 +73,11 @@
 						<dd>Generate instrument batches either automatically or by hand.</dd>
 						</g:ifAnyGranted>
 									
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
-						<dt><g:link controller="fatherEngagement" action="create">Father Engagement Form Entry</g:link></dt>
+						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<dt><g:link controller="dataEntry" action="index">Data Entry</g:link></dt>
 						<dd>
-							Enter father enhanced consent form data for father engagement participants.  
-						</dd>
-						</g:ifAnyGranted>
-
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
-						<dt><g:link controller="batch" action="listByDate">Generated Batches</g:link></dt>
-						<dd>
-							Provides a list of the batches for the selected month with an option to update A&M Date, Mail Date, Printing Services Date and tracking Return Date.
+							Enter study forms into the system.  This covers any form with a tracked
+							item, such as a Father Enhanced Consent, or an Eligibility Questionnaire.
 						</dd>
 						</g:ifAnyGranted>
 
