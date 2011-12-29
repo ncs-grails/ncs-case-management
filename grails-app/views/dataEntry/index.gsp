@@ -4,6 +4,11 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Data Entry - National Children's Study</title>
 		<meta name="layout" content="ncs" />
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('input[name="id"]').focus();
+			});
+		</script>
 	</head>
 	<body>
 		<div class="nav">

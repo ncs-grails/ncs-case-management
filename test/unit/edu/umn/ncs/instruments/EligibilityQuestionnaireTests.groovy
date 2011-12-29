@@ -10,6 +10,7 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 
 	Country countryInstance
 	TrackedItem trackedItemInstance
+	TrackedItem trackedItemInstance2
 	Gender genderMale
 	Gender genderFemale
 	StreetAddress streetAddressInstance
@@ -28,6 +29,8 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		countryInstance.id = 42
 		trackedItemInstance = new TrackedItem()
 		trackedItemInstance.id = 9999
+		trackedItemInstance2 = new TrackedItem()
+		trackedItemInstance2.id = 8888
 		genderMale = new Gender(name:'male')
 		genderMale.id = 1
 		genderFemale = new Gender(name:'female')
@@ -39,7 +42,8 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 			firstName: 'Aaron',
 			userCreated: 'fake user', 
 			appCreated: 'fake app', 
-			useExistingStreetAddress: streetAddressInstance ]
+			useExistingStreetAddress: streetAddressInstance,
+		    trackedItem: trackedItemInstance ]
     }
 
     protected void tearDown() {
@@ -68,6 +72,7 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		eq1.userCreated = 'fake user'
 		eq1.appCreated = 'fake app'
 		eq1.useExistingStreetAddress = streetAddressInstance
+		eq1.trackedItem = trackedItemInstance
 		assertTrue eq1.validate()
 		def eqSaved = eq1.save()
 		assert eqSaved.id > 0
@@ -81,6 +86,7 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		eq2.address = '123 Elm St'
 		eq2.city = 'Saint Paul'
 		eq2.state = 'MN'
+		eq2.trackedItem = trackedItemInstance2
 		assertTrue eq2.validate()
 		eqSaved = eq2.save()
 		assert eqSaved.id > 0
@@ -271,10 +277,4 @@ class EligibilityQuestionnaireTests extends GrailsUnitTestCase {
 		assertTrue eq.validate()
 	}
 
-	void testTrackedItemAssignable() {
-		def eq = new EligibilityQuestionnaire(minimumAttributeMap)
-
-		eq.trackedItem = trackedItemInstance
-		assertTrue eq.validate()
-	}
 }

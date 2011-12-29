@@ -121,7 +121,7 @@ class EligibilityQuestionnaire {
 
 	/** these are the constraint definitions. */
     static constraints = {
-		trackedItem(unique:true, nullable:true)
+		trackedItem(unique:true)
 		title(nullable:true, maxSize:10)
 		firstName(nullable:true, maxSize:30, validator: mustHaveFirstOrLastName)
 		middleName(nullable:true, maxSize:20)

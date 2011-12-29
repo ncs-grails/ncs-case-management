@@ -32,7 +32,7 @@
 
 <g:if test="${batchCreationConfigInstanceList.size() > 0}">
 	<fieldset class="maroonBorder">
-          <legend>Search Results</legend>
+          <legend>Bundles matching your search criteria</legend>
 
 	<div class="list">
 	<table>
@@ -79,7 +79,7 @@
 	</fieldset>
 </g:if>
 <fieldset class="maroonBorder">
-	<legend>Recently Generated Mailings</legend>
+	<legend>Recently Generated Bundles</legend>
 	<div class="list">
 		<table>
 			<thead>
