@@ -25,7 +25,7 @@
 				<g:textField class="capitalize" name="firstName" maxlength="30" value="${eligibilityQuestionnaireInstance?.firstName}" />
 			</td>
 			<td class="value ${hasErrors(bean: eligibilityQuestionnaireInstance, field: 'middleName', 'errors')}">
-				<g:textField class="capitalize" name="middleName" maxlength="20" value="${eligibilityQuestionnaireInstance?.middleName}" />
+				<g:textField class="capitalize nodots" name="middleName" maxlength="20" value="${eligibilityQuestionnaireInstance?.middleName}" />
 			</td>
 			<td class="value ${hasErrors(bean: eligibilityQuestionnaireInstance, field: 'lastName', 'errors')}">
 				<g:textField class="capitalize" name="lastName" maxlength="30" value="${eligibilityQuestionnaireInstance?.lastName}" />

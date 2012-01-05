@@ -102,6 +102,7 @@ class EligibilityQuestionnaireController {
 		if (debug) { println "params: ${params}" }
 
         def eligibilityQuestionnaireInstance = EligibilityQuestionnaire.get(params.id)
+		def user = authenticateService.principal()
 
 		if (params['useExistingStreetAddress'] && ! params?.useExistingStreetAddress?.id ) {
 			if (debug) { println "removing: useExistingStreetAddress" }
@@ -119,6 +120,7 @@ class EligibilityQuestionnaireController {
                 }
             }
             eligibilityQuestionnaireInstance.properties = params
+			eligibilityQuestionnaireInstance.userUpdated = user.username
             if (!eligibilityQuestionnaireInstance.hasErrors() && eligibilityQuestionnaireInstance.save(flush: true)) {
                 flash.message = "${message(code: 'default.updated.message', args: [message(code: 'eligibilityQuestionnaire.label', default: 'EligibilityQuestionnaire'), eligibilityQuestionnaireInstance.trackedItem.id])}"
                 // redirect(action: "show", id: eligibilityQuestionnaireInstance.id)
