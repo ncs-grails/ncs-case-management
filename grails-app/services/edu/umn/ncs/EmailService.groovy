@@ -3,7 +3,7 @@ package edu.umn.ncs
 import org.joda.time.*
 import org.joda.time.contrib.hibernate.*
 
-// Sends out Email Alerts
+/** Sends out Email Alerts */
 class EmailService {
 
     static transactional = true

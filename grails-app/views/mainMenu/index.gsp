@@ -81,6 +81,13 @@
 						</dd>
 						</g:ifAnyGranted>
 
+						<g:ifAnyGranted role="ROLE_NCS_IT">
+						<dt><g:link controller="demog" action="index">Demog</g:link></dt>
+						<dd>
+							Demographic Change Form
+						</dd>
+						</g:ifAnyGranted>
+
 						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
 						<dd>Enter mail dates for generated batches</dd>

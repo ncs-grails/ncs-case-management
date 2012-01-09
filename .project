@@ -28,5 +28,45 @@
 			<type>2</type>
 			<locationURI>GRAILS_ROOT/1.3.7/projects/ncs-case-management/plugins</locationURI>
 		</link>
+		<link>
+			<name>csv-0.3-src-groovy</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/csv-0.3/src/groovy</location>
+		</link>
+		<link>
+			<name>ncs-appointment-0.2-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-appointment-0.2/grails-app/domain</location>
+		</link>
+		<link>
+			<name>ncs-calling-0.1-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-calling-0.1/grails-app/domain</location>
+		</link>
+		<link>
+			<name>ncs-event-1.1-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-event-1.1/grails-app/domain</location>
+		</link>
+		<link>
+			<name>ncs-people-0.8-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-people-0.8/grails-app/domain</location>
+		</link>
+		<link>
+			<name>ncs-recruitment-0.4-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-recruitment-0.4/grails-app/domain</location>
+		</link>
+		<link>
+			<name>ncs-recruitment-0.4-grails-app-i18n</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-recruitment-0.4/grails-app/i18n</location>
+		</link>
+		<link>
+			<name>ncs-tracking-3.2.1-grails-app-domain</name>
+			<type>2</type>
+			<location>/home/AD/ngp/.grails/1.3.7/projects/ncs-case-management/plugins/ncs-tracking-3.2.1/grails-app/domain</location>
+		</link>
 	</linkedResources>
 </projectDescription>
