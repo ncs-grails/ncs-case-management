@@ -22,11 +22,12 @@ class AppointmentController {
 		def appointmentInstanceList = null
 		if (personInstance) {
 			appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+            render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )
 		} else {
-			flash.message "couldn't find person: ${params?.person?.id}"
+			appointmentInstanceList = Appointment.list(params)
 		}
+		[ appointmentInstanceList: appointmentInstanceList] 
 
-        [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList]
     }
 	
 	// TODO: This is not done, but should be finished later on

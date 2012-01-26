@@ -1,49 +1,64 @@
 <%@ page import="edu.umn.ncs.Appointment" %>
-<div class="list">
-    <table>
-    	<g:if test="${appointmentInstanceList}">
-        <thead>
-            <tr>
-              <g:sortableColumn property="startTime" title="${message(code: 'appointment.appCreated.label', default: 'Appt Start Time')}" />
-          
-              <th>Type</th>
-              <th>Result (click to change)</th>
-              <th>Modify</th>
-          </tr>
-      	</thead>
-      	</g:if>
-      <tbody>
-      <g:each in="${appointmentInstanceList}" status="i" var="appointmentInstance">
-          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-          
-              <td><g:link action="show" id="${appointmentInstance.id}">
-              	<g:formatDate date="${appointmentInstance.startTime}" format="MM/dd/yyyy hh:mm a" />
-              </g:link></td>
-          
-              <td>${appointmentInstance.type}</td>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="layout" content="ncs" />
+		<g:set var="entityName"
+		value="${message(code: 'appointment.label', default: 'Appointment')}" />
+		<title><g:message code="default.list.label" args="[entityName]" /></title>
+	</head>
+	<body>
+		<div class="nav"><span class="menuButton"><a class="home"
+					href="${createLink(uri: '/')}"><g:message
+					code="default.home.label" /></a></span> <span class="menuButton"><g:link
+				class="create" action="create">
+				<g:message code="default.new.label" args="[entityName]" />
+				</g:link></span></div>
+				<div class="body">
+					<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+					<g:if test="${flash.message}">
+					<div class="message">${flash.message}</div>
+					</g:if>
+					<div class="list">
+						<table>
+							<thead>
+								<tr>
 
-              <td>
-              	<g:link action="result" id="${appointmentInstance.id}">
-              		${appointmentInstance.result ?: "(none)"}
-				</g:link>
-              </td>
-          
-			  <td>
-				<g:link action="edit" id="${appointmentInstance.id}">Edit</g:link>
-				|
-			  	<g:link action="reschedule" id="${appointmentInstance.id}">Reschedule</g:link>
-			  </td>
-          
-          </tr>
-      </g:each>
-        </tbody>
-        <tfoot>
-        	<tr>
-        		<th colspan="4">
-        			<g:link action="create" params="${ ['person.id': personInstance?.id ] }">New Appointment</g:link>
-        		</th>
-        	</tr>
-        </tfoot>
+									<g:sortableColumn property="id" title="${message(code: 'appointment.id.label', default: 'Id')}" />
 
-    </table>
-</div>
+									<g:sortableColumn property="startTime" title="${message(code: 'appointment.startTime.label', default: 'Start Time')}" />
+
+									<g:sortableColumn property="endTime" title="${message(code: 'appointment.endTime.label', default: 'End Time')}" />
+
+									<th><g:message code="appointment.person.label" default="Person" /></th>
+
+									<th><g:message code="appointment.dwellingUnit.label" default="Dwelling Unit" /></th>
+
+									<th><g:message code="appointment.study.label" default="Study" /></th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<g:each in="${appointmentInstanceList}" status="i" var="appointmentInstance">
+								<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+
+									<td><g:link action="show" id="${appointmentInstance.id}">${fieldValue(bean: appointmentInstance, field: "id")}</g:link></td>
+
+									<td><g:formatDate date="${appointmentInstance.startTime}" /></td>
+
+									<td><g:formatDate date="${appointmentInstance.endTime}" /></td>
+
+									<td>${fieldValue(bean: appointmentInstance, field: "person")}</td>
+
+									<td>${fieldValue(bean: appointmentInstance, field: "dwellingUnit")}</td>
+
+									<td>${fieldValue(bean: appointmentInstance, field: "study")}</td>
+
+								</tr>
+								</g:each>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</body>
+		</html>
