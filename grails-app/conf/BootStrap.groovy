@@ -624,13 +624,6 @@ class BootStrap {
                 word.substring(0,1).toUpperCase() + word.substring(1, word.size())
             }.join(' ')
         }
-		
-		def env = System.getenv()
-		def username = env['USERNAME']
-		if (username) {
-			println "\nBrowse to https://${env['USERNAME']}.healthstudies.umn.edu:8443/ncs-case-management/\n"
-		}
-
     }
     def destroy = {
     }

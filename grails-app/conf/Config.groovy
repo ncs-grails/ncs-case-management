@@ -41,6 +41,7 @@ grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
 
+// Spring Cache (makes lookup FAST!)
 springcache {
     defaults {
         // set default cache properties that will apply to all caches that do not override them
@@ -54,6 +55,9 @@ springcache {
         }
     }
 }
+
+// jQuery everywhere!
+grails.views.javascript.library="jquery"
 
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
