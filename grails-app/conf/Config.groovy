@@ -1,4 +1,4 @@
-# externalized configuration files
+// externalized configuration files
 grails.config.locations = [ 
 	"file:/etc/grails/active-directory.groovy",
 	"file:/etc/grails/shibboleth.groovy",
