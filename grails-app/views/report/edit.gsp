@@ -28,7 +28,7 @@
             <g:form method="post" enctype="multipart/form-data" onsubmit="return validateReportEntry();" >
                 <g:hiddenField name="id" value="${reportInstance?.id}" />
                 <g:hiddenField name="version" value="${reportInstance?.version}" />
-                <g:hiddenField name="userUpdated" value="${loggedInUserInfo(field:'username')}" />
+                <g:hiddenField name="userUpdated" value="${sec.username()}" />
                 <g:set var="reportList" value="${reportList}" />
                 <g:hiddenField name="reportList" value="${reportList}" />
                 <div class="dialog">

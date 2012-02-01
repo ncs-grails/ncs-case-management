@@ -23,14 +23,14 @@
             <div class="message">${flash.message}</div>
             </g:if>
             
-            <g:ifAnyGranted role="ROLE_NCS_IT">
+            <sec:ifAnyGranted roles="ROLE_NCS_IT">
 	            <div class="buttons">
 	                <g:form>
 	                    <g:hiddenField name="id" value="${reportInstance?.id}" />
 	                    <span class="button"><g:actionSubmit class="edit" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" /></span>
 	                </g:form>
 	            </div>
-			</g:ifAnyGranted>
+			</sec:ifAnyGranted>
 			
             <div class="dialog">
                 <table id="list-table" class="tablesorter">
@@ -63,14 +63,14 @@
                 </table>
                 <label class="total-count">Showing <em>${recordList.size()}</em> rows</label>
             </div>
-            <g:ifAnyGranted role="ROLE_NCS_IT">
+            <sec:ifAnyGranted roles="ROLE_NCS_IT">
 	            <div class="buttons">
 	                <g:form>
 	                    <g:hiddenField name="id" value="${reportInstance?.id}" />
 	                    <span class="button"><g:actionSubmit class="edit" action="edit" value="${message(code: 'default.button.edit.label', default: 'Edit')}" /></span>
 	                </g:form>
 	            </div>
-            </g:ifAnyGranted>
+            </sec:ifAnyGranted>
         </div>
     </body>
 </html>

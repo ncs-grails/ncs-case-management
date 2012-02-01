@@ -1,6 +1,6 @@
 package edu.umn.ncs
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.converters.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 @Secured(['ROLE_NCS_DOCGEN'])
 class DocumentGenerationController {
     def documentGenerationService
-    def authenticateService
+    def springSecurityService
 	def grailsApplication
 
 	private boolean debug = false
@@ -124,7 +124,7 @@ class DocumentGenerationController {
 		//${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}
 		def norcMailingPattern = ~/[0-9]{4}-[0-9]{8,10}-[0-9]{2,3}/
 		
-        def username = authenticateService.principal().getUsername()
+        def username = springSecurityService.principal.getUsername()
         def itemPassed = params.id
         def batchCreationQueueSourceInstance = null
         def batchCreationQueueInstance = null
@@ -299,7 +299,7 @@ class DocumentGenerationController {
 	def cancelItem = {}
 	
 	private def _checkItem(itemPassed, itemInfo){
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		def batchCreationConfigInstance = null
 		
 		if (itemInfo.batchCreationConfigId) {
@@ -374,7 +374,7 @@ class DocumentGenerationController {
     def find = {
         flash.message = null
         def batchCreationQueue = null
-        def username = authenticateService.principal().getUsername()
+        def username = springSecurityService.principal.getUsername()
 
         def person = null
         def household = null
@@ -493,7 +493,7 @@ class DocumentGenerationController {
         loadRecentBatches {
             action {
 
-                def username = authenticateService?.principal()?.getUsername()
+                def username = springSecurityService?.principal?.getUsername()
                 // println "loadRecentBatches params: ${params}"
 
                 def q = params?.q
@@ -609,7 +609,7 @@ class DocumentGenerationController {
             on("return").to "loadRecentBatches"
             on("manualGenerateAction"){
                 // Clear the user's manual queue
-                def username = authenticateService?.principal()?.getUsername()
+                def username = springSecurityService?.principal?.getUsername()
                 def sql = "delete BatchCreationQueue bcq where bcq.username = ?"
                 BatchCreationQueue.executeUpdate(sql, [username])
 
@@ -640,7 +640,7 @@ class DocumentGenerationController {
                 // def batchCreationConfigInstance = BatchCreationConfig.read(params?.batchCreationConfigInstance?.id)
                 // pull the creation config from the flow scope
                 def batchCreationConfigInstance = flow.batchCreationConfigInstance
-                def username = authenticateService?.principal()?.getUsername()
+                def username = springSecurityService?.principal?.getUsername()
                 def docGenParams = [manual:true, username:username]
 
                 if (batchCreationConfigInstance) {
@@ -697,7 +697,7 @@ class DocumentGenerationController {
                 def batchInstance = null
                 def batchCreationConfigInstance = BatchCreationConfig.read(params?.id)
                 def results = null
-                def username = authenticateService?.principal()?.getUsername()
+                def username = springSecurityService?.principal?.getUsername()
                 def docGenParams = [manual:false, username:username]
 
                 if (batchCreationConfigInstance) {

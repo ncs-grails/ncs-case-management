@@ -70,7 +70,7 @@ h2 {
 	class="create" controller="logout" action="index">Logout</g:link></span></div>
 
 <div id="nav">
-<g:ifAnyGranted role="ROLE_NCS_IT">
+<sec:ifAnyGranted roles="ROLE_NCS_IT">
 	<div class="homePagePanel">
 	<div class="panelTop"></div>
 	<div class="panelBody">
@@ -82,7 +82,7 @@ h2 {
 	</div>
 	<div class="panelBtm"></div>
 	</div>
-</g:ifAnyGranted>
+</sec:ifAnyGranted>
 
 <div class="homePagePanel">
 <div class="panelTop"></div>
@@ -126,7 +126,7 @@ h2 {
 <p>This application is available for generating and tracking study
 documents and tracking the location of study participants.</p>
 
-<div id="pageList" class="dialog"><g:ifAnyGranted
+<div id="pageList" class="dialog"><sec:ifAnyGranted
 	role="ROLE_NCS_IT">
 
 	<h2>Configuration</h2>
@@ -145,7 +145,7 @@ documents and tracking the location of study participants.</p>
 		<dt><g:link controller="batch" action="list">Batch Management</</g:link></dt>
 		<dd>Manage batch attributes and items.</dd>
 	</dl>
-</g:ifAnyGranted>
+</sec:ifAnyGranted>
 
 <h2>Data Creation / Entry</h2>
 <dl class="menu">
@@ -171,7 +171,7 @@ documents and tracking the location of study participants.</p>
 			<g:each var="reportInstance" in="${Report.list()}">
 				<g:if test="${reportInstance?.enabled}">
 					<g:if test="${reportInstance?.adminsOnly}">
-						<g:ifAnyGranted role="ROLE_NCS_IT">
+						<sec:ifAnyGranted roles="ROLE_NCS_IT">
 							<dt>
 								<g:if test="${reportInstance?.underConstruction}">
 									<img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />
@@ -200,7 +200,7 @@ documents and tracking the location of study participants.</p>
 									${reportInstance?.description}
 								</g:else>
 							</dd>	
-						</g:ifAnyGranted>		
+						</sec:ifAnyGranted>		
 					</g:if>
 					<g:else>
 						<dt>
@@ -218,11 +218,11 @@ documents and tracking the location of study participants.</p>
 								<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']">
 									<img src="${resource(dir:'images',file:'pdf_button.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
 								</g:link>
-								<g:ifAnyGranted role="ROLE_NCS_IT">
+								<sec:ifAnyGranted roles="ROLE_NCS_IT">
 									<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']">
 										<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XLS" alt="Export to XLS" />
 									</g:link>
-								</g:ifAnyGranted>		
+								</sec:ifAnyGranted>		
 							</g:else>
 						</dt>
 						<dd>
@@ -239,7 +239,7 @@ documents and tracking the location of study participants.</p>
         </dl>
 
 		<%--<dl class="menu highlight-box">
-			<g:ifAnyGranted role="ROLE_NCS_IT">
+			<sec:ifAnyGranted roles="ROLE_NCS_IT">
 			<h2>Report Administration (admins only)</h2>
 				<dt><g:link controller="report">Report List</g:link></dt>
 				<dd>
@@ -249,7 +249,7 @@ documents and tracking the location of study participants.</p>
 				<dd>
 					Upload a BIRT report or create a SQL only report
 				</dd>
-			</g:ifAnyGranted>
+			</sec:ifAnyGranted>
        </dl> --%>
         
       </div>

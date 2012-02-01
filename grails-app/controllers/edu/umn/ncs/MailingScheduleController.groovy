@@ -1,5 +1,5 @@
 package edu.umn.ncs
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_IT'])
 class MailingScheduleController {

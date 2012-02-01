@@ -1,11 +1,11 @@
 package edu.umn.ncs
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_DOCGEN'])
 class InstrumentApprovalController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	def authenticateService
+	def springSecurityService
 	def appName = 'ncs-case-management'
 
     def index = {
@@ -26,7 +26,7 @@ class InstrumentApprovalController {
     def save = {
         def instrumentApprovalInstance = new InstrumentApproval(params)
 
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		instrumentApprovalInstance.userCreated = username
 		instrumentApprovalInstance.appCreated = appName
 

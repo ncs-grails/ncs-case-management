@@ -1,6 +1,6 @@
 package edu.umn.ncs
 
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 import org.joda.time.LocalDate
@@ -10,7 +10,7 @@ import org.joda.time.format.DateTimeFormat
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventReportController {
 	def debug = false		
-	def authenticateService
+	def springSecurityService
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -35,7 +35,7 @@ class EventReportController {
 
     def create = {
 		// get the username of the logged in user
-        def username = authenticateService?.principal()?.getUsername()
+        def username = springSecurityService?.principal?.getUsername()
 
 		def eventReportInstance = new EventReport()
 		eventReportInstance.properties = params

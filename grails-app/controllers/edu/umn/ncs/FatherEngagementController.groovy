@@ -7,7 +7,7 @@ import org.joda.time.LocalTime
 import edu.umn.ad.DirectoryService
 // Let's us use security annotations
 import grails.converters.*
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 

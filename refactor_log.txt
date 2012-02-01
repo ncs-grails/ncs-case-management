@@ -1,0 +1,76 @@
+Starting Process at Tue Jan 31 22:52:10 CST 2012
+Updating Config.groovy
+Adding security plugin dependencies to grails-app/conf/BuildConfig.groovy
+Removing plugins.umn-acegi from application.properties
+./grails-app/controllers/edu/umn/ncs/InstrumentApprovalController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/InstrumentApprovalController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/InstrumentApprovalController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/EventPickOneController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/ReceiptItemsController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/ReceiptItemsController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/ReceiptItemsController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/TrackedItemController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/TrackedItemController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/TrackedItemController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/FatherEngagementController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/PdfController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/BatchController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/BatchController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/BatchController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/EventTypeController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/EventTypeController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/EventTypeController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/IncentiveController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/IncentiveController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/IncentiveController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/DwellingUnitController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/InstrumentHistoryController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/InstrumentHistoryController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/InstrumentHistoryController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/InstrumentController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/DocumentGenerationController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/DocumentGenerationController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/DocumentGenerationController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/DocumentGenerationController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/MailingScheduleController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/LookupController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/DataSetTypeController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/MainMenuController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/MainMenuController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/MainMenuController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/ReportController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/BatchCreationConfigController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/BatchCreationItemController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/BatchCreationDocumentController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/AppointmentController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/AppointmentController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/AppointmentController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/EventReportController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/EventReportController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/EventReportController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/EventOfInterestController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/EventOfInterestController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/EventOfInterestController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/BarcodeController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/DataEntryController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/instruments/EligibilityQuestionnaireController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/instruments/EligibilityQuestionnaireController.groovy	Updating	Definition	def springSecurityService
+./grails-app/controllers/edu/umn/ncs/instruments/EligibilityQuestionnaireController.groovy	Updating	DefinitionuthenticateService.principal
+./grails-app/controllers/edu/umn/ncs/EventSourceController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/PersonController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/controllers/edu/umn/ncs/EventResultController.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/services/edu/umn/ncs/FatherEngagementDataBuilderService.groovy	Updating	Annotation	grails.plugins.springsecurity.Secured
+./grails-app/views/mainMenu/index.gsp\tUpdating\tTags\tifAnyGranted
+./grails-app/views/mainMenu/index.gsp\tUpdating\tTags\tifNotGranted
+./grails-app/views/mainMenu/indexOrig.gsp\tUpdating\tTags\tifAnyGranted
+./grails-app/views/layouts/ncs.gsp\tUpdating\tTags\tloggedInUserInfo
+./grails-app/views/layouts/ncs.gsp\tUpdating\tTags\tusername
+./grails-app/views/layouts/ncs.gsp\tUpdating\tTags\tifLoggedIn
+./grails-app/views/layouts/ncs.gsp\tUpdating\tTags\tifNotLoggedIn
+./grails-app/views/person/show.gsp\tUpdating\tTags\tifAnyGranted
+./grails-app/views/person/show.gsp\tUpdating\tTags\tifNotGranted
+./grails-app/views/report/showReportByQuery.gsp\tUpdating\tTags\tifAnyGranted
+./grails-app/views/report/create.gsp\tUpdating\tTagMethod\tifNotLoggedIn
+./grails-app/views/report/edit.gsp\tUpdating\tTagMethod\tifNotLoggedIn
+Starting Process at Tue Jan 31 22:53:19 CST 2012
+Starting Process at Tue Jan 31 22:54:13 CST 2012

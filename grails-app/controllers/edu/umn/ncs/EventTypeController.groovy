@@ -3,14 +3,14 @@ package edu.umn.ncs
 import grails.converters.JSON
 
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 
 @Secured(['ROLE_NCS_IT','ROLE_NCS'])
 class EventTypeController {
 
-	def authenticateService
+	def springSecurityService
 	def debug = true
 	def appName = 'ncs-case-management'
 	
@@ -33,7 +33,7 @@ class EventTypeController {
 
     def save = {
 		// get the username of the logged in user
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 
         def eventTypeInstance = new EventType(params)
 
@@ -79,7 +79,7 @@ class EventTypeController {
 
     def update = {
 		// get the username of the logged in user
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 
         def eventTypeInstance = EventType.get(params.id)
         if (eventTypeInstance) {

@@ -1,7 +1,7 @@
 package edu.umn.ncs
 
 import org.krysalis.barcode4j.impl.code39.Code39Bean
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS'])
 class BarcodeController {

@@ -2,13 +2,13 @@ package edu.umn.ncs
 
 import grails.converters.*
 import org.joda.time.*
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_RECEIPT'])
 class ReceiptItemsController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    def authenticateService
+    def springSecurityService
 
     def rand = new Random()
 
@@ -193,7 +193,7 @@ class ReceiptItemsController {
 	
 	private def _receiptItem(itemId, receivedDate, result){
 		
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		def appName = "ncs-case-management"
 		
 		def receivedResult = Result.findByName('received')

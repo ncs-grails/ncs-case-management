@@ -189,10 +189,10 @@ class BatchControllerTests extends ControllerUnitTestCase {
 		// instatiate the batch controller
 		def bc = new BatchController()
 
-		//Mock up the authenticateService
+		//Mock up the springSecurityService
 		def principal = [ getUsername: { "unittest" } ]
-		def authService = [ principal: { principal } ]
-		bc.authenticateService = authService
+		def authService = [ principal: principal ]
+		bc.springSecurityService = authService
 
 		// set the params
 		bc.params.id = 'B2'

@@ -28,8 +28,8 @@
             <div class="info-box hidden"></div>
 
             <g:uploadForm action="save" >
-                <g:hiddenField name="userCreated" value="${loggedInUserInfo(field:'username')}" />
-                <g:hiddenField name="userUpdated" value="${loggedInUserInfo(field:'username')}" />
+                <g:hiddenField name="userCreated" value="${sec.username()}" />
+                <g:hiddenField name="userUpdated" value="${sec.username()}" />
                 <g:set var="reportList" value="${reportList}" />
                 <g:hiddenField name="reportList" value="${reportList}" />
                 <div class="dialog">

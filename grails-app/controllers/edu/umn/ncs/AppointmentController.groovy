@@ -2,14 +2,14 @@ package edu.umn.ncs
 import org.joda.time.*
 
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_PROTECTED'])
 class AppointmentController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	
-	def authenticateService
+	def springSecurityService
 
     def index = {
         def personInstance = Person.read(params?.person?.id)
@@ -131,7 +131,7 @@ class AppointmentController {
 
     def create = {
 		
-		def user = authenticateService.principal()
+		def user = springSecurityService.principal
 		
 		def tomorrow = new LocalDate()
 		tomorrow = tomorrow.plusDays(1)
@@ -191,7 +191,7 @@ class AppointmentController {
 	
     def save = {
 		
-		def user = authenticateService.principal()
+		def user = springSecurityService.principal
 		
         def appointmentInstance = new Appointment(params)
 		if ( ! appointmentInstance.followUpAppointment) {

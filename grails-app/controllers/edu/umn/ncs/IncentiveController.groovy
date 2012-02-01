@@ -8,11 +8,11 @@ import org.joda.time.LocalDate
 import grails.converters.*
 import edu.umn.ad.DirectoryService
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 
 @Secured(['ROLE_NCS_INCENTIVES'])
 class IncentiveController {
-	def authenticateService
+	def springSecurityService
 	def directoryService
 	def memberInstanceList
 	static groupName = "EnHS-NCS-Interviewer"
@@ -28,7 +28,7 @@ class IncentiveController {
     }
 
 	def list = {
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		// Get NCS group members for list of interviewers
 		//def groupName = "EnHS-NCS"
 		
@@ -153,7 +153,7 @@ class IncentiveController {
     }
 
 	def saveAppointmentIncentive = {
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		// Get the appointment
 		def appointmentInstance = Appointment.get(params?.appointment.id)
 		if (appointmentInstance) {
@@ -190,7 +190,7 @@ class IncentiveController {
 
 	def saveIncentiveBatch = {
 		// Mechanism for saving a batch of incentives in one session (e.g. gift cards)
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		
 		// Delay Code, used to test out of sequence responses
 		/*
@@ -301,7 +301,7 @@ class IncentiveController {
     }
 
     def update = {
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
         def incentiveInstance = Incentive.get(params.id)
         if (incentiveInstance) {
             if (params.version) {
@@ -362,7 +362,7 @@ class IncentiveController {
 	// TODO: Move these into an AppointmentIncentiveController...  some day???
 	def updateAppointmentIncentive = {
 		
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		def incentiveInstance = Incentive.get(params.id)
 		if (incentiveInstance) {
 			if (params.version) {
@@ -450,7 +450,7 @@ class IncentiveController {
 
 	def checkout = {
 		// Get current user
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		// Get NCS group members for list of interviewers
 		//def groupName = "EnHS-NCS"
 
@@ -468,7 +468,7 @@ class IncentiveController {
 		 * Sets the checked out status of an incentive (e.g. gift card) with
 		 * corresponding provenance data.
 		 */
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		def checkedOutDate = null
 		def checkedOutTo = null
 		
@@ -603,7 +603,7 @@ class IncentiveController {
 	
 	def checkinIncentive = {
 		
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		
 		// Delay Code, used to test out of sequence responses
 		/*
@@ -685,7 +685,7 @@ class IncentiveController {
 	def assignIncentive = { }
 	
 	def assignIncentiveToItem = {
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 
 		// prep all the things we'll need to send back
 		def result = [
@@ -823,7 +823,7 @@ class IncentiveController {
 	def unassignIncentive = { }
 	
 	def unassignIncentiveFromItem = { 
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		
 		// prep all the things we'll need to send back
 		def result = [
@@ -980,7 +980,7 @@ class IncentiveController {
 		/**
 		 * Activate all incentives with a given receipt number
 		 */
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		
 		// Delay Code, used to test out of sequence responses
 		/*

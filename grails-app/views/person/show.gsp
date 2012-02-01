@@ -16,14 +16,14 @@
 		<h1>Person Details</h1>
 		
 		<fieldset class="maroonBorder"><legend class="m1">Person ID: ${personInstance.id}</legend>
-			<g:ifAnyGranted role="ROLE_NCS_CALLING">
+			<sec:ifAnyGranted roles="ROLE_NCS_CALLING">
 				<div style="float:right;">
 				<g:link base="/phone" controller="logCall" action="newCallToPerson" id="${personInstance.id}">
 					Call this person
 					<img style="vertical-align: middle;" src="${resource(dir:'images', file:'phone.png')}" width="32" height="32" alt="Make a Call to this Person" /><br/>
 				</g:link>
 				</div>
-			</g:ifAnyGranted>
+			</sec:ifAnyGranted>
 
 			<p>
 			${personInstance.title}
@@ -159,21 +159,21 @@
 					<g:each var="c" in="${callInstanceList}">
 					<tr>
 						<td>
-							<g:ifAnyGranted role="ROLE_NCS_CALLING">
+							<sec:ifAnyGranted roles="ROLE_NCS_CALLING">
 								<g:link base="/phone" controller="report" action="item" id="${c.items.collect{it.id}.join(',')}">
 								<g:each status="s" var="i" in="${c.items}">
 									<g:if test="${s > 0}"><br/></g:if>
 									${i.batch.primaryInstrument}
 								</g:each>
 								</g:link>
-							</g:ifAnyGranted>
+							</sec:ifAnyGranted>
 							
-							<g:ifNotGranted role="ROLE_NCS_CALLING">
+							<sec:ifNotGranted roles="ROLE_NCS_CALLING">
 								<g:each status="s" var="i" in="${c.items}">
 									<g:if test="${s > 0}"><br/></g:if>
 									${i.batch.primaryInstrument}
 								</g:each>
-							</g:ifNotGranted>
+							</sec:ifNotGranted>
 							
 						</td>
 						<td><g:formatDate date="${c.startTime}" format="M/d/yyyy h:mm a" /></td>

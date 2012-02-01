@@ -1,5 +1,5 @@
 package edu.umn.ncs
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import org.joda.time.*
 import org.codehaus.groovy.grails.plugins.orm.auditable.*
 
@@ -9,7 +9,7 @@ class TrackedItemController {
 	private boolean debug = true
 	private static LocalTime midnight = new LocalTime(0,0)
 
-	def authenticateService
+	def springSecurityService
 	
     def index = { redirect(controller:'mainMenu') }
 	
@@ -53,7 +53,7 @@ class TrackedItemController {
 		// ... the answer may be "no", but I thought I'd ask.
 		
 		// TODO: Expiration date doesn't show up for addition/modification/deletion
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		def appName = "ncs-case-management"
 
 		def message = ''
@@ -277,7 +277,7 @@ class TrackedItemController {
 	private def auditLog(className, eventName, newValue, oldValue, persistedObjectId, propertyName){
 
 		def message = ""		
-		def username = authenticateService.principal().getUsername()
+		def username = springSecurityService.principal.getUsername()
 		
 		def auditLog = new AuditLogEvent(actor: username,
 			className: className,

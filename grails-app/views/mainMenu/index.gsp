@@ -21,14 +21,14 @@
 	<div class="container">
 		<div class="menu-box">
 			<ul id="menu-items">
-				<g:ifAnyGranted role="ROLE_NCS_IT">
+				<sec:ifAnyGranted roles="ROLE_NCS_IT">
 					<li id="config" class="top-border-light">Configuration</li>
-				</g:ifAnyGranted>
-				<li id="data-mngmt" class="<g:ifNotGranted role='ROLE_NCS_IT'>top-border-light</g:ifNotGranted>">Data Management</li>
+				</sec:ifAnyGranted>
+				<li id="data-mngmt" class="<sec:ifNotGranted roles='ROLE_NCS_IT'>top-border-light</sec:ifNotGranted>">Data Management</li>
 				<li id="lookup">Lookup</li>
-				<g:ifAnyGranted role="ROLE_NCS_IT">
+				<sec:ifAnyGranted roles="ROLE_NCS_IT">
 					<li id="report-admin">Report Admin</li>
-				</g:ifAnyGranted>
+				</sec:ifAnyGranted>
 				<li id="report">Reporting</li>
 				<li id="tools">Tools</li>
 				<li id="about">About</li>			
@@ -36,7 +36,7 @@
 		</div>
 		<div class="content-box">
 			<div id="tabs" class="content">
-				<g:ifAnyGranted role="ROLE_NCS_IT">
+				<sec:ifAnyGranted roles="ROLE_NCS_IT">
 					<div id="config-tab">
 						<dl class="menu">
 							<dt><g:link controller="instrument" action="list">Instruments</g:link></dt>
@@ -64,47 +64,47 @@
 
 						</dl>				
 					</div>
-				</g:ifAnyGranted>
+				</sec:ifAnyGranted>
 						
 				<div id="data-mngmt-tab">
 					<dl class="menu">
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
+						<sec:ifAnyGranted roles="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="documentGeneration">Document Generation</g:link></dt>
 						<dd>Generate instrument batches either automatically or by hand.</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 									
-						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<sec:ifAnyGranted roles="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="dataEntry" action="index">Data Entry</g:link></dt>
 						<dd>
 							Enter study forms into the system.  This covers any form with a tracked
 							item, such as a Father Enhanced Consent, or an Eligibility Questionnaire.
 						</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
+						<sec:ifAnyGranted roles="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="batch" action="entry">Mail Date Entry</g:link></dt>
 						<dd>Enter mail dates for generated batches</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
+						<sec:ifAnyGranted roles="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="receiptItems" action="index">Receipt Items</g:link></dt>
 						<dd>Receipt documents</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
-						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<sec:ifAnyGranted roles="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="appointment">Appointment Entry</g:link></dt>
 						<dd>Enter Appointment Dates and Times for study subjects.</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
-						<g:ifAnyGranted role="ROLE_NCS_DOCGEN">
+						<sec:ifAnyGranted roles="ROLE_NCS_DOCGEN">
 						<dt><g:link controller="incentive" action="index">Incentive Tracking</g:link></dt>
 						<dd>Scan, checkout/in and assign incentives.</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
-						<g:ifAnyGranted role="ROLE_NCS_PROTECTED">
+						<sec:ifAnyGranted roles="ROLE_NCS_PROTECTED">
 						<dt><g:link controller="eventReport">Event of Interest Reporting</g:link></dt>
 						<dd>Enter events of interest for study subjects.</dd>
-						</g:ifAnyGranted>
+						</sec:ifAnyGranted>
 
 					</dl>
 				</div>
@@ -120,7 +120,7 @@
 					</dl>
 				</div>
 								
-				<g:ifAnyGranted role="ROLE_NCS_IT">
+				<sec:ifAnyGranted roles="ROLE_NCS_IT">
 					<div id="report-admin-tab">
 						<dl class="menu">
 							<dt><g:link controller="report">Report List</g:link></dt>
@@ -133,7 +133,7 @@
 							</dd>
 				       </dl>
 					</div>
-				</g:ifAnyGranted>
+				</sec:ifAnyGranted>
 
 				<div id="report-tab">
 					<dl class="menu">
@@ -145,7 +145,7 @@
 						<g:each var="reportInstance" in="${Report.list().sort{ it.title }}">
 							<g:if test="${reportInstance?.enabled}">
 								<g:if test="${reportInstance?.adminsOnly}">
-									<g:ifAnyGranted role="ROLE_NCS_IT">
+									<sec:ifAnyGranted roles="ROLE_NCS_IT">
 										<dt>
 											<g:if test="${reportInstance?.underConstruction}">
 												<img src="${resource(dir:'images',file:'under_construction_icon-red_30x25.png')}" class="under-construction-img" title="Under construction" alt="Under construction" />
@@ -174,7 +174,7 @@
 												${reportInstance?.description}
 											</g:else>
 										</dd>	
-									</g:ifAnyGranted>		
+									</sec:ifAnyGranted>		
 								</g:if>
 								<g:else>
 									<dt>
@@ -192,11 +192,11 @@
 											<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'pdf']" class="image-link" >
 												<img src="${resource(dir:'images',file:'pdf_button.png')}" class="export-img" title="Export to PDF" alt="Export to PDF" />
 											</g:link>
-											<g:ifAnyGranted role="ROLE_NCS_IT">
+											<sec:ifAnyGranted roles="ROLE_NCS_IT">
 												<g:link controller="report" action="exportBirtReport" id="${reportInstance.id}" params="[format:'xls']" class="image-link" >
 												<img src="${resource(dir:'images',file:'excel_16x16.png')}" class="export-img" title="Export to XML for Excel" alt="Export to XML for Excel" />
 												</g:link>
-											</g:ifAnyGranted>		
+											</sec:ifAnyGranted>		
 										</g:else>
 									</dt>
 									<dd>

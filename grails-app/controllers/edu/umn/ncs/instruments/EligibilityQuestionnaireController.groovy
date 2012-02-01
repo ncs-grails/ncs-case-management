@@ -1,7 +1,7 @@
 package edu.umn.ncs.instruments
 
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import edu.umn.ncs.TrackedItem
 import edu.umn.ncs.StreetAddress
 import edu.umn.ncs.Country
@@ -13,7 +13,7 @@ class EligibilityQuestionnaireController {
 	private static appCreated = 'ncs-case-management'
 	private static debug = false
 	
-	def authenticateService
+	def springSecurityService
 
     def index = {
         redirect(action: "list", params: params)
@@ -56,7 +56,7 @@ class EligibilityQuestionnaireController {
     }
 
     def save = {
-		def user = authenticateService.principal()
+		def user = springSecurityService.principal
 
         def eligibilityQuestionnaireInstance = new EligibilityQuestionnaire(params)
 		eligibilityQuestionnaireInstance.appCreated = appCreated
@@ -102,7 +102,7 @@ class EligibilityQuestionnaireController {
 		if (debug) { println "params: ${params}" }
 
         def eligibilityQuestionnaireInstance = EligibilityQuestionnaire.get(params.id)
-		def user = authenticateService.principal()
+		def user = springSecurityService.principal
 
 		if (params['useExistingStreetAddress'] && ! params?.useExistingStreetAddress?.id ) {
 			if (debug) { println "removing: useExistingStreetAddress" }

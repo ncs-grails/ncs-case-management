@@ -4,7 +4,7 @@ import org.joda.time.*
 import org.joda.time.contrib.hibernate.*
 
 // Let's us use security annotations
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 
 @Secured(['ROLE_NCS'])
@@ -13,7 +13,7 @@ class BatchController {
     private boolean debug = false 
 
     def emailService
-    def authenticateService
+    def springSecurityService
 
     def index = { 
         redirect(action:'list',params:params)
@@ -113,7 +113,7 @@ class BatchController {
     def entry = {
         // reference date
         def referenceDate = params?.referenceDate
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 		
 		println "debug: ${debug}"
 	
@@ -227,7 +227,7 @@ class BatchController {
 	@Secured(['ROLE_NCS_IT'])
     def list = {
         
-        def username = authenticateService?.principal()?.getUsername()
+        def username = springSecurityService?.principal?.getUsername()
         def q = params?.q
         def searchedId = 0L
 		def itemId = 0L
@@ -545,7 +545,7 @@ class BatchController {
 			def personId = params?.person?.id
 			def householdId = params?.household?.id
 			
-			def username = authenticateService?.principal()?.getUsername()
+			def username = springSecurityService?.principal?.getUsername()
 			
 			def bcq = new BatchCreationQueue()
 			

@@ -1,6 +1,6 @@
 package edu.umn.ncs
 
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 
@@ -8,7 +8,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 class EventOfInterestController {
 	def debug = true
 
-	def authenticateService	
+	def springSecurityService	
 	def eventTriggerService
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -24,7 +24,7 @@ class EventOfInterestController {
 
     def create = {
 		// get the username of the logged in user
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 		
         def eventOfInterestInstance = new EventOfInterest()
         eventOfInterestInstance.properties = params
@@ -48,7 +48,7 @@ class EventOfInterestController {
 		def eventReportInstance = EventReport.get(params.eventReport.id)
 		
 		// get the username of the logged in user
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 		
 		if (eventReportInstance){
 			// Set the event report to which the eoi belongs
@@ -179,7 +179,7 @@ class EventOfInterestController {
     def update = {
 		
 		// get the username of the logged in user
-		def username = authenticateService?.principal()?.getUsername()
+		def username = springSecurityService?.principal?.getUsername()
 
         def eventOfInterestInstance = EventOfInterest.get(params.eventOfInterestInstance_id)
 		def eventReportInstance = EventReport.read(eventOfInterestInstance.eventReport.id)

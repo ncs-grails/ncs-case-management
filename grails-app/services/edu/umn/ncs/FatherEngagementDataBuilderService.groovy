@@ -3,7 +3,7 @@ package edu.umn.ncs
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
 // Security stuff
-import org.codehaus.groovy.grails.plugins.springsecurity.Secured
+import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 

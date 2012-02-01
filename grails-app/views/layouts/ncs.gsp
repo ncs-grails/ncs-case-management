@@ -50,12 +50,12 @@
 	href="#maincontent">Main content</a></p>
 
 <div id="header"><!-- BEGIN LOGIN/LOGOUT -->
-<div id="auth_links"><g:isLoggedIn>
-		Logged in as: <g:loggedInUserInfo field="username" />
+<div id="auth_links"><sec:ifLoggedIn>
+		Logged in as: <sec:username/>
 	<g:link controller="logout" action="index">Log Out</g:link>
-</g:isLoggedIn> <g:isNotLoggedIn>
+</sec:ifLoggedIn> <sec:ifNotLoggedIn>
                 Not Logged In
-            </g:isNotLoggedIn></div>
+            </sec:ifNotLoggedIn></div>
 <!-- END CAMPUS LINKS --> <!-- BEGIN CAMPUS LINKS -->
 <div id="campus_links">
 <p>Campuses:</p>
