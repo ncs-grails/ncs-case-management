@@ -36,9 +36,35 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.5'
     }
     plugins {
+		compile ":hibernate:$grailsVersion"
+		compile ":tomcat:$grailsVersion"
+
+		compile ":address-lookup-zpfour:0.1.2"
+		compile ":audit-logging:0.5.4"
+		compile ":barcode4j:0.2"
+		compile ":birt-report:2.6.1.0"
+		test ":code-coverage:1.2.5"
+		test ":codenarc:0.16.1"
+		compile ":csv:0.3"
+		compile ":joda-time:1.0"
+		compile ":jquery:1.7.1"
+		compile ":mail:1.0-SNAPSHOT"
+		compile ":ncs-appointment:0.2"
+		compile ":ncs-calling:0.1"
+		compile ":ncs-event:1.1"
+		compile ":ncs-norc-link:0.4"
+		compile ":ncs-people:0.8"
+		compile ":ncs-recruitment:1.0"
+		compile ":ncs-tracking:3.2.2"
+		compile ":ncs-web-template:0.2"
+		compile ":pdf:0.6"
+		compile ":quartz:0.4.2"
+		compile ":springcache:1.3.1"
 		compile ":spring-security-core:1.2.7.2"
 		compile ":spring-security-ldap:1.0.5.1"
-		compile ":spring-security-shibboleth-native-sp:1.0.2"
 		provided ":spring-security-mock:1.0.1"
+		compile ":spring-security-shibboleth-native-sp:1.0.2"
+		compile ":webflow:1.3.4"
+
 	}
 }
