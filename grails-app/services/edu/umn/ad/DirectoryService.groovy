@@ -1,6 +1,7 @@
 package edu.umn.ad
-import grails.plugin.springcache.annotations.Cacheable
 
+import grails.plugin.springcache.annotations.Cacheable
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.apache.directory.groovyldap.LDAP
 import org.apache.directory.groovyldap.SearchScope
 import org.codehaus.groovy.grails.commons.*
@@ -12,30 +13,34 @@ class DirectoryService {
 	// default constructor for service…
 	DirectoryService() {
 
-		def conf = ConfigurationHolder.config
+		def conf = SpringSecurityUtils.securityConfig
 
 		// pull config var from grails-app/conf/Config.groovy
-		ldapUri = conf.umnad.ldapUri
-		ldapUserDn = conf.umnad.ldapUserDn
-		ldapUserPw = conf.umnad.ldapUserPw
-		ldapPeopleBaseDn = conf.umnad.ldapPeopleBaseDn
-		ldapGroupsBaseDn = conf.umnad.ldapGroupsBaseDn
-		ldapMemberAttribute = conf.umnad.ldapMemberAttribute
-		ldapMemberOfAttribute = conf.umnad.ldapMemberOfAttribute
-		rolePrefix = conf.umnad.rolePrefix 
-		roleSuffix = conf.umnad.roleSuffix 
+		ldapUri = conf.ldap.context.server ?: DEFAULT_URI
+		ldapUserDn = conf.ldap.context.managerDn
+		ldapUserPw = conf.ldap.context.managerPassword
+		ldapPeopleBaseDn = conf.ldap.search.base
+		ldapGroupsBaseDn = conf.ldap.authorities.groupSearchBase
+		ldapGroupSearchFilter = conf.ldap.authorities.groupSearchFilter ?: DEFAULT_GROUP_SEARCH_FILTER
+		ldapMemberSearchFilter = conf.ldap.authorities.memberSearchFilter ?: DEFAULT_MEMBER_SEARCH_FILTER
+		rolePrefix = conf.ldap.authorities.clean.prefix
+		roleSuffix = conf.ldap.authorities.clean.suffix
 	}
 
+	private String DEFAULT_URI = 'ldap://localhost'
+	private String DEFAULT_GROUP_SEARCH_FILTER = "(member:1.2.840.113556.1.4.1941:={0})"
+	private String DEFAULT_MEMBER_SEARCH_FILTER = "(memberOf:1.2.840.113556.1.4.1941:={0})"
+
 	// privately defined variables
-	private def ldapUri = 'ldaps://ad.umn.edu'
-	private def ldapUserDn = ''
-	private def ldapUserPw = ''
-	private def ldapPeopleBaseDn = ''
-	private def ldapGroupsBaseDn = ''
-	private def ldapMemberAttribute = 'member'
-	private def ldapMemberOfAttribute = 'memberOf'
-	private def rolePrefix = ''
-	private def roleSuffix = ''
+	private String ldapUri = ''
+	private String ldapUserDn = ''
+	private String ldapUserPw = ''
+	private String ldapPeopleBaseDn = ''
+	private String ldapGroupsBaseDn = ''
+	private String ldapGroupSearchFilter = ''
+	private String ldapMemberSearchFilter = ''
+	private String rolePrefix = ''
+	private String roleSuffix = ''
 
 	private def _authorities = [] as Set
 	private def _members = [] as Set
@@ -86,8 +91,7 @@ class DirectoryService {
 
 
 		// Find the members
-		def searchCriteria = "(${ldapMemberOfAttribute}:1.2.840.113556.1.4.1941:=${groupDn})"
-		// (memberof:1.2.840.113556.1.4.1941:=(cn=Group1,OU=groupsOU,DC=x))
+		def searchCriteria = ldapMemberSearchFilter.replaceAll(/\{0\}/, groupDn)
 		def results = ldap.search(filter:searchCriteria, base:ldapPeopleBaseDn, scope:SearchScope.SUB )
 
 		results.each{
@@ -196,8 +200,8 @@ class DirectoryService {
 		}
 
 
-		// Find the groups
-		def searchCriteria = "(${ldapMemberAttribute}:1.2.840.113556.1.4.1941:=CN=${username},OU=People,DC=ad,DC=umn,DC=edu)"
+		// Find the groups 
+		def searchCriteria = ldapGroupSearchFilter.replaceAll(/\{0\}/, "${username},${ldapPeopleBaseDn}")
 		def results = ldap.search(filter:searchCriteria, base:ldapGroupsBaseDn, scope:SearchScope.SUB )
 
 		results.each{
