@@ -68,3 +68,15 @@ grails.project.dependency.resolution = {
 
 	}
 }
+
+codenarc.reports = {
+	JenkinsXmlReport('xml') {
+		outputFile = 'target/test-reports/CodeNarcReport.xml'
+		title = 'CodeNarc Report for NCS Case Management'
+	}
+	JenkinsHtmlReport('html') {
+		outputFile = 'CodeNarcReport.html'
+		title = 'CodeNarc Report for NCS Case Management'
+	}
+}
+codenarc.propertiesFile = 'grails-app/conf/codenarc.properties'
