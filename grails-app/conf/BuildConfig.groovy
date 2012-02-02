@@ -65,7 +65,6 @@ grails.project.dependency.resolution = {
 		provided ":spring-security-mock:1.0.1"
 		compile ":spring-security-shibboleth-native-sp:1.0.3"
 		compile ":webflow:1.3.4"
-
 	}
 }
 
