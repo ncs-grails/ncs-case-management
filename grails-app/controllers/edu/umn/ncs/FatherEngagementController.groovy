@@ -33,8 +33,18 @@ class FatherEngagementController {
     def create = {
         def fatherEngagementInstance = new FatherEngagement()
         fatherEngagementInstance.properties = params
-		
-        return [fatherEngagementInstance: fatherEngagementInstance ]
+		// Get NCS group members for list of interviewers
+		memberInstanceList = directoryService.getMembers()
+		if ( ! memberInstanceList ) {
+			if (debug) {
+				println "Populating user list"
+			}
+			directoryService.loadUsersByGroupname(groupName)
+			//memberInstanceList = directoryService.members
+			memberInstanceList = directoryService.getMembers()
+		}
+
+        return [fatherEngagementInstance: fatherEngagementInstance, memberInstanceList: memberInstanceList ]
     }
 
     def save = {

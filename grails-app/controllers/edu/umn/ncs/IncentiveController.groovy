@@ -772,6 +772,14 @@ class IncentiveController {
 							// Attempt to save
 							if (!incentiveInstance.hasErrors() && incentiveInstance.save(flush: true)) {
 								result.success = true
+								// Update transaction log
+								new IncentiveTransactionLog(incentive:incentiveInstance, 
+									transactionDate:new Date(),
+									givenToPerson:true,
+									checkedOut:false,
+									checkedOutInToWhom:"unassigned",
+									checkedOutInByWhom:"unassigned").save(flush:true)
+									
 								//flash.message = "${message(code: 'default.updated.message', args: [message(code: 'incentive.label', default: 'Incentive'), incentiveInstance.id])}"
 								flash.message = "${incentiveInstance?.type?.name}  assigned to ${trackedItemInstance?.person} for item ${trackedItemInstance?.id}: ${trackedItemInstance?.batch?.primaryBatchInstrument?.instrument?.name}"
 								redirect(action: "assignIncentive")
@@ -863,6 +871,7 @@ class IncentiveController {
 					incentiveInstance.incentiveDate = null
 					incentiveInstance.checkedOutToWhom = null
 					incentiveInstance.checkedOutByWhom = null
+					incentiveInstance.checkedOut = false
 					incentiveInstance.dateCheckedOut = null
 					incentiveInstance.userUpdated = username
 
