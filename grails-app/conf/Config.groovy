@@ -71,3 +71,6 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
 
+log4j = {
+	debug "grails.app.controller"
+}
