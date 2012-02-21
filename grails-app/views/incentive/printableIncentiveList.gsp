@@ -43,7 +43,7 @@
 			img
 			{
 				height:1.9em;
-				width:22.0em;
+				width:18.0em;
 				margin-left:-1.0em;
 			}
 		</style>
@@ -52,7 +52,7 @@
     	<g:each in="${incentiveInstanceList}" var="incentiveInstance" status="i">
     		<div class="label">
     			<div class="label-row">${incentiveInstance?.type?.name}</div>
-    			<div class="label-row barcode"><img src="${createLink(controller:'barcode', action:'png', id:incentiveInstance?.barcode)}" /></div>
+    			<div class="label-row barcode"><img src="${createLink(controller:'barcode', action:'png', id:'INC' + incentiveInstance?.id)}" /></div>
     			<div class="label-row barcode">${incentiveInstance?.barcode}</div>    			
     		</div>
     	</g:each>

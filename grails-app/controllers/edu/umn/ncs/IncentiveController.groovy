@@ -229,13 +229,17 @@ class IncentiveController {
 		if (type) {
 			if (params?.id){
 				// Get the barcode
-				def barcodeValue = params?.id
+				def barcodeValue = params?.id?.toUpperCase()?.replace('INC','')
 				if (debug) {
 					println "barcodeValue: ${barcodeValue}"
 				}
 				
-				// Check for incentive with current barcode
-				def incentiveInstance = Incentive.findByBarcodeAndType(barcodeValue, type)
+				// Check for incentive
+				def incentiveInstance = Incentive.get(barcodeValue.toLong())
+				// If not found, try by current barcode and type
+				if (!incentiveInstance) {
+					incentiveInstance = Incentive.findByBarcodeAndType(barcodeValue, type)				
+				}
 				if (incentiveInstance) {
 					// barcode already scanned
 					result.errorText = "An incentive already exists with this barcode and type"
@@ -497,7 +501,7 @@ class IncentiveController {
 		}
 
 		if (params?.id){
-			def barcodeValue = params?.id
+			def barcodeValue = params?.id?.toUpperCase()?.replace('INC','')
 			
 			if (debug) {
 				println "barcodeValue: ${barcodeValue}"
@@ -505,6 +509,10 @@ class IncentiveController {
 			
 			// Check for existing incentive by barcode
 			def incentiveInstance = Incentive.findByBarcode(barcodeValue)
+			// If not found, try by id
+			if (!incentiveInstance) {
+				incentiveInstance = Incentive.get(barcodeValue.toLong())				
+			}
 			if (incentiveInstance) {
 				// Get Assignment status
 				if (incentiveInstance?.trackedItem) {
@@ -629,7 +637,7 @@ class IncentiveController {
 		}
 
 		if (params?.id){
-			def barcodeValue = params?.id
+			def barcodeValue = params?.id?.toUpperCase()?.replace('INC','')
 			
 			if (debug) {
 				println "barcodeValue: ${barcodeValue}"
@@ -637,6 +645,10 @@ class IncentiveController {
 			
 			// Check for existing incentive by barcode
 			def incentiveInstance = Incentive.findByBarcode(barcodeValue)
+			// If not found, try by id
+			if (!incentiveInstance) {
+				incentiveInstance = Incentive.get(barcodeValue.toLong())				
+			}
 			if (incentiveInstance) {
 				// Determine if the incentive has been assigned
 				if (incentiveInstance?.trackedItem) {
@@ -704,14 +716,18 @@ class IncentiveController {
 		def incentiveInstance = null
 		def trackedItemInstance = null
 		
-		// Get the incentive barcode
-		def barcode = params?.code
+		// Get the incentive barcode -- Replace INC prefix if
+		def barcodeValue = params?.code?.toUpperCase()?.replace('INC','')
 		if (debug) {
 			println "params::barcode::${barcode}"
 		}
-		if (barcode) {
-			// Get incentive
-			incentiveInstance = Incentive.findByBarcode(barcode)
+		if (barcodeValue) {
+			// Get incentive by barcode
+			incentiveInstance = Incentive.findByBarcode(barcodeValue)
+			// If not found, try by id
+			if (!incentiveInstance) {
+				incentiveInstance = Incentive.get(barcodeValue.toLong())				
+			}
 			if (incentiveInstance) {
 				// Determine if incentive has already been assigned
 				if (incentiveInstance?.trackedItem) {
@@ -748,7 +764,7 @@ class IncentiveController {
 							// Search for an appointment associated with this tracked item
 							def appointmentInstance = Appointment.findByLetter(trackedItemInstance)
 							result.incentiveId = incentiveInstance.id
-							result.incentiveBarcode = barcode
+							result.incentiveBarcode = barcodeValue
 							result.incentiveVersion = incentiveInstance.version
 							result.trackedItemId = trackedItemInstance.id
 							if (appointmentInstance) {
@@ -806,14 +822,14 @@ class IncentiveController {
 					else {
 						result.errorText = "Tracked item with id [${params?.trackedItemId}] does not exist"
 						//render(template:'assignErrorForm', model:[result:result])
-						result.incentiveBarcode = barcode
+						result.incentiveBarcode = barcodeValue
 						render(view: "assignIncentive", model:[result:result])
 						return false
 					}
 				}
 			}
 			else {
-				result.errorText = "Incentive not found with barcode: ${barcode}"
+				result.errorText = "Incentive not found with barcode: ${barcodeValue}"
 				//render(template:'assignErrorForm', model:[result:result])
 				render(view: "assignIncentive", model:[result:result])
 				return false
@@ -849,20 +865,24 @@ class IncentiveController {
 		def trackedItemInstance = null
 		
 		// Get the incentive barcode
-		def barcode = params?.incentiveBarcode
+		def barcodeValue = params?.incentiveBarcode?.toUpperCase()?.replace('INC','')
 		if (debug) {
-			println "params::barcode::${barcode}"
+			println "params::barcode::${barcodeValue}"
 		}
-		if (barcode) {
+		if (barcodeValue) {
 			// Get incentive
-			incentiveInstance = Incentive.findByBarcode(barcode)
+			incentiveInstance = Incentive.findByBarcode(barcodeValue?.toLong())
+			// If not found, try by barcode
+			if (!incentiveInstance) {
+				incentiveInstance = Incentive.findByBarcode(barcodeValue)				
+			}
 			if (incentiveInstance) {
 				// Determine if incentive has been assigned
 				if (incentiveInstance?.trackedItem) {
 					def msg = "${incentiveInstance?.type?.name}  unassigned from ${incentiveInstance?.trackedItem?.person} for item ${incentiveInstance?.trackedItem?.id}: ${incentiveInstance?.trackedItem?.batch?.primaryBatchInstrument?.instrument?.name}"
 					result.incentiveId = incentiveInstance?.id
 					result.resultName = "Unassigning from tracked item"
-					result.incentiveBarcode = barcode
+					result.incentiveBarcode = barcodeValue
 					result.incentiveVersion = incentiveInstance.version
 					result.trackedItemId = incentiveInstance?.trackedItem.id
 
@@ -897,12 +917,12 @@ class IncentiveController {
 				} else {
 						result.errorText = "This incentive has not been assigned. Nothing to do."
 						//render(template:'assignErrorForm', model:[result:result])
-						result.incentiveBarcode = barcode
+						result.incentiveBarcode = barcodeValue
 						render(view: "assignIncentive", model:[result:result])
 						return false
 				}
 			} else {
-				result.errorText = "Incentive not found with barcode: ${barcode}"
+				result.errorText = "Incentive not found with barcode: ${barcodeValue}"
 				//render(template:'assignErrorForm', model:[result:result])
 				render(view: "assignIncentive", model:[result:result])
 				return false
