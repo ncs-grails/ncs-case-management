@@ -1,4 +1,4 @@
-@ page import="edu.umn.ncs.Appointment" %>
+<%@ page import="edu.umn.ncs.Appointment" %>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
