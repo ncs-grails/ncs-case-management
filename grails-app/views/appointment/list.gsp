@@ -44,7 +44,7 @@
 				</table>
 			</div> <!-- end class=list  -->
 
-			Number of appointments in the past: XX
+			Total number of appointments: ${appointmentInstanceTotal}
 
 
 
