@@ -14,10 +14,10 @@ class AppointmentController {
 	def index = {
 
 		log.debug ("APPOINTMENT > index > params: ${params}")
-		println ("APPOINTMENT > index > params: ${params}")
+		//println ("APPOINTMENT > index > params: ${params}")
 
 		def personInstance = Person.read(params?.person?.id)
-		log.debug ("personInstance = Person.read(params?.person?.id)= ${personInstance}")
+		//println ("APPOINTMENT > index > personInstance: ${personInstance}")
 
 		[ personInstance: personInstance ]
 
@@ -25,77 +25,67 @@ class AppointmentController {
 
 	def list = {
 
-		log.debug ("APPOINTMENT > list > params: ${params}")
-		println "APPOINTMENT > list > params = ${params}"
+		//println "APPOINTMENT > list > params = ${params}"
 
-		// confirmed appointments, starting from now
-		def now = new Date()
-		println "=> now = ${now}"
-
-		def apptResultConfirmed = AppointmentResult.findWhere(name:"Confirmed")
-		println "=> apptResultConfirmed = ${apptResultConfirmed}"
-		
-		def ca = Appointment.createCriteria()
-		def appointmentInstanceList = ca.list{
-			//eq("result", apptResultConfirmed)
-			ge("startTime", now)
-			order("startTime", "asc")
-		}
-
-		// create list of all parameters for confirmed appointments, starting from now
-		def appointmentDetailInstanceList = []
-		
-		// add records to appointment detailed list
-		appointmentInstanceList.eachWithIndex {rs, i ->
-
-			def record = [:]
-
-			def personInstance = Person.findWhere(id:rs.personId)
-			println "=> personInstance = ${personInstance}"
-			
-			def personLinkInstance = PersonLink.findByPerson(personInstance)
-			println "=> personLinkInstance = ${personLinkInstance}"
-			
-			record.personId = personInstance.id				
-			record.norcId = personLinkInstance.norcSuId 	
-			record.lastName = personInstance.lastName
-			record.firstName = personInstance.firstName
-			record.middleName = personInstance.middleName
-			record.startTime = rs.startTime
-			record.apptType = AppointmentType.findWhere(id:rs.typeId)			
-	
-			println "=> record = ${record}"
-		 	appointmentDetailInstanceList.add(record)
-
-		} 
-		
-
-
-
-/*
-		// current confirmed appointments
-		def nowDateTime = new Date()
-		log.debug ("nowDateTime: ${nowDateTime}")
-		def cpa = Appointment.createCriteria()
-		def pastAppointmentIntanceList = cpa.get{
-			eq("result", "Confirmed")
-			lt("startTime",nowDateTime)
-			projections {
-				count("id")
-			}
-		}
-
-					
 		def personInstance = Person.read(params?.person?.id)
-                def appointmentInstanceList = null
                 if (personInstance) {
+
+	                def appointmentInstanceList = null
                         appointmentInstanceList = Appointment.findAllByPerson(personInstance)
             		render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )
-                } else {
-                        appointmentInstanceList = Appointment.list(params)
+        
+	        } else {
+
+                        //appointmentInstanceList = Appointment.list(params)
+
+			// confirmed appointments, starting from now
+			def now = new Date()
+			//println "=> now = ${now}"
+
+			def apptResultConfirmed = AppointmentResult.findWhere(name:"Confirmed")
+			//println "=> apptResultConfirmed = ${apptResultConfirmed}"
+			
+			def ca = Appointment.createCriteria()
+			def appointmentInstanceList = ca.list{
+				//eq("result", apptResultConfirmed)
+				ge("startTime", now)
+				order("startTime", "asc")
+			}
+
+			// create list of all parameters for confirmed appointments, starting from now
+			def appointmentDetailInstanceList = []
+			
+			// add records to appointment detailed list
+			appointmentInstanceList.eachWithIndex {rs, i ->
+
+				def record = [:]
+
+				def personInstanceForList = Person.findWhere(id:rs.personId)
+				//println "=> personInstanceForList = ${personInstance}"
+				
+				def personLinkInstance = PersonLink.findByPerson(personInstanceForList)
+				//println "=> personLinkInstance = ${personLinkInstance}"
+				
+				record.personId = personInstanceForList.id				
+				record.norcId = personLinkInstance.norcSuId 	
+				record.lastName = personInstanceForList.lastName
+				record.firstName = personInstanceForList.firstName
+				record.middleName = personInstanceForList.middleName
+				record.startTime = rs.startTime
+				record.apptType = AppointmentType.findWhere(id:rs.typeId)			
+		
+				//println "=> record = ${record}"
+				appointmentDetailInstanceList.add(record)
+
+			} 
+
                 }
-*/
-		[ appointmentDetailInstanceList: appointmentDetailInstanceList] 
+		//[ appointmentDetailInstanceList: appointmentDetailInstanceList] 
+
+		
+
+
+
 
 	}
 

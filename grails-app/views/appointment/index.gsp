@@ -10,7 +10,7 @@
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><g:link class="list" action="calendar">Calendar</g:link></span>
-            <span class="menuButton"><g:link class="list" action="list">List</g:link></span>
+            <!-- <span class="menuButton"><g:link class="list" action="list">List</g:link></span> -->
         </div>
         <div class="body">
             <h1>Appointment Scheduling</h1>
@@ -25,7 +25,7 @@
             	(if you don't know, please use <g:link controller="lookup">Lookup</g:link>)
             </g:form>
             
-           	<fieldset class="maroonBorder">
+	<fieldset class="maroonBorder">
             <g:if test="${personInstance}">
             	<legend>
             	<g:link controller="person" action="show" id="${personInstance.id}" title="Open in Lookup">

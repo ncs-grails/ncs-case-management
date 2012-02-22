@@ -10,7 +10,7 @@
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
-		<span class="menuButton"><g:link class="list" action="list">List</g:link></span>
+		<!-- <span class="menuButton"><g:link class="list" action="list">List</g:link></span> -->
             <span class="menuButton"><g:link class="create" action="index">Enter New Appointment</g:link></span>
         </div>
         <div class="body" style="margin: 0 0 1em 0;">
