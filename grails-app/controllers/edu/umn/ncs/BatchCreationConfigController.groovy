@@ -2,7 +2,7 @@ package edu.umn.ncs
 // Let's us use security annotations
 import grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
+@Secured(['ROLE_NCS_DOCGEN'])
 class BatchCreationConfigController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -17,6 +17,7 @@ class BatchCreationConfigController {
         [batchCreationConfigInstanceList: BatchCreationConfig.list(params)]
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def create = {
         def batchCreationConfigInstance = new BatchCreationConfig()
         batchCreationConfigInstance.recipients = [ 0 ]
@@ -24,9 +25,10 @@ class BatchCreationConfigController {
         return [batchCreationConfigInstance: batchCreationConfigInstance]
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def save = {
 
-        println "Save Action. batchCreationConfigInstance. params: ${params}"
+        log.debug "Save Action. batchCreationConfigInstance. params: ${params}"
         def batchCreationConfigInstance = new BatchCreationConfig(params)
         if (batchCreationConfigInstance.save(flush: true)) {
             flash.message = "${message(code: 'default.created.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), batchCreationConfigInstance.id])}"
@@ -57,19 +59,19 @@ class BatchCreationConfigController {
 
             // items instruments
             def bciInstrumentList = batchCreationConfigInstance.subItems.collect{ it.instrument }
-            // println "bciInstrumentList :: ${bciInstrumentList}"
+            // log.debug "bciInstrumentList :: ${bciInstrumentList}"
             // sister/child instruments
             def subInstrumentList = batchCreationConfigInstance.subItems.findAll{it.relation.id != attachmentOf.id}.collect{ it.instrument }
-            // println "subInstrumentList :: ${subInstrumentList}"
+            // log.debug "subInstrumentList :: ${subInstrumentList}"
 
             usedInstruments = bciInstrumentList + bccInstruments
             attachableInstruments = subInstrumentList + bccInstruments
-            // println "usedInstruments :: ${usedInstruments}"
-            // println "attachableInstruments :: ${attachableInstruments}"
+            // log.debug "usedInstruments :: ${usedInstruments}"
+            // log.debug "attachableInstruments :: ${attachableInstruments}"
 
             def sql = "from Instrument as i where (i.id not in (:ui))"
             unusedInstruments = Instrument.findAll(sql, [ui:usedInstruments.collect{it.id}])
-            // println "unusedInstruments :: ${attachableInstruments}"
+            // log.debug "unusedInstruments :: ${attachableInstruments}"
         }
 
         // Save / Delete
@@ -91,8 +93,9 @@ class BatchCreationConfigController {
 
 	}
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def edit = {
-        def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+        def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
 
         if (!batchCreationConfigInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batchCreationConfig.label', default: 'BatchCreationConfig'), params.id])}"
@@ -103,6 +106,7 @@ class BatchCreationConfigController {
         }
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def update = {
 
         def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
@@ -146,7 +150,7 @@ class BatchCreationConfigController {
             }
             else {
 			    batchCreationConfigInstance.errors.each{
-					println "error saving batchCreationConfigInstance:${it} "
+					log.debug "error saving batchCreationConfigInstance:${it} "
 				}
                 render(view: "edit", model: getEditModel(batchCreationConfigInstance) )
             }
@@ -156,4 +160,41 @@ class BatchCreationConfigController {
             redirect(action: "list")
         }
     }
+
+	def showDescription = {
+        def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
+		log.debug "called showDescription(${params.id})"
+        if (batchCreationConfigInstance) {
+			log.debug "rendering batchCreationConfigInstance..."
+            render(template:'/batchCreationConfig/description', bean:batchCreationConfigInstance )
+        } else {
+			log.error "Invalid BatchCreationConfig.id: ${params.id}"
+			render ""
+        }
+	}
+
+	def editDescription = {
+        def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
+		log.debug "called editDescription(${params.id})"
+
+        if (batchCreationConfigInstance) {
+			log.debug "rendering batchCreationConfigInstance..."
+            render(template:'/batchCreationConfig/editDescription', model:[batchCreationConfig:batchCreationConfigInstance] )
+        } else {
+			render "Invalid BatchCreationConfig.id: ${params.id}"
+        }
+	}
+
+	def updateDescription = {
+		log.debug "updateDescription(${params.description})"
+
+		def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+		batchCreationConfigInstance.description = params.description
+		if (batchCreationConfigInstance.save(flush:true)) {
+			render(template:"/batchCreationConfig/description", bean:batchCreationConfigInstance)
+		} else {
+			render "Save failed."
+		}
+	}
+
 }

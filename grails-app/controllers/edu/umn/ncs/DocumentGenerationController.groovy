@@ -76,7 +76,9 @@ class DocumentGenerationController {
 			if (lastModifiedTime) {
 				def lastModifiedDate = new Date(lastModifiedTime)
 				render lastModifiedDate.format('M/d/yyyy')
-			} else { "MISSING" }
+			} else { 
+				render "MISSING" 
+			}
         } else {
             render ""
         }

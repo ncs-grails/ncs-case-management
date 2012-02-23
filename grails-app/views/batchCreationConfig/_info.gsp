@@ -1,7 +1,9 @@
 <fieldset class="maroonBorder">
 	<legend>${batchCreationConfigInstance.name} - Details</legend>
 	<h2>Selection Criteria</h2>
-	<p>${batchCreationConfigInstance?.description}</p>
+	<p id="batchCreationConfig-${batchCreationConfigInstance.id}-description">
+		<g:render template="/batchCreationConfig/description" bean="${batchCreationConfigInstance}" />
+	</p>
 
 	<h2>Instruments</h2>
 	<table>
