@@ -13,81 +13,129 @@ class AppointmentController {
 
 	def index = {
 
-		log.debug ("APPOINTMENT > index > params: ${params}")
-		//println ("APPOINTMENT > index > params: ${params}")
+		log.debug ("APPOINTMENT > index > params = ${params}")
+		println ("APPOINTMENT > index > params = ${params}")
 
 		def personInstance = Person.read(params?.person?.id)
-		//println ("APPOINTMENT > index > personInstance: ${personInstance}")
+		println ("=> personInstance = ${personInstance}")
 
-		[ personInstance: personInstance ]
+		if (personInstance) {
+                def appointmentInstanceList = null
+				appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+				println "=> appointmentInstanceList = ${appointmentInstanceList}"
+        		render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )    
+        } else {     
+			[ personInstance: personInstance ]
+        }
 
 	}
 
 	def list = {
 
-		//println "APPOINTMENT > list > params = ${params}"
+		println "APPOINTMENT > list > params = ${params}"
 
-		def personInstance = Person.read(params?.person?.id)
-                if (personInstance) {
+		// get date filter
+		def now = new Date()
+		//def now = new Date().minus(30)
+		println "=> now = ${now}"
 
-	                def appointmentInstanceList = null
-                        appointmentInstanceList = Appointment.findAllByPerson(personInstance)
-            		render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )
-        
-	        } else {
+		// get confirmed appointments
+		def apptResultConfirmed = AppointmentResult.findWhere(name:"Confirmed")
+		println "=> apptResultConfirmed = ${apptResultConfirmed}"
+		
+		// get appointment Type
+		def appointmentTypeId = params?.appointmentType?.id
+		println "=> appointmentTypeId = ${appointmentTypeId}"		
+		def appointmentTypeInstance = null
+		if ( appointmentTypeId ) {
+			appointmentTypeInstance = AppointmentType.findWhere(id:appointmentTypeId.toLong())
+		}
+		println "=> appointmentTypeInstance = ${appointmentTypeInstance}"
 
-                        //appointmentInstanceList = Appointment.list(params)
+		// create appointment: criteria for query, list, and detail list
+		def ca = Appointment.createCriteria()		
+		def appointmentInstanceList
+		def appointmentDetailInstanceList = []
+		
+		// create appointment total: criteria for query, and future count
+		def cat = Appointment.createCriteria()
+		def pastAppointmentTotal = null
+		
+		if ( appointmentTypeInstance ) {
 
-			// confirmed appointments, starting from now
-			def now = new Date()
-			//println "=> now = ${now}"
-
-			def apptResultConfirmed = AppointmentResult.findWhere(name:"Confirmed")
-			//println "=> apptResultConfirmed = ${apptResultConfirmed}"
-			
-			def ca = Appointment.createCriteria()
-			def appointmentInstanceList = ca.list{
-				//eq("result", apptResultConfirmed)
+			// get appointment list
+			appointmentInstanceList = ca.list {
+				eq("type", appointmentTypeInstance)
+				eq("result", apptResultConfirmed)
 				ge("startTime", now)
 				order("startTime", "asc")
 			}
+	
+			// get total number of appointments
+			pastAppointmentTotal = cat.get {
+				eq("type", appointmentTypeInstance)
+				eq("result", apptResultConfirmed)
+				lt("startTime",now)
+				projections {
+					count("id")
+				}
+			}
 
-			// create list of all parameters for confirmed appointments, starting from now
-			def appointmentDetailInstanceList = []
+		} else {
+
+			// get appointment list
+			appointmentInstanceList = ca.list{
+				eq("result", apptResultConfirmed)
+				ge("startTime", now)
+				order("startTime", "asc")
+			}
+	
+			// get total number of appointments
+			pastAppointmentTotal = cat.get{
+				eq("result", apptResultConfirmed)
+				lt("startTime",now)
+				projections {
+					count("id")
+				}
+			}
+		
+		}			
+		println "=> appointmentInstanceList = ${appointmentInstanceList}"		
+		println "=> pastAppointmentTotal = ${pastAppointmentTotal}"
+		
+		// add records to appointment detailed list
+		appointmentInstanceList.eachWithIndex {rs, i ->
+
+			def record = [:]
+
+			def personInstanceForList = Person.findWhere(id:rs.personId)
+			//println "=> personInstanceForList = ${personInstanceForList}"
 			
-			// add records to appointment detailed list
-			appointmentInstanceList.eachWithIndex {rs, i ->
+			def personLinkInstance = PersonLink.findByPerson(personInstanceForList)
+			//println "=> personLinkInstance = ${personLinkInstance}"
+			
+			record.personId = personInstanceForList.id				
+			record.norcId = personLinkInstance.norcSuId 	
+			record.lastName = personInstanceForList.lastName
+			record.firstName = personInstanceForList.firstName
+			record.middleName = personInstanceForList.middleName
+			record.startTime = rs.startTime
+			record.apptType = AppointmentType.findWhere(id:rs.typeId)			
+	
+			println "=> record = ${record}"
+			appointmentDetailInstanceList.add(record)
 
-				def record = [:]
+		} 
+		println "=> appointmentDetailInstanceList = ${appointmentDetailInstanceList}"
 
-				def personInstanceForList = Person.findWhere(id:rs.personId)
-				//println "=> personInstanceForList = ${personInstance}"
-				
-				def personLinkInstance = PersonLink.findByPerson(personInstanceForList)
-				//println "=> personLinkInstance = ${personLinkInstance}"
-				
-				record.personId = personInstanceForList.id				
-				record.norcId = personLinkInstance.norcSuId 	
-				record.lastName = personInstanceForList.lastName
-				record.firstName = personInstanceForList.firstName
-				record.middleName = personInstanceForList.middleName
-				record.startTime = rs.startTime
-				record.apptType = AppointmentType.findWhere(id:rs.typeId)			
+		 
+		[ 
+			appointmentTypeInstance: appointmentTypeInstance, 
+			appointmentDetailInstanceList: appointmentDetailInstanceList, 
+			pastAppointmentTotal: pastAppointmentTotal
+		] 
 		
-				//println "=> record = ${record}"
-				appointmentDetailInstanceList.add(record)
-
-			} 
-
-                }
-		//[ appointmentDetailInstanceList: appointmentDetailInstanceList] 
-
-		
-
-
-
-
-	}
+	} // def = list
 
 	// TODO: This is not done, but should be finished later on
 	def calendar = {

@@ -1,0 +1,57 @@
+th.basic {
+	text-align: center;
+	font-weight: bold;
+}
+.tableFooterNote {
+	margin-top:.5em;
+	padding-bottom:1em;
+	color:black;
+}
+
+.specialMessage {
+	float:left;
+	margin: .5em 0;
+	/* border: 1px silver solid; */
+	padding: .5em 1em;
+	color: maroon;
+	/* background-color: lemonchiffon; */
+	width:100%;
+	font-style: italic;
+}
+
+.formControlSection {
+	margin: .5em 0;
+	border: 1px silver solid;
+	padding: .5em .5em;
+	background-color: lightgray;
+	white-space: nowrap;
+}
+
+button {
+    font-size: 1.0em;
+}
+
+
+/*
+.buttonX:hover {
+	margin: 0 .5em;
+	border: .15em outset PapayaWhip;
+	-moz-border-radius: .75em;
+	-webkit-border-radius: .75em;
+	padding: .2em 1em;
+	background-color: PapayaWhip;
+	color: purple;
+}
+
+.buttonX {
+	margin: 0 .5em;
+	border: .15em outset red;
+	-moz-border-radius: .75em;
+	-webkit-border-radius: .75em;
+	padding: .2em 1em;
+	background-color: purple;
+	color: PapayaWhip;
+	font-weight:bold;
+}
+*/
+
