@@ -16,7 +16,7 @@
 
 		<div class="body">
 
-			<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+			<h1>Confirmed <g:message code="default.list.label" args="[entityName]" /></h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
