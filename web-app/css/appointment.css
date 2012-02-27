@@ -2,6 +2,7 @@ th.basic {
 	text-align: center;
 	font-weight: bold;
 }
+
 .tableFooterNote {
 	margin-top:.5em;
 	padding-bottom:1em;
@@ -10,7 +11,7 @@ th.basic {
 
 .specialMessage {
 	float:left;
-	margin: .5em 0;
+	margin: 1em 0;
 	/* border: 1px silver solid; */
 	padding: .5em 1em;
 	color: maroon;
@@ -20,7 +21,7 @@ th.basic {
 }
 
 .formControlSection {
-	margin: .5em 0;
+	margin: 1em 0;
 	border: 1px silver solid;
 	padding: .5em .5em;
 	background-color: lightgray;
