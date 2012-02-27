@@ -16,12 +16,14 @@ class BatchCreationItemController {
         [batchCreationItemInstanceList: BatchCreationItem.list(params), batchCreationItemInstanceTotal: BatchCreationItem.count()]
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def create = {
         def batchCreationItemInstance = new BatchCreationItem()
         batchCreationItemInstance.properties = params
         return [batchCreationItemInstance: batchCreationItemInstance]
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def save = {
 
         def batchCreationConfig = BatchCreationConfig.get(params.batchCreationConfig.id)
@@ -52,6 +54,7 @@ class BatchCreationItemController {
         }
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def edit = {
         def batchCreationItemInstance = BatchCreationItem.get(params.id)
         if (!batchCreationItemInstance) {
@@ -63,6 +66,7 @@ class BatchCreationItemController {
         }
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def update = {
         //println "${params}"
 
@@ -95,6 +99,7 @@ class BatchCreationItemController {
         }
     }
 
+	@Secured(['ROLE_NCS_DOCGEN_MANAGE'])
     def delete = {
 
         println "${params}"
@@ -116,4 +121,45 @@ class BatchCreationItemController {
             redirect(controller:"batchCreationConfig", action: "list")
         }
     }
+
+	def showComment = {
+        def batchCreationItemInstance = BatchCreationItem.read(params.id)
+		log.debug "called showComment(${params.id})"
+        if (batchCreationItemInstance) {
+			log.debug "rendering batchCreationItemInstance..."
+            render(template:'/batchCreationItem/comment', bean:batchCreationItemInstance )
+        } else {
+			log.error "Invalid BatchCreationItem.id: ${params.id}"
+			render ""
+        }
+	}
+
+	def editComment = {
+        def batchCreationItemInstance = BatchCreationItem.read(params.id)
+		log.debug "called editComment(${params.id})"
+
+        if (batchCreationItemInstance) {
+			log.debug "rendering batchCreationItemInstance..."
+            render(template:'/batchCreationItem/editComment', model:[batchCreationItem:batchCreationItemInstance] )
+        } else {
+			render "Invalid BatchCreationItem.id: ${params.id}"
+        }
+	}
+
+	def updateComment = {
+		log.debug "updateComment(${params.comment})"
+
+		def batchCreationItemInstance = BatchCreationItem.get(params.id)
+        if (batchCreationItemInstance) {
+			batchCreationItemInstance.comment = params.comment
+			if (batchCreationItemInstance.save(flush:true)) {
+				render(template:"/batchCreationItem/comment", bean:batchCreationItemInstance)
+			} else {
+				log.debug batchCreationItemInstance.errors
+				render "Save failed."
+			}
+        } else {
+			render "Invalid BatchCreationItem.id: ${params.id}"
+        }
+	}
 }

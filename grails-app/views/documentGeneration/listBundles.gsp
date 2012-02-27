@@ -6,6 +6,7 @@
 		<g:set var="entityName" value="${message(code: 'batchCreationConfig.label', default: 'Mailings')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 		<g:javascript src="showConfig.js"/>
+	<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'documentGeneration.css')}" />
 		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'showConfig.css')}" />
 	</head>
 

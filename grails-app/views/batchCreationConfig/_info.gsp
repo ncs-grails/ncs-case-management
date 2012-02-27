@@ -32,9 +32,9 @@
 					<g:if test="${i.optional}">(optional)</g:if>
 				</td>
 			</tr>
-			<g:if test="${i.comment}">
-			<tr><td/><td colspan="4" class="message">${i.comment}</td></tr>
-			</g:if>
+			<tr><td/><td colspan="4" class="message" id="batchCreationItem-${i.id}-comment">
+				<g:render template="/batchCreationItem/comment" bean="${i}" />
+			</td></tr>
 			</g:each>
 		</tbody>
 	</table>
@@ -53,11 +53,15 @@
 				<td style="font-size: 0.9em;">${d.mergeSourceFile}</td>
 				<td><g:include controller="documentGeneration" action="documentLastModified" id="${d.id}" /></td>
 			</tr>
-			<g:if test="${d.comment}">
-			<tr><td colspan="3" class="message">${d.comment}</td></tr>
-			</g:if>
+			<tr><td colspan="4" class="message" id="batchCreationDocument-${d.id}-comment">
+				<g:render template="/batchCreationDocument/comment" bean="${d}" />
+			</td></tr>
 			</g:each>
 		</tbody>
 	</table>
+	<h2>Extra Instructions</h2>
+	<p id="batchCreationConfig-${batchCreationConfigInstance.id}-extraInstructions">
+		<g:render template="/batchCreationConfig/extraInstructions" bean="${batchCreationConfigInstance}" />
+	</p>
 
 </fieldset>

@@ -4,6 +4,7 @@
 }
 
 textarea.bundle-note {
+	border-style: inset;
 	width: 100%;
 	height: 5em;
 	font: 1.0em verdana, arial, helvetica, sans-serif;

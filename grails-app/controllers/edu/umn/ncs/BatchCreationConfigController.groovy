@@ -161,6 +161,7 @@ class BatchCreationConfigController {
         }
     }
 
+	// DESCRIPTION
 	def showDescription = {
         def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
 		log.debug "called showDescription(${params.id})"
@@ -192,6 +193,43 @@ class BatchCreationConfigController {
 		batchCreationConfigInstance.description = params.description
 		if (batchCreationConfigInstance.save(flush:true)) {
 			render(template:"/batchCreationConfig/description", bean:batchCreationConfigInstance)
+		} else {
+			render "Save failed."
+		}
+	}
+
+	// EXTRA INSTRUCTIONS
+	def showExtraInstructions = {
+        def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
+		log.debug "called showExtraInstructions(${params.id})"
+        if (batchCreationConfigInstance) {
+			log.debug "rendering batchCreationConfigInstance..."
+            render(template:'/batchCreationConfig/extraInstructions', bean:batchCreationConfigInstance )
+        } else {
+			log.error "Invalid BatchCreationConfig.id: ${params.id}"
+			render ""
+        }
+	}
+
+	def editExtraInstructions = {
+        def batchCreationConfigInstance = BatchCreationConfig.read(params.id)
+		log.debug "called editExtraInstructions(${params.id})"
+
+        if (batchCreationConfigInstance) {
+			log.debug "rendering batchCreationConfigInstance..."
+            render(template:'/batchCreationConfig/editExtraInstructions', model:[batchCreationConfig:batchCreationConfigInstance] )
+        } else {
+			render "Invalid BatchCreationConfig.id: ${params.id}"
+        }
+	}
+
+	def updateExtraInstructions = {
+		log.debug "updateExtraInstructions(${params.extraInstructions})"
+
+		def batchCreationConfigInstance = BatchCreationConfig.get(params.id)
+		batchCreationConfigInstance.extraInstructions = params.extraInstructions
+		if (batchCreationConfigInstance.save(flush:true)) {
+			render(template:"/batchCreationConfig/extraInstructions", bean:batchCreationConfigInstance)
 		} else {
 			render "Save failed."
 		}

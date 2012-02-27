@@ -55,7 +55,7 @@ grails.project.dependency.resolution = {
 		compile ":ncs-norc-link:0.4"
 		compile ":ncs-people:0.8"
 		compile ":ncs-recruitment:1.0"
-		compile ":ncs-tracking:3.2.2"
+		compile ":ncs-tracking:3.2.3"
 		compile ":ncs-web-template:0.2"
 		compile ":pdf:0.6"
 		compile ":quartz:0.4.2"

@@ -1,4 +1,5 @@
-${it.description}
+<g:if test="${it.description}">${it.description}</g:if>
+<g:else><em>No Description</em></g:else>
 <g:remoteLink 
 	controller="batchCreationConfig"
 	action="editDescription"
