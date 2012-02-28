@@ -252,7 +252,7 @@
 				<tbody>
 				<g:each var="i" in="${trackedItemInstanceList}">
 					<tr>
-						<td>${i.id}</td>
+						<td title="Batch ID: ${i.batch.id}">${i.id}</td>
 						<td>${i.batch.primaryInstrument.study}</td>
 						<td>${i.batch.primaryInstrument}</td>
 						<td><g:formatDate format="M/d/yyyy" date="${i.batch.dateCreated}" /></td>
