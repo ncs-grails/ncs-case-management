@@ -13,17 +13,15 @@ grails.project.dependency.resolution = {
         grailsPlugins()
         grailsHome()
         grailsCentral()
-        grailsRepo "http://svn.cccs.umn.edu/grails-plugins"
+		// TODO: Remove the following line after all the plugins are migrated to artifactory
         grailsRepo "http://svn.cccs.umn.edu/ncs-grails-plugins"
 
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
         //mavenLocal()
-        mavenCentral()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
+        //mavenCentral()
+        mavenRepo "http://artifact.ncs.umn.edu/plugins-release"
+        //mavenRepo "http://artifact.ncs.umn.edu/plugins-snapshot"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -53,9 +51,9 @@ grails.project.dependency.resolution = {
 		compile ":ncs-calling:0.1"
 		compile ":ncs-event:1.1"
 		compile ":ncs-norc-link:0.4"
-		compile ":ncs-people:0.8"
+		compile ":ncs-people:0.9"
 		compile ":ncs-recruitment:1.0"
-		compile ":ncs-tracking:3.2.3"
+		compile ":ncs-tracking:3.2.5"
 		compile ":ncs-web-template:0.2"
 		compile ":pdf:0.6"
 		compile ":quartz:0.4.2"
