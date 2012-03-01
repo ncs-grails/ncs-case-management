@@ -16,8 +16,11 @@
 
 		<div class="body">
 
-			<h1>Confirmed <g:message code="default.list.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
+			<h1>
+				<g:message code="default.list.label" args="[entityName]" />
+				<g:if test="${appointmentTypeInstance}">: ${appointmentTypeInstance.name.toUpperCase()}</g:if>
+			</h1>
+		<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
 			
@@ -39,28 +42,34 @@
 						<div class="list">
 							<table>
 								<thead>
+									<!-- 
 									<tr>
 										<th class="basic" colspan="5">
-											<g:if test="${appointmentTypeInstance}">Future ${appointmentTypeInstance.name.toUpperCase()} Appointments</g:if>
-											<g:else>All Future Appointments</g:else>
+											<g:if test="${appointmentTypeInstance}">Current ${appointmentTypeInstance.name.toUpperCase()} Appointments</g:if>
+											<g:else>All Current Appointments</g:else>
 										</th>
 									</tr>
+									-->
 									<tr>
+										<th class="basic"></th>
 										<th class="basic">Person Id</th>
 										<th class="basic">NORC Id</th>
 										<th class="basic">Name</th>
 										<th class="basic">Type</th>
 										<th class="basic">Start Time</th>
+										<th class="basic">Result</th>
 									</tr>
 								</thead>
 								<tbody>
 									<g:each in="${appointmentDetailInstanceList}" status="i" var="ea">
 										<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-											<td>${ea.personId}</td>
-											<td>${ea.norcId}</td>
-											<td>${ea.lastName}, ${ea.firstName}</td>
-											<td>${ea.apptType}</td>
-											<td><g:formatDate date="${ea.startTime}" /></td>
+											<td class="basic" style="text-align:right">${ea.rowNum}</td>
+											<td class="basic" style="text-align:right">${ea.personId}</td>
+											<td class="basic">${ea.norcId}</td>
+											<td class="basic">${ea.lastName}, ${ea.firstName}</td>
+											<td class="basic">${ea.apptType}</td>
+											<td class="basic"><g:formatDate date="${ea.startTime}" /></td>
+											<td class="basic">${ea.apptResult}</td>
 										</tr>
 									</g:each>
 								</tbody>
@@ -68,12 +77,18 @@
 						</div> <!-- end class=list  -->
 					</g:if>
 					<g:else>
-						<div class="specialMessage">No confirmed <g:if test="${appointmentTypeInstance}">${appointmentTypeInstance.name.toUpperCase()}</g:if> appointments in the future.</div>
+						<div class="specialMessage">
+							No current appointments.
+						</div>
 					</g:else>
-					<p class="tableFooterNote">Total <g:if test="${appointmentTypeInstance}">${appointmentTypeInstance.name.toUpperCase()}</g:if> appointments in the past: ${pastAppointmentTotal}</p>
+					<p class="tableFooterNote">
+						Total Past Appointments: ${pastAppointmentTotal}
+					</p>
 
 				</g:form>
 
 		</div> <!-- class=body  -->
+
 	</body>
+
 </html>

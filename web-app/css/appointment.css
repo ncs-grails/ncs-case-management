@@ -1,29 +1,33 @@
 th.basic {
+	padding: .2em;
 	text-align: center;
 	font-weight: bold;
 }
 
-.tableFooterNote {
-	margin-top:.5em;
-	padding-bottom:1em;
-	color:black;
+td.basic {
+	padding: .2em;
 }
 
 .specialMessage {
-	float:left;
 	margin: 1em 0;
-	/* border: 1px silver solid; */
 	padding: .5em 1em;
 	color: maroon;
-	/* background-color: lemonchiffon; */
 	width:100%;
 	font-style: italic;
 }
 
+.tableFooterNote {
+	margin-top: 1em;
+	border: .1em silver solid;
+	padding: .5em 1em;
+	background-color: lightgray;
+	color:black;
+}
+
 .formControlSection {
 	margin: 1em 0;
-	border: 1px silver solid;
-	padding: .5em .5em;
+	border: .1em silver solid;
+	padding: .75em 1em;
 	background-color: lightgray;
 	white-space: nowrap;
 }

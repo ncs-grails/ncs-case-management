@@ -14,43 +14,38 @@ class AppointmentController {
 	def index = {
 
 		log.debug ("APPOINTMENT > index > params = ${params}")
-		println ("APPOINTMENT > index > params = ${params}")
+		//println ("APPOINTMENT > index > params = ${params}")
 
 		def personInstance = Person.read(params?.person?.id)
-		println ("=> personInstance = ${personInstance}")
+		//println ("=> personInstance = ${personInstance}")
 
 		if (personInstance) {
-                def appointmentInstanceList = null
-				appointmentInstanceList = Appointment.findAllByPerson(personInstance)
-				println "=> appointmentInstanceList = ${appointmentInstanceList}"
-        		render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )    
-        } else {     
+			def appointmentInstanceList = null
+			appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+			//println "=> appointmentInstanceList = ${appointmentInstanceList}"
+			render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )    
+		} else {     
 			[ personInstance: personInstance ]
-        }
+		}
 
 	}
 
 	def list = {
 
-		println "APPOINTMENT > list > params = ${params}"
+		//println "APPOINTMENT > list > params = ${params}"
 
 		// get date filter
 		def now = new Date()
-		//def now = new Date().minus(30)
-		println "=> now = ${now}"
+		//println "=> now = ${now}"
 
-		// get confirmed appointments
-		def apptResultConfirmed = AppointmentResult.findWhere(name:"Confirmed")
-		println "=> apptResultConfirmed = ${apptResultConfirmed}"
-		
 		// get appointment Type
 		def appointmentTypeId = params?.appointmentType?.id
-		println "=> appointmentTypeId = ${appointmentTypeId}"		
+		//println "=> appointmentTypeId = ${appointmentTypeId}"		
 		def appointmentTypeInstance = null
 		if ( appointmentTypeId ) {
 			appointmentTypeInstance = AppointmentType.findWhere(id:appointmentTypeId.toLong())
 		}
-		println "=> appointmentTypeInstance = ${appointmentTypeInstance}"
+		//println "=> appointmentTypeInstance = ${appointmentTypeInstance}"
 
 		// create appointment: criteria for query, list, and detail list
 		def ca = Appointment.createCriteria()		
@@ -66,7 +61,6 @@ class AppointmentController {
 			// get appointment list
 			appointmentInstanceList = ca.list {
 				eq("type", appointmentTypeInstance)
-				eq("result", apptResultConfirmed)
 				ge("startTime", now)
 				order("startTime", "asc")
 			}
@@ -74,7 +68,6 @@ class AppointmentController {
 			// get total number of appointments
 			pastAppointmentTotal = cat.get {
 				eq("type", appointmentTypeInstance)
-				eq("result", apptResultConfirmed)
 				lt("startTime",now)
 				projections {
 					count("id")
@@ -85,14 +78,12 @@ class AppointmentController {
 
 			// get appointment list
 			appointmentInstanceList = ca.list{
-				eq("result", apptResultConfirmed)
 				ge("startTime", now)
 				order("startTime", "asc")
 			}
 	
 			// get total number of appointments
 			pastAppointmentTotal = cat.get{
-				eq("result", apptResultConfirmed)
 				lt("startTime",now)
 				projections {
 					count("id")
@@ -100,8 +91,8 @@ class AppointmentController {
 			}
 		
 		}			
-		println "=> appointmentInstanceList = ${appointmentInstanceList}"		
-		println "=> pastAppointmentTotal = ${pastAppointmentTotal}"
+		//println "=> appointmentInstanceList = ${appointmentInstanceList}"		
+		//println "=> pastAppointmentTotal = ${pastAppointmentTotal}"
 		
 		// add records to appointment detailed list
 		appointmentInstanceList.eachWithIndex {rs, i ->
@@ -114,6 +105,7 @@ class AppointmentController {
 			def personLinkInstance = PersonLink.findByPerson(personInstanceForList)
 			//println "=> personLinkInstance = ${personLinkInstance}"
 			
+			record.rowNum = i + 1
 			record.personId = personInstanceForList.id				
 			record.norcId = personLinkInstance.norcSuId 	
 			record.lastName = personInstanceForList.lastName
@@ -121,12 +113,13 @@ class AppointmentController {
 			record.middleName = personInstanceForList.middleName
 			record.startTime = rs.startTime
 			record.apptType = AppointmentType.findWhere(id:rs.typeId)			
+			record.apptResult = AppointmentResult.findWhere(id:rs.resultId)
 	
-			println "=> record = ${record}"
+			//println "=> record = ${record}"
 			appointmentDetailInstanceList.add(record)
 
 		} 
-		println "=> appointmentDetailInstanceList = ${appointmentDetailInstanceList}"
+		//println "=> appointmentDetailInstanceList = ${appointmentDetailInstanceList}"
 
 		 
 		[ 
