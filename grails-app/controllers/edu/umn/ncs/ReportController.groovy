@@ -44,17 +44,22 @@ class ReportController {
 	
 	def save = {
 		def reportInstance = new Report(params)
-		
-		if (!reportInstance?.useQuery){
+
+		def reportLocation = grailsApplication.config.birt.reportHome
+
+		if (!reportLocation) {
+			log.error "birt.reportHome is not configured!"
+			flash.message "birt.reportHome is not configured in Grails application!"
+			redirect action:'index'
+		} else if (!reportInstance?.useQuery){
 			// Handle uploaded file
 			def uploadedFile = request.getFile('reportFile')
 			if (!uploadedFile.empty) {
-				//println "Class: ${uploadedFile.class}"
-				//println "Name: ${uploadedFile.name}"
-				//println "Size: ${uploadedFile.size}"
-				//println "ContentType: ${uploadedFile.contentType}"
 				// Upload the file to server
-				def newFile = "/var/lib/webreports/${uploadedFile.originalFilename}"
+				if (reportLocation[-1] != '/') {
+					reportLocation = "${reportLocation}/"
+				}
+				def newFile = "${reportLocation}${uploadedFile.originalFilename}"
 				uploadedFile.transferTo ( new File(newFile))
 				// Set the designed report name
 				def designedName = uploadedFile.originalFilename.split("\\.")[0]
@@ -238,6 +243,8 @@ class ReportController {
 
 	def update = {
 		def reportInstance = Report.get(params.id)
+		def reportLocation = grailsApplication.config.birt.reportHome
+
 		if (reportInstance) {
 			if (params.version) {
 				def version = params.version.toLong()
@@ -250,26 +257,23 @@ class ReportController {
 			}
 			reportInstance.properties = params
 		
-			if (!reportInstance?.useQuery){
+			if (!reportLocation) {
+				log.error "birt.reportHome is not configured!"
+				flash.message "birt.reportHome is not configured in Grails application!"
+				redirect action:'index'
+			} else if (!reportInstance?.useQuery){
 				// Handle uploaded file
 				def uploadedFile = request.getFile('reportFile')
 				if (uploadedFile && !uploadedFile.empty) {
 					// Upload the file to server
-					def newFile = "/var/lib/webreports/${uploadedFile.originalFilename}"
-					// Check to see if file exists
-					/*File src = new File(newFile)
-					if (src.exists()) {
-						reportInstance.errors.rejectValue("designedName", "default.designed.report.name.exists", [message(code: 'report.label', default: 'Report')] as Object[], "A designed report with this name already exists on the server. Please change the name of the report.")
-						render(view: "edit", model: [reportInstance: reportInstance])
-						return
+					if (reportLocation[-1] != '/') {
+						reportLocation = "${reportLocation}/"
 					}
-					else {*/
-						uploadedFile.transferTo ( new File(newFile))
-						// Set the designed report name
-						def designedName = uploadedFile.originalFilename.split("\\.")[0]
-						//println "    Designed report name is ${designedName}"
-						reportInstance.designedName = designedName
-					//}
+					def newFile = "${reportLocation}${uploadedFile.originalFilename}"
+					uploadedFile.transferTo ( new File(newFile))
+					// Set the designed report name
+					def designedName = uploadedFile.originalFilename.split("\\.")[0]
+					reportInstance.designedName = designedName
 				}
 			}
 
