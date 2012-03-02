@@ -39,7 +39,7 @@ grails.project.dependency.resolution = {
 		compile ":address-lookup-zpfour:0.1.2"
 		compile ":audit-logging:0.5.4"
 		compile ":barcode4j:0.2"
-		compile ":birt-report:3.7.0.1"
+		compile ":birt-report:2.6.1.0"
 		test ":code-coverage:1.2.5"
 		test ":codenarc:0.16.1"
 		compile ":csv:0.3"
