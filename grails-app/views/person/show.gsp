@@ -60,80 +60,78 @@
 		<!-- Events -->
 		<g:if test="${eventReportInstanceList}">
 		<fieldset class="maroonBorder">
-		<legend class="m1">Events of Interest</legend>
+			<legend class="m1">Events of Interest</legend>
 			<table>
 				<tbody>
 					<g:each var="er" in="${eventReportInstanceList}">
-					
-					<tr>
-						<th>Contact Date</th>
-						<td><g:formatDate date="${er.contactDate}" format="M/d/yyyy" /></td>
-						<td rowspan="3">
-							<g:each var="eoi" in="${er.events}">
-							<table>
-								<thead>
-									<tr>
-										<th>Event</th>
-										<g:if test="${eoi.eventType.useEventCode}">
-											<th>Code</th>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventPickOne}">
-											<th>Selected</th>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventDate}">
-											<th>Date</th>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventDescription}">
-											<th>Description</th>
-										</g:if>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>${eoi.eventType}</td>
-										<g:if test="${eoi.eventType.useEventCode}">
-											<td>${eoi.eventCode}</td>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventPickOne}">
-											<td>${eoi.eventPickOne}</td>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventDate}">
-											<td><g:formatDate date="${eoi.eventDate}" format="M/d/yyyy" /></td>
-										</g:if>
-										<g:if test="${eoi.eventType.useEventDescription}">
-											<td>${eoi.eventDescription}</td>
-										</g:if>
-									</tr>
-								</tbody>
-							</table>
+						<tr>
+							<th>Contact Date</th>
+								<td><g:formatDate date="${er.contactDate}" format="M/d/yyyy" /></td>
+								<td rowspan="3">
+									<g:each var="eoi" in="${er.events}">
+										<table>
+											<thead>
+												<tr>
+													<th>Event</th>
+													<g:if test="${eoi.eventType.useEventCode}">
+														<th>Code</th>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventPickOne}">
+														<th>Selected</th>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventDate}">
+														<th>Date</th>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventDescription}">
+														<th>Description</th>
+													</g:if>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>${eoi.eventType}</td>
+													<g:if test="${eoi.eventType.useEventCode}">
+														<td>${eoi.eventCode}</td>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventPickOne}">
+														<td>${eoi.eventPickOne}</td>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventDate}">
+														<td><g:formatDate date="${eoi.eventDate}" format="M/d/yyyy" /></td>
+													</g:if>
+													<g:if test="${eoi.eventType.useEventDescription}">
+														<td>${eoi.eventDescription}</td>
+													</g:if>
+												</tr>
+											</tbody>
+										</table>
 
-							<g:if test="${eoi.eventResult}">
-							
-								Result: ${eoi.eventResult} <br/>
-								Date: ${eoi.eventResultDate} <br/>
-								Entered by: ${eoi.userResultEntered} on ${eoi.dateResultEntered}
-							</g:if>
-							</g:each>
-						</td>						
-					</tr>
+										<g:if test="${eoi.eventResult}">
+											Result: ${eoi.eventResult} <br/>
+											Date: ${eoi.eventResultDate} <br/>
+											Entered by: ${eoi.userResultEntered} on ${eoi.dateResultEntered}
+										</g:if>
+									</g:each>
+								</td>						
+						</tr>
 
-					<tr>
-						<th>Completed</th>
-						<td>by ${er.filledOutBy ?: 'unknown'} on <g:formatDate date="${er.filledOutDate}" format="M/d/yyyy" /></td>
-					</tr>
+						<tr>
+							<th>Completed</th>
+							<td>by ${er.filledOutBy ?: 'unknown'} on <g:formatDate date="${er.filledOutDate}" format="M/d/yyyy" /></td>
+						</tr>
 
-					<tr>
-						<th>Source</th>
-						<td>
-							<g:if test="${er.eventSourceOther}">${er.eventSourceOther}</g:if>
-							<g:else>${er.eventSource}</g:else>
-						</td>
-					
-					<g:if test="${er.comments}">
-					<tr>
-						<td colspan="3">Comments: <blockquote>${er.comments}</blockquote>></td>
-					</tr>
-					</g:if>
+						<tr>
+							<th>Source</th>
+							<td>
+								<g:if test="${er.eventSourceOther}">${er.eventSourceOther}</g:if>
+								<g:else>${er.eventSource}</g:else>
+							</td>
+						
+						<g:if test="${er.comments}">
+							<tr>
+								<td colspan="3">Comments: <blockquote>${er.comments}</blockquote>></td>
+							</tr>
+						</g:if>
 					</g:each>
 				</tbody>
 			</table>
