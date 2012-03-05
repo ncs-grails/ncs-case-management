@@ -1,6 +1,6 @@
 <%@ page import="edu.umn.ncs.Appointment" %>
 <html>
-    <head>
+	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="ncs" />
         <g:set var="entityName" value="${message(code: 'appointment.label', default: 'Appointment')}" />

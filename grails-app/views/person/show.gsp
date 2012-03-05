@@ -3,8 +3,8 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-			<title>Lookup - National Children's Study</title>
 		<meta name="layout" content="ncs" />
+		<title>Lookup - National Children's Study</title>
 	</head>
 	<body>
 		<div class="nav">
@@ -15,22 +15,23 @@
 		
 		<h1>Person Details</h1>
 		
-		<fieldset class="maroonBorder"><legend class="m1">Person ID: ${personInstance.id}</legend>
+		<fieldset class="maroonBorder">
+			<legend class="m1">Person ID: ${personInstance.id}</legend>
 			<sec:ifAnyGranted roles="ROLE_NCS_CALLING">
 				<div style="float:right;">
-				<g:link base="/phone" controller="logCall" action="newCallToPerson" id="${personInstance.id}">
-					Call this person
-					<img style="vertical-align: middle;" src="${resource(dir:'images', file:'phone.png')}" width="32" height="32" alt="Make a Call to this Person" /><br/>
-				</g:link>
+					<g:link base="/phone" controller="logCall" action="newCallToPerson" id="${personInstance.id}">
+						Call this person
+						<img style="vertical-align: middle;" src="${resource(dir:'images', file:'phone.png')}" width="32" height="32" alt="Make a Call to this Person" />
+						<br/>
+					</g:link>
 				</div>
 			</sec:ifAnyGranted>
-
 			<p>
-			${personInstance.title}
-			${personInstance.firstName}
-			${personInstance.middleName}
-			${personInstance.lastName}
-			${personInstance.suffix}
+				${personInstance.title}
+				${personInstance.firstName}
+				${personInstance.middleName}
+				${personInstance.lastName}
+				${personInstance.suffix}
 			</p>
 		</fieldset>
 
@@ -39,21 +40,21 @@
 			<legend class="m1">Subjects</legend>
 			<ul>
 				<g:each var="subjectInstance" in="${subjectInstanceList}">
-				<li>
-				<g:if test="${subjectInstance?.randomized}">Eligible for </g:if>
-				<g:else>Enrolled on ${subjectInstance.selectionDate} in</g:else>
-				${subjectInstance.enrollment} arm
-				of ${subjectInstance.study} <br/>
-				Subject ID: ${subjectInstance.subjectId}
-				</li>
-			</g:each>
+					<li>
+						<g:if test="${subjectInstance?.randomized}">Eligible for </g:if>
+						<g:else>Enrolled on ${subjectInstance.selectionDate} in</g:else>
+						${subjectInstance.enrollment} arm
+						of ${subjectInstance.study} <br/>
+						Subject ID: ${subjectInstance.subjectId}
+					</li>
+				</g:each>
 			</ul>
 		</fieldset>
 		
 		<!-- Appointments -->
 		<fieldset class="maroonBorder">
 			<legend class="m1">Appointments</legend>
-			<g:include controller="appointment" action="list" params="${[ person: [id: personInstance.id ] ] }" />
+			<g:include controller="appointment" action="listPerPerson" params="${[ person: [id: personInstance.id ] ] }" />
 		</fieldset>
 
 		<!-- Events -->

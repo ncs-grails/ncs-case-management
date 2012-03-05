@@ -20,12 +20,16 @@ class AppointmentController {
 		//println ("=> personInstance = ${personInstance}")
 
 		if (personInstance) {
+		
 			def appointmentInstanceList = null
 			appointmentInstanceList = Appointment.findAllByPerson(personInstance)
 			//println "=> appointmentInstanceList = ${appointmentInstanceList}"
 			render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )    
+			
 		} else {     
+		
 			[ personInstance: personInstance ]
+			
 		}
 
 	}
