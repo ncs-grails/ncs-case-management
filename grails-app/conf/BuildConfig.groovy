@@ -10,17 +10,11 @@ grails.project.dependency.resolution = {
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
+
         grailsPlugins()
         grailsHome()
         grailsCentral()
-        grailsRepo "http://svn.cccs.umn.edu/ncs-grails-plugins"
-
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenLocal()
-        //mavenCentral()
         mavenRepo "http://artifact.ncs.umn.edu/plugins-release"
-        //mavenRepo "http://artifact.ncs.umn.edu/plugins-snapshot"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -30,7 +24,8 @@ grails.project.dependency.resolution = {
 		// 	excludes 'xml-apis', 'xmlParserAPIs'
 		// }
 
-        // runtime 'mysql:mysql-connector-java:5.1.5'
+        compile 'groovy-ldap:groovy-ldap:groovy-ldap'
+        runtime 'mysql:mysql-connector-java:5.1.18'
     }
     plugins {
 		compile ":hibernate:$grailsVersion"
@@ -57,10 +52,10 @@ grails.project.dependency.resolution = {
 		compile ":pdf:0.6"
 		compile ":quartz:0.4.2"
 		compile ":springcache:1.3.1"
-		compile ":spring-security-core:1.2.7.2"
-		compile ":spring-security-ldap:1.0.5.1"
-		provided ":spring-security-mock:1.0.1"
+		compile ":spring-security-core:1.2.7.3"
+		compile ":spring-security-ldap:1.0.6"
 		compile ":spring-security-shibboleth-native-sp:1.0.3"
+		provided ":spring-security-mock:1.0.1"
 		compile ":webflow:1.3.4"
 	}
 }
