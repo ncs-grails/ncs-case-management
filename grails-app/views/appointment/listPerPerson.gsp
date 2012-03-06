@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="ncs" />
 		<g:set var="entityName" value="${message(code: 'appointment.label', default: 'Appointment')}" />
-		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'appointment.css')}" />i
+		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'appointment.css')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>

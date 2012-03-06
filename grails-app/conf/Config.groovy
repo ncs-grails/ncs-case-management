@@ -70,3 +70,6 @@ grails.gorm.default.mapping = {
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentLocalDateTime, class: org.joda.time.LocalDateTime
 	"user-type" type: org.joda.time.contrib.hibernate.PersistentPeriod, class: org.joda.time.Period
 }
+
+// Added by the Address Lookup ZP4 Plugin:
+//grails.plugins.addressLookupZpfour.server = 'http://zp4.intranet.example.com/'
