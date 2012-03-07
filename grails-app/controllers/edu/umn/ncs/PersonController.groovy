@@ -8,19 +8,22 @@ import edu.umn.ncs.phone.Call
 class PersonController {
 
 	@Secured(['ROLE_NCS_LOOKUP'])
+
 	def show = {
+
+		println "PERSON CONTROLLER > SHOW"
+
 		def personInstance = Person.read(params.id)
+		println "=> personInstance = ${personInstance}"
+
 		if (!personInstance) {
 			response.sendError(404)
 			render "Person ${params.id} Not found"
 		}
 		else {
 			def personLinkInstance = PersonLink.findByPerson(personInstance)
-
 			def trackedItemInstanceList = TrackedItem.findAllByPerson(personInstance)
-			
 			def appointmentInstanceList = Appointment.findAllByPerson(personInstance)
-
 			def subjectInstanceList = Subject.findAllByPerson(personInstance)
 			
 			def callInstanceList = Call.createCriteria().list {
