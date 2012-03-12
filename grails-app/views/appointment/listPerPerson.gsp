@@ -1,5 +1,6 @@
 <%@ page import="edu.umn.ncs.Appointment" %>
 <html>
+
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="ncs" />
@@ -7,6 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'appointment.css')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
+
 	<body>
 
 		<div class="body">
@@ -45,7 +47,17 @@
 						  </tr>
 						</g:each>
 					</tbody>
+
+        				<tfoot>
+                				<tr>
+                        				<th colspan="4">
+                                				<g:link action="create" params="${ ['person.id': personInstance?.id ] }">New Appointment</g:link>
+                        				</th>
+                				</tr>
+        				</tfoot>
 				</table>
 			</div>
+
 	</body>
+
 </html>
