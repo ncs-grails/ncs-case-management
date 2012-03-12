@@ -18,22 +18,30 @@ class AppointmentController {
 
 		def personInstance = Person.read(params?.person?.id)
 		//println ("=> personInstance = ${personInstance}")
-
-		if (personInstance) {
-		
-			def appointmentInstanceList = null
-			appointmentInstanceList = Appointment.findAllByPerson(personInstance)
-			//println "=> appointmentInstanceList = ${appointmentInstanceList}"
-			render(view: "listPerPerson", model: [personInstance: personInstance, appointmentInstanceList: appointmentInstanceList] )    
-			
-		} else {     
-		
-			[ personInstance: personInstance ]
-			
-		}
+	
+		[personInstance: personInstance] 	
 
 	}
 
+	def listPerPerson = {
+	
+		//println ("APPOINTMENT > listPerPerson > params = ${params}")
+			
+		def personInstance = Person.read(params?.person?.id)
+		//println ("=> personInstance = ${personInstance}")
+                
+		def appointmentInstanceList = null
+                if (personInstance) {
+                        appointmentInstanceList = Appointment.findAllByPerson(personInstance)
+			//println "=> appointmentInstanceList = ${appointmentInstanceList}"
+                } else {
+                        flash.message "couldn't find person: ${params?.person?.id}"
+                }
+
+        	[personInstance: personInstance, appointmentInstanceList: appointmentInstanceList]
+
+	}
+	
 	def list = {
 
 		//println "APPOINTMENT > list > params = ${params}"

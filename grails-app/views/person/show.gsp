@@ -54,7 +54,7 @@
 		<!-- Appointments -->
 		<fieldset class="maroonBorder">
 			<legend class="m1">Appointments</legend>
-			<g:include controller="appointment" action="index" params="${[ person: [id: personInstance.id ] ] }" />
+			<g:include controller="appointment" action="listPerPerson" params="${[ person: [id: personInstance.id ] ] }" />
 		</fieldset>
 
 		<!-- Events -->

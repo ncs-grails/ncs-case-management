@@ -11,10 +11,10 @@ class PersonController {
 
 	def show = {
 
-		println "PERSON CONTROLLER > SHOW"
+		//println "PERSON CONTROLLER > SHOW"
 
 		def personInstance = Person.read(params.id)
-		println "=> personInstance = ${personInstance}"
+		//println "=> personInstance = ${personInstance}"
 
 		if (!personInstance) {
 			response.sendError(404)
