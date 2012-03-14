@@ -871,10 +871,10 @@ class IncentiveController {
 		}
 		if (barcodeValue) {
 			// Get incentive
-			incentiveInstance = Incentive.findByBarcode(barcodeValue?.toLong())
+			incentiveInstance = Incentive.findByBarcode(barcodeValue)
 			// If not found, try by barcode
 			if (!incentiveInstance) {
-				incentiveInstance = Incentive.findByBarcode(barcodeValue)				
+				incentiveInstance = Incentive.get(barcodeValue.toLong())				
 			}
 			if (incentiveInstance) {
 				// Determine if incentive has been assigned
@@ -911,26 +911,26 @@ class IncentiveController {
 					} else {
 						result.success = false
 						result.errorText = "An error occurred. Incentive could not be unassigned."
-						render(view: "assignIncentive", model:[result:result])
+						render(view: "unassignIncentive", model:[result:result])
 						return false
 					}
 				} else {
 						result.errorText = "This incentive has not been assigned. Nothing to do."
 						//render(template:'assignErrorForm', model:[result:result])
 						result.incentiveBarcode = barcodeValue
-						render(view: "assignIncentive", model:[result:result])
+						render(view: "unassignIncentive", model:[result:result])
 						return false
 				}
 			} else {
 				result.errorText = "Incentive not found with barcode: ${barcodeValue}"
 				//render(template:'assignErrorForm', model:[result:result])
-				render(view: "assignIncentive", model:[result:result])
+				render(view: "unassignIncentive", model:[result:result])
 				return false
 			}
 		} else {
 			result.errorText = "No incentive barcode entered. Please try again"
 			//render(template:'assignErrorForm', model:[result:result])
-			render(view: "assignIncentive", model:[result:result])
+			render(view: "unassignIncentive", model:[result:result])
 			return false
 		}
 		
