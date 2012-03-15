@@ -15,13 +15,12 @@ class EmailService {
 		// println "sendProductionReport:params::${params}"
 		def referenceDate = new Date()
 		
-		def recipients = [ 'ajz@cccs.umn.edu'
+		def recipients = [ 'ajz@umn.edu'
 			, 'dmd@cccs.umn.edu'
+			, 'jaf@umn.edu'
 			, 'front_dis@cccs.umn.edu'
 			, 'sup_dis@cccs.umn.edu' ]
 
-		// recipients = [ 'ajz@cccs.umn.edu' ]
-		
 		def dateRange = getFullDayRange(params?.referenceDate)
 
 		try {
