@@ -10,7 +10,7 @@ import grails.plugins.springsecurity.Secured
 import grails.plugin.springcache.annotations.Cacheable
 import grails.plugin.springcache.annotations.CacheFlush
 
-@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
+@Secured(['ROLE_NCS'])
 class ReportController {
     def dataSource      // inject the Spring-Bean dataSource
     def birtReportService
@@ -19,11 +19,13 @@ class ReportController {
         redirect(action: "list", params: params)
     }
 
+	@Secured(['ROLE_NCS_IT'])
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [reportInstanceList: Report.list(params), reportInstanceTotal: Report.count()]
     }
 
+	@Secured(['ROLE_NCS_IT'])
 	def create = {
 		def reportInstance = new Report()
 		reportInstance.properties = params
@@ -42,6 +44,7 @@ class ReportController {
 		return [reportInstance: reportInstance, reportList: reportList, reportParamInstanceList: reportParamInstanceList ]
 	}
 	
+	@Secured(['ROLE_NCS_IT'])
 	def save = {
 		def reportInstance = new Report(params)
 
@@ -77,6 +80,7 @@ class ReportController {
 		}
 	}
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def show = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -88,6 +92,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def showReport = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -104,6 +109,7 @@ class ReportController {
 		}
 	}
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
     def showReportByQuery = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -171,6 +177,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def exportReportByQueryToFile = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -219,6 +226,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT'])
 	def edit = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -241,6 +249,7 @@ class ReportController {
 		}
 	}
 
+	@Secured(['ROLE_NCS_IT'])
 	def update = {
 		def reportInstance = Report.get(params.id)
 		def reportLocation = grailsApplication.config.birt.reportHome
@@ -291,6 +300,7 @@ class ReportController {
 		}
 	}
 
+	@Secured(['ROLE_NCS_IT'])
 	def delete = {
 		def reportInstance = Report.get(params.id)
 		if (reportInstance) {
@@ -319,7 +329,7 @@ class ReportController {
 		}
 	}
 
-	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def birtReport = {
 		//println "CURRENT PARAMS: ${params}"
 		def reportInstance = Report.get(params.id)
@@ -349,6 +359,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def birtReportParams = {
 		def reportInstance = Report.get(params.id)
 		String reportName = reportInstance.designedName
@@ -364,6 +375,7 @@ class ReportController {
 		}		
 	}	
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def showBirtReport = {
 		def reportInstance = Report.get(params.id)
 		def format = params.format
@@ -398,6 +410,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def exportBirtReport = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -416,6 +429,7 @@ class ReportController {
 		}
     }
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def exportBirtReportToFile = {
 		def reportInstance = Report.get(params.id)
 		if (!reportInstance) {
@@ -505,10 +519,12 @@ class ReportController {
 		return false				
 	}
 
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	private def getDesignedReports = {
 		return birtReportService.listReports()
 	}
 	
+	@Secured(['ROLE_NCS_IT'])
 	def uploadFile = {
 		//println "PARAMS  ${params}"
 		def f = request.getFile('reportFile')
@@ -524,6 +540,7 @@ class ReportController {
 		return null
 	}
 	
+	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def getConvertedValue = { val, type ->
 		def convertedValue = null
 		switch ( type ) {
