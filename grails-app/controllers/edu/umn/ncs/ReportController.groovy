@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 class ReportController {
     def dataSource      // inject the Spring-Bean dataSource
     def birtReportService
+	def reportService
 	
     def index = { 
         redirect(action: "list", params: params)
@@ -83,6 +84,12 @@ class ReportController {
 	@Secured(['ROLE_NCS_IT','ROLE_NCS_REPORTS'])
 	def show = {
 		def reportInstance = Report.get(params.id)
+		//TODO: something like this
+		// if (reportService.canViewReport(reportInstance) ) {
+		// ...
+		// } else {
+		//	redirect(action:'reportAccessDenied')
+		// }
 		if (!reportInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'report.label', default: 'Report'), params.id])}"
 			redirect(action: "list")
