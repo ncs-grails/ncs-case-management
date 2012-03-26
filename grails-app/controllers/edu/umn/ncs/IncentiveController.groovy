@@ -55,7 +55,7 @@ class IncentiveController {
 				success: false,
 				filterName:"",
 				filterId:params?.id.toInteger(),
-				incentiveInstanceList:Incentive.list(params),
+				incentiveInstanceList:Incentive.list(),
 				incentiveInstanceTotal: Incentive.count(),
 				memberInstanceList:memberInstanceList,
 				interviewer:username,
@@ -68,16 +68,16 @@ class IncentiveController {
 				result.filterName = filterName
 				result.success = true
 			}
-			filterName = "Distributed Incentives"
 			if (filterId == '2') {
+				filterName = "Distributed Incentives"
 				incentiveInstanceList = Incentive.findAllByTrackedItemIsNotNull()
 				result.success = true
 				result.filterName = filterName
 				result.incentiveInstanceList = incentiveInstanceList
 				result.incentiveInstanceTotal = incentiveInstanceList.size()
 			}
-			filterName = "Checked In Incentives"
 			if (filterId == '3') {
+				filterName = "Checked In Incentives"
 				incentiveInstanceList = Incentive.findAllByTrackedItemAndCheckedOut(null,false)
 				tempIncentiveInstanceList.each {
 					// Only add incentives that have not been distributed (i.e. no tracked item)
@@ -90,16 +90,16 @@ class IncentiveController {
 				result.incentiveInstanceList = incentiveInstanceList
 				result.incentiveInstanceTotal = incentiveInstanceList.size()
 			}
-			filterName = "Checked Out Incentives"
 			if (filterId == '4') {
+				filterName = "Checked Out Incentives"
 				incentiveInstanceList = Incentive.findAllByTrackedItemAndCheckedOut(null,true)
 				result.success = true
 				result.filterName = filterName
 				result.incentiveInstanceList = incentiveInstanceList
 				result.incentiveInstanceTotal = incentiveInstanceList.size()
 			}
-			filterName = "Incentives Checked Out To "
 			if (filterId == '5') {
+				filterName = "Incentives Checked Out To "
 				def user = memberInstanceList.find{ it?.username == params?.interviewer }
 				filterName += user?.displayName
 				incentiveInstanceList = Incentive.findAllByTrackedItemAndCheckedOutToWhom(null,params?.interviewer)
@@ -109,8 +109,8 @@ class IncentiveController {
 				result.incentiveInstanceTotal = incentiveInstanceList.size()
 				result.interviewer = user?.username
 			}
-			filterName = "Incentives with Receipt#: "
 			if (filterId == '6') {
+				filterName = "Incentives with Receipt#: "
 				filterName += params?.receiptNumber
 				incentiveInstanceList = Incentive.findAllByReceiptNumber(params?.receiptNumber)
 				result.success = true
@@ -951,10 +951,24 @@ class IncentiveController {
 	}
 
 	def printableIncentiveList = {
-		if (params?.id) {
-			def incentiveInstanceList = Incentive.findAllByCheckedOutToWhomAndTrackedItem(params?.id, null)
-			// Get NCS group members for list of interviewers
-			//def groupName = "EnHS-NCS"
+		if (debug) {
+			println "printable params::${params}"
+		}
+		//if (params?.id) {
+			//def incentiveInstanceList = Incentive.findAllByCheckedOutToWhomAndTrackedItem(params?.id, null)
+		def user = params?.user
+		if (user) {
+			def incentiveInstanceList = []
+			def incentiveInstance = null
+			// Get list of selected incentives
+			def selectedIncentives = params.incentivesToPrint?.split(',')
+			// Add selected incentives to the list
+			selectedIncentives.each {
+				incentiveInstance = Incentive.read(it.toLong())
+				if (incentiveInstance && !incentiveInstance?.trackedItem && incentiveInstance?.checkedOutToWhom == user) {
+					incentiveInstanceList << incentiveInstance					
+				}				
+			}
 			
 			memberInstanceList = directoryService.getMembers()
 			if ( ! memberInstanceList ) {

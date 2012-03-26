@@ -1,4 +1,5 @@
 <g:setProvider library="jquery" />
+<g:javascript src="incentive.js" />
 <div class="list">
 	<h1 id="incentive-list-header">${result?.filterName}</h1>
     <div class="filter-buttons">
@@ -58,7 +59,7 @@
 				    	optionValue="displayName"
 				    	value="${result?.interviewer}" />
 	            </span>
-	            <span class="button with-select">
+	            <%-- <span class="button with-select">
 					<g:submitToRemote value="With Receipt #"
 						url="[controller:'incentive', action:'list', id:'6']"
 						update="formContainer"
@@ -67,42 +68,63 @@
 						onSuccess=""
 						onFailure="showFailure()" />
 					<g:textField name="receiptNumber" value="" />
-	             </span>		                  
+	             </span>	--%>	                  
+				<g:if test="${result?.filterId != 1}">
+					 <span class="button with-select">
+				        <g:textField name="filter" class="searchBox" value="Search..." />
+	                 </span>
+                 </g:if>		                  
     		</div>
     	</g:form>
     </div>	
-	<div class="info-header">Showing ${result?.incentiveInstanceTotal} incentive(s)
-		<g:if test="${result?.filterId == 5}">
-			<g:link class="print" action="printableIncentiveList" id="${result?.interviewer}" target="_blank">Printable List</g:link>
-   		</g:if>
-    </div>
+    <g:form name="printIncentiveListForm" action="printableIncentiveList">
+		<div class="info-header">Showing <span class="total-count">${result?.incentiveInstanceTotal}</span> incentive(s)
+			<g:if test="${result?.filterId == 5}">
+				<g:if test="${result?.incentiveInstanceTotal > 0}">
+					<%-- <g:link class="print" action="printableIncentiveList" id="${result?.interviewer}" target="_blank">Printable List</g:link>--%>
+						<g:hiddenField name="user" value="${result?.interviewer}"/>
+						<g:hiddenField name="incentivesToPrintOrig" value="${result?.incentiveInstanceList.id}" />
+						<g:hiddenField name="incentivesToPrint" value="${result?.incentiveInstanceList.id}" />
+						<g:submitButton class="print" value="Printable List" name="printableIncentiveList" onclick="return checkSelectedIncentives();" />
+						<span class="selectIncentivesToPrint">Unselect All</span>
+						<span class="noSelectedIncentives">No Incentives have been selected to print</span>
+		   		</g:if>
+	   		</g:if>
+	    </div>
+    </g:form>
 	
-    <table>
+    <table id="list-table" class="tablesorter">
         <thead>
             <tr>
-            
-                <g:sortableColumn property="id" title="${message(code: 'incentive.id.label', default: 'Id')}" />
+				<g:if test="${result?.filterId == 5}">
+	                <th>Print</th>
+				</g:if>
+				
+                <th>Id</th>
                 
-                <g:sortableColumn property="type" title="${message(code: 'incentive.type.label', default: 'Type')}" />
+                <th>Type</th>
                 
-                <g:sortableColumn property="amount" title="${message(code: 'incentive.amount.label', default: 'Value')}" />
+                <th>Value</th>
 
-                <g:sortableColumn property="barcode" title="${message(code: 'incentive.barcode.label', default: 'Barcode')}" />
+                <th>Barcode</th>
 
-                <g:sortableColumn property="receiptNumber" title="${message(code: 'incentive.receiptNumber.label', default: 'Receipt #')}" />
+                <th>Receipt</th>
 
-                <g:sortableColumn property="activated" title="${message(code: 'incentive.activated.label', default: 'Activated')}" />	
+                <th>Activated</th>	
 
-                <g:sortableColumn property="lastUpdated" title="${message(code: 'incentive.lastUpdated.label', default: 'Last Updated')}" />
+                <th>Updated</th>
 
                 <th><strong>Status</strong></th>
 
             </tr>
         </thead>
-        <tbody>
+        <tbody class="zebra">
         <g:each in="${result?.incentiveInstanceList}" status="i" var="incentiveInstance">
-            <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">                        
+            <%-- <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">--%>  
+            <tr>                        
             
+                <td><g:checkBox name="${'checkBox_' + incentiveInstance?.id}" value="${true}" /></td>
+
                 <td><g:link action="edit" id="${incentiveInstance?.id}">${incentiveInstance?.id}</g:link></td>
 
                 <td>${incentiveInstance?.type?.name}</td>
@@ -134,8 +156,5 @@
              </g:each>
         </tbody>
     </table>
-</div>
-<div class="paginateButtons">
-    <g:paginate total="${result?.incentiveInstanceTotal}" />
 </div>
 

@@ -67,11 +67,88 @@ div.filter-buttons input[type="button"]:hover {
 div.filter-buttons-row {
 	padding-bottom: 1.0em;
 }
+/*
 .print {
 	padding: 0.5em 2.0em;
 	background: transparent url(../images/print_32x32.png) center  left no-repeat;
 }
+*/
 .info-header {
 	padding-bottom: 0.5em;
 }
-	
+
+th a:link, th a:visited, th a:hover {
+    color: #333;
+    display: block;
+    font-size: 1.0em;
+    text-decoration: none;
+    width: 100%;
+    padding: 2px 20px 2px 2px;
+}
+th.asc a, th.desc a {
+    background-position: right;
+    background-repeat: no-repeat;
+}
+th.asc a {
+    background-image: url(../images/skin/sorted_asc.gif);
+}
+th.desc a {
+    background-image: url(../images/skin/sorted_desc.gif);
+}
+/* TABLESORTER STYLE */
+table.tablesorter thead tr .header {
+    background-image:#eee url(../images/skin/bg.gif) center right no-repeat;
+    cursor: pointer;
+    font-weight: bold;
+    padding-right: 20px;
+    border-bottom: 1px solid #dad9c7;
+    margin-left: -1px;
+    white-space: nowrap;    
+}
+table.tablesorter thead tr .headerSortUp {
+    background: #ccc url(../images/skin/asc.gif) center right no-repeat;
+}
+table.tablesorter thead tr .headerSortDown {
+    background: #ccc url(../images/skin/desc.gif) center right no-repeat;
+}
+table.tablesorter tbody tr.odd td {
+    background: #f7f7f7;
+}
+table.tablesorter thead tr .header:hover {
+    background-color: #ccc;
+}
+
+div#searching {
+    display: none;
+    width:100px;
+    height: 100px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background:url(../images/spinner.gif) no-repeat center #fff;
+    text-align:center;
+    padding:10px;
+    font:normal 16px Tahoma, Geneva, sans-serif;
+    border:1px solid #aaa;
+    margin-left: -50px;
+    margin-top: -50px;
+    z-index:2;
+    overflow: auto;	
+}
+
+.searchBox {
+	    color: #ccc;	
+}
+
+.selectIncentivesToPrint {
+	text-decoration: none;
+	padding: 0 2.0em;
+}
+.selectIncentivesToPrint:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color:#7A0019;
+}
+.noSelectedIncentives {
+	color: red;
+}

@@ -34,7 +34,7 @@
             <div class="message">${flash.message}</div>
             </g:if>
             
-			<div id="searching" ><strong>Searching</strong> <img src="../images/spinner.gif" title="spinner" /></div>
+			<div id="searching" ><strong>Searching</strong></div>
                         
             <div id="formContainer">
 	            <div class="list">
@@ -97,7 +97,7 @@
 							        	optionValue="displayName"
 							        	value="${interviewer}" />
 			                    </span>		                  
-								<span class="button with-select">
+								<%--<span class="button with-select">
 							    	<g:submitToRemote value="With Receipt #"
 							    		url="[controller:'incentive', action:'list', id:'6']"
 							    		update="formContainer"
@@ -105,7 +105,7 @@
 							    		onComplete="hideSearching()"
 							    		onSuccess=""
 							    		onFailure="showFailure()" />
-							        <g:textField name="receiptNumber" value="" />
+							        <g:textField name="receiptNumber" value="" /> --%>
 			                    </span>		                  
 		            		</div>
 		            	</g:form>
@@ -127,7 +127,7 @@
 
 	                            <g:sortableColumn property="activated" title="${message(code: 'incentive.activated.label', default: 'Activated')}" />	
 	
-	                            <g:sortableColumn property="lastUpdated" title="${message(code: 'incentive.lastUpdated.label', default: 'Last Updated')}" />
+	                            <g:sortableColumn property="lastUpdated" title="${message(code: 'incentive.lastUpdated.label', default: 'Updated')}" />
 	
 	                            <th><strong>Status</strong></th>
 								

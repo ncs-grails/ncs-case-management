@@ -4,18 +4,103 @@
 * By: Aaron S. Timbo
 */
 
+var debug = false;
 var incentive = false;
 var instrument = false;
-var debug = false;
 var incentiveElementId = 0;
 var barcodeCount = 0;
+var spinnerVisible = false;
+var selectAll = false;
 
 $(document).ready(function() {
 	if (debug) {
 		alert('jQuery loaded');
 	}
 
+    // Enable table sorting
+    $("#list-table").tablesorter({widgets: ['zebra']});
+
+    // Refresh zebra striping
+    $("#list-table th").click(function() {
+        $('tbody.zebra tr').removeClass('odd');
+        zebraRows('tbody.zebra tr:odd', 'odd');
+    });
+
+    //default each row to visible
+    $('tbody tr').addClass('visible');
+
+    zebraRows('tbody.zebra tr:odd', 'odd');
+
+    // Set default value of search box
+    $('#filter').val('Search...');
+    
+    // Clear value of search box when activated
+    $('#filter').focus(function(event) { 
+    	$(this).val('');
+    	$(this).css({'color':'#666'});
+    });
+
+    // Filter table lists
+    $('#filter').keyup(function(event) {
+    	if (debug) {
+    		alert('filtering list...');
+    	}
+        //if esc is pressed or nothing is entered
+        if (event.keyCode == 27 || $(this).val() == '') {
+          //if esc is pressed we want to clear the value of search box
+          $(this).val('');
+
+          //we want each row to be visible because if nothing
+          //is entered then all rows are matched.
+          $('tbody tr').removeClass('visible').show().addClass('visible');
+        }
+
+        //if there is text, lets filter
+        else {
+          filter('tbody tr', $(this).val());
+          // Count the visible items
+          var numItems = $('.visible').length
+          $('.total-count').html(numItems);
+        }
+
+        //reapply zebra rows
+        $('.visible td').removeClass('odd');
+        zebraRows('.visible:odd td', 'odd');
+    });
+
+    // Handle checkbox events for printable incentive list
+    $("input[id*='checkBox_']").click(function(event) {
+        $('.noSelectedIncentives').hide();
+    	updateIncentiveList(this);
+    });
 	
+    // Un/select all incentives to print
+    $(".selectIncentivesToPrint").click(function(event){
+    	if (selectAll) {
+            $('.noSelectedIncentives').hide();
+    		$(this).html('Unselect All');
+    		selectAll = false; 
+    		$("input[id*='checkBox_']").each(function(event){
+    			$(this).attr('checked', true);
+    		});
+    		// Add all original incentives to the list
+    		var incentiveList = groovyListToArray($('#incentivesToPrintOrig').val());
+			$('#incentivesToPrint').val(incentiveList);
+    		
+    	} else {
+    		$(this).html('Select All');
+    		selectAll = true;    		
+    		$("input[id*='checkBox_']").each(function(event){
+    			$(this).attr('checked', false);
+    		});
+    		// Clear out incentives list
+			$('#incentivesToPrint').val('');
+    	}    	
+    });
+    
+    // Hide no selected incentive message by default
+    $('.noSelectedIncentives').hide();
+    
 //    $('#barcode').change(function() {
 	// Only do a save on enter
     $('#barcode').keyup(function(event) {
@@ -537,17 +622,136 @@ function showSearching() {
 	$('#formContainter').removeClass('errors');
 	$('#notFound').hide();
 	$('.message').hide();	
-	$('#searching').show();	
+	// $('#searching').show();
+	if (!spinnerVisible) {
+		$('#searching').fadeIn('fast');
+		spinnerVisible = true;
+	}
 }
 
 function hideSearching() {
-	$('#searching').hide();
+	// $('#searching').hide();
+	if (spinnerVisible) {
+		var spinner = $('div#searching');
+		spinner.stop();
+		$('#searching').fadeOut('fast');
+		spinnerVisible = false;
+	}
 }
 
 function showFailure() {
 	$('#notFound').show();	
 }
 
+//used to apply alternating row styles
+function zebraRows(selector, className)
+{
+  $(selector).removeClass(className).addClass(className);
+}
+
+//filter results based on query
+function filter(selector, query) {
+  query	=	$.trim(query); //trim white space
+  query = query.replace(/ /gi, '|'); //add OR for regex query
+
+  $(selector).each(function() {
+    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');
+  });
+  
+}
+
+// Update list of incentive ids to print
+function updateIncentiveList(checkBox) {
+	// Get incentive id
+	try {
+		var incentiveId = $(checkBox).attr('name').replace('checkBox_','');		
+	} catch (err) {
+		alert ("Could not get id from element::" + $(checkBox).attr('name') + " -- ERROR:: " + err);
+	}
+	var index = null;
+	var incentiveList = null;
+	
+	if (incentiveId) {
+		if (debug) {
+			alert ("Updating print status for incentive::" + incentiveId);
+		}		
+		// Get list of incentive ids	
+		var incentiveList = groovyListToArray($('#incentivesToPrint').val());
+		if (incentiveList != '') {
+			if (debug) {
+				alert ("Searching for incentive in list::" + incentiveList);
+			}
+			// Get index of incentive id in incentive list
+			index = $.inArray(incentiveId, incentiveList);
+			if (debug) {
+				alert ("Setting incentive id index::" + index + " | incentiveList::[" + incentiveList + "]::length::" + incentiveList.length);
+			}		
+			// Update incentive list based on checkbox status
+			if ($(checkBox).attr('checked')) {
+				// Search incentive list for current id and add if missing
+				if (index < 0) {
+					incentiveList.push(incentiveId);						
+					// Update the page with new array list
+					$('#incentivesToPrint').val(incentiveList);
+					if (debug) {
+						alert ("Added incentive::" + incentiveId + " to list");
+					}		
+				}
+			} else {
+				// Search incentive list for current id and remove if found
+				if (index >= 0) {
+					incentiveList.splice(index, 1);
+					// Update the page with new array list
+					$('#incentivesToPrint').val(incentiveList);
+					if (debug) {
+						alert ("Removed incentive::" + incentiveId + " from list");
+					}		
+				}							
+			}			
+		} else {
+			// Add one incentive id to list
+			incentiveList = incentiveId;			
+			// Update the page with new array list
+			$('#incentivesToPrint').val(incentiveList);
+		}
+		if (debug) {
+			alert ("Updated incentive list::" + $('#incentivesToPrint').val());
+		}		
+
+	}	
+}
+
+function groovyListToArray(l) {
+    // convert a groovy list to an array
+    //alert("Converting string to array: " + l);
+    var list = l.replace(/\[/g, "");
+    list = list.replace(/\]/g, "");
+    list = list.replace(/ /g, "");
+    //alert("Removed characters, new list: " + list);
+    var theArray = new Array
+    theArray = list.split(",");
+    //alert("New array: " + theArray + " with length: " + theArray.length);
+    return theArray;
+}
+
+function checkSelectedIncentives() {
+	var incentiveInstanceList = $('#incentivesToPrint').val();
+	if (incentiveInstanceList) {
+		// check for leading comma
+		if (debug) {
+			alert("incentiveInstanceList::" + incentiveInstanceList);
+		}
+		if (incentiveInstanceList.substring(1) == ',') {
+			$('#incentivesToPrint').val(incentiveInstanceList.replace(' ,',''));
+		}
+		if (debug) {
+			alert("Updated incentiveInstanceList::" + $('#incentivesToPrint').val());
+		}
+		return true;
+	}
+    $('.noSelectedIncentives').show();
+	return false;
+}
 /*
 //Disable form submit on ENTER key press
 function stopRKey(evt) {
