@@ -154,7 +154,10 @@
 	
 				                <div id="${'eventCode' + i}" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventCode }'>hidden</g:if>">
 				                	<span class="name">
-	                                   	<label for="eventCode"><g:if test="${eventOfInterestInstance?.eventType?.nameEventCode}" >${eventOfInterestInstance?.eventType?.nameEventCode}</g:if><g:else>Event Code</g:else></label>
+										<label for="eventCode">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventCode}" >${eventOfInterestInstance?.eventType?.nameEventCode}</g:if>
+											<g:else>Event Code</g:else>
+										</label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:textField name="eventCode" value="${fieldValue(bean: eventOfInterestInstance, field: 'eventCode')}" />
@@ -163,7 +166,10 @@
 	
 				                <div id="${'eventPickOne' + i }" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventPickOne }'>hidden</g:if>">
 				                	<span class="name">
-	                                   	<label for="eventPickOne"><g:message code="eventOfInterest.eventPickOne.label" default="Event Pick One" /></label>
+										<label for="eventPickOne">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventPickOne}" >${eventOfInterestInstance?.eventType?.nameEventPickOne}</g:if>
+											<g:else><g:message code="eventOfInterest.eventPickOne.label" default="Event Pick One" /></g:else>
+										</label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <g:select id="${'eventPickOneOptions' + i}"  name="eventPickOne.id" from="${edu.umn.ncs.EventPickOne.findAllByEventType(eventOfInterestInstance?.eventType)}" optionKey="id" value="${eventOfInterestInstance?.eventPickOne?.id}" noSelection="['null': '']" />
@@ -172,7 +178,10 @@
 	
 				                <div id="${'eventDateDiv' + i}" class="prop <g:if test='${! eventOfInterestInstance?.eventType?.useEventDate }'>hidden</g:if>">
 				                	<span class="name">
-	                                   	<label for="eventDate"><g:message code="eventOfInterest.eventDate.label" default="Event Date" /></label>
+										<label for="eventDate">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventDate}" >${eventOfInterestInstance?.eventType?.nameEventDate}</g:if>
+											<g:else><g:message code="eventOfInterest.eventDate.label" default="Event Date" /></g:else>
+										</label>
 				                	</span>
 				                	<span class="value"> 
 	                                    <%--<gui:datePicker id="${'eventDate' + i}"
