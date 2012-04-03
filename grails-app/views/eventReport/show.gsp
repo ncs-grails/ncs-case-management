@@ -103,7 +103,15 @@
 								<g:if test="${eventOfInterestInstance?.eventType?.useEventCode}" >
 				                <div class="prop">
 				                	<span class="show">
-                                    	<label for="eventCode"><g:message code="eventOfInterest.eventCode.label" default="Event Code:" /></label>    ${eventOfInterestInstance?.eventCode}
+
+										<label for="eventCode">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventCode}">
+												${eventOfInterestInstance?.eventType?.nameEventCode}
+											</g:if>
+											<g:else>
+												Event Code
+											</g:else>
+										</label>    ${eventOfInterestInstance?.eventCode}
 				                    </span>
 				                </div>
 				                </g:if>
@@ -111,7 +119,14 @@
 								<g:if test="${eventOfInterestInstance?.eventType?.useEventPickOne}" >
 				                <div class="prop">
 				                	<span class="show">
-                                    	<label for="eventPickOne"><g:message code="eventOfInterest.eventPickOne.label" default="Event Pick One:" /></label>    ${eventOfInterestInstance?.eventPickOne}
+										<label for="eventPickOne">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventPickOne}">
+												${eventOfInterestInstance?.eventType?.nameEventPickOne}
+											</g:if>
+											<g:else>
+												Event Pick One:
+											</g:else>
+										</label>    ${eventOfInterestInstance?.eventPickOne}
 				                    </span>
 				                </div>
 				                </g:if>
@@ -119,7 +134,14 @@
 								<g:if test="${eventOfInterestInstance?.eventType?.useEventDate}" >
 				                <div class="prop">
 				                	<span class="show">
-                                    	<label for="eventDate"><g:message code="eventOfInterest.eventDate.label" default="Event Date:" /></label>    <g:formatDate format="MM/dd/yyyy" date="${eventOfInterestInstance?.eventDate}" />
+										<label for="eventDate">
+											<g:if test="${eventOfInterestInstance?.eventType?.nameEventDate}">
+												${eventOfInterestInstance?.eventType?.nameEventDate}
+											</g:if>
+											<g:else>
+												Event Date
+											</g:else>
+										</label>    <g:formatDate format="MM/dd/yyyy" date="${eventOfInterestInstance?.eventDate}" />
 				                    </span>
 				                </div>
 				                </g:if>
