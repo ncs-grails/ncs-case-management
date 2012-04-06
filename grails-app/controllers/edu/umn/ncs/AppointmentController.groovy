@@ -13,11 +13,10 @@ class AppointmentController {
 
 	def index = {
 
-		log.debug ("APPOINTMENT > index > params = ${params}")
-		//println ("APPOINTMENT > index > params = ${params}")
+		log.debug "params = ${params}"
 
 		def personInstance = Person.read(params?.person?.id)
-		//println ("=> personInstance = ${personInstance}")
+		log.debug "personInstance = ${personInstance}"
 	
 		[personInstance: personInstance] 	
 
@@ -145,15 +144,22 @@ class AppointmentController {
 	// TODO: This is not done, but should be finished later on
 	def calendar = {
 
-		def midnight = new LocalTime(0,0)
+		log.debug "params: ${params}"
+
 		// There is no "calendar.gsp", only "month.gsp, week.gsp, and day.gsp)
+		def midnight = new LocalTime(0,0)
+		log.debug "midnight = ${midnight}"
 
 		def format = "month"
 		if (params?.format == "week") { format = "week" }
+		log.debug "format = ${format}"
 
 		def refDate = new Date()
+		log.debug "refDate = ${refDate}"
 		if (params.id) {
+			log.debug "if (params.id)"
 			refDate = ( new LocalDate(params.id) ).toDateTime(midnight).toCalendar().time
+			log.debug "=> refDate = ${refDate}"
 		}
 
 		/* monthInfo stuff
@@ -165,16 +171,24 @@ class AppointmentController {
 		 *   firstWeekdayOfMonth
 		 *   firstOfMonth
 		 *   lastOfmonth
+		 *   firstDayOfNextMonth
 		 */
 		def monthInfo = getMonthInfo(refDate) 
 		def referenceDate = new LocalDate(refDate.time)
 		def startDate
 		def endDate
 		def weeks = []
-		def nextMonth = referenceDate.plusMonths(1).toDateTime(midnight).toCalendar().time
 		def prevMonth = referenceDate.minusMonths(1).toDateTime(midnight).toCalendar().time
+		def nextMonth = referenceDate.plusMonths(1).toDateTime(midnight).toCalendar().time
+		def prevWeek = referenceDate.plusWeeks(-1).toDateTime(midnight).toCalendar().time
 		def nextWeek = referenceDate.plusWeeks(1).toDateTime(midnight).toCalendar().time
-		def prevWeek = referenceDate.plusWeeks(1).toDateTime(midnight).toCalendar().time
+
+		log.debug "monthInfo= ${monthInfo}"
+		log.debug "referenceDate = ${referenceDate}"
+		log.debug "prevMonth = ${prevMonth}"
+		log.debug "nextMonth = ${nextMonth}"
+		log.debug "prevWeek = ${prevWeek}"
+		log.debug "nextWeek = ${nextWeek}"
 
 		// get the range for the calendar
 		if (format == "week") {
@@ -182,8 +196,11 @@ class AppointmentController {
 			endDate = monthInfo.lastOfWeek
 		} else {
 			startDate = monthInfo.firstCalendarDate
-			endDate = monthInfo.lastOfMonth
+			//endDate = monthInfo.lastOfMonth.plusDays(1).toDateTime(midnight).toCalendar().time
+			endDate = monthInfo.firstDayOfNextMonth
 		}
+		log.debug "startDate = ${startDate}"
+		log.debug "endDate = ${endDate}"
 
 		// get the appointments for the calendar
 		def c = Appointment.createCriteria()
@@ -194,16 +211,13 @@ class AppointmentController {
 			}
 			order("startTime")
 		}
+		log.debug "appointmentInstanceList = ${appointmentInstanceList}"
 
 		def cursorDate = startDate
-
-		/*
-		 println "cursorDate: ${cursorDate}"
-		 println "startDate: ${startDate}"
-		 println "endDate: ${endDate}"
-		*/
+		log.debug "cursorDate = ${cursorDate}"
 
 		while (cursorDate <= endDate) {
+			log.debug "BEGIN while (cursorDate <= endDate)"
 			// add all days to week
 			def daysOfWeek = []
 				(1..7).each{
@@ -213,6 +227,11 @@ class AppointmentController {
 					day.dayOfMonth = cursorLocalDate.dayOfMonth
 					day.date = cursorDate
 					day.appointments = appointmentInstanceList.findAll{ (it.startTime.compareTo(cursorDate) == 1) && ( it.startTime.compareTo(tomorrow) == -1 ) }
+					log.debug "  cursorLocalDate = ${cursorLocalDate}"
+					log.debug "  tomorrow = ${tomorrow}"
+					log.debug "  day.dayOfMonth = ${day.dayOfMonth}"
+					log.debug "  day.date = ${day.date}"
+					log.debug "  day.appointments = ${day.appointments}"
 					if (referenceDate.monthOfYear == cursorLocalDate.monthOfYear) {
 						day.cssShadow = ""
 						day.thisMonth = true
@@ -224,6 +243,7 @@ class AppointmentController {
 					cursorDate++
 				}
 			weeks.add([days:daysOfWeek])
+			log.debug "END while (cursorDate <= endDate)"
 		}
 
 		def model = [ weeks:weeks, 
@@ -444,25 +464,40 @@ class AppointmentController {
 	 */
 	private def getMonthInfo(refDate) {
 
+		log.debug "BEGIN private def getMonthInfo(refDate)"
+
 		// convert java.util.Date to org.joda.time.LocalDate
 		LocalDate referenceDate = new LocalDate(refDate.time)
 		def dayOfWeek = referenceDate.getDayOfWeek()
 		LocalDate firstOfMonth = referenceDate.withDayOfMonth(1)
 		def lastOfmonth = referenceDate.plusMonths(1).withDayOfMonth(1).minusDays(1)
+		def firstDayOfNextMonth = referenceDate.plusMonths(1).withDayOfMonth(1) 
+
+		log.debug "  referenceDate = ${referenceDate}"
+		log.debug "  dayOfWeek = ${dayOfWeek}"
+		log.debug "  firstOfMonth = ${firstOfMonth}"
+		log.debug "  lastOfmonth = ${lastOfmonth}"
+
 		// get first weekday of the month
 		def firstWeekdayOfMonth = firstOfMonth.getDayOfWeek()
+		log.debug "  firstWeekdayOfMonth = ${firstWeekdayOfMonth}"
 
-		// difference between first day on calendar and first
-		// day of month is (firstOfMonth - (7 - firstWeekdayOfMonth)
+		// difference between first day on calendar and 
+		//first day of month is (firstOfMonth - (7 - firstWeekdayOfMonth)
 		def firstCalendarDate = firstOfMonth
+		log.debug "  firstCalendarDate = ${firstCalendarDate}"
 		if (firstWeekdayOfMonth != 7) {
+			log.debug "  if (firstWeekdayOfMonth != 7)"
 			firstCalendarDate = firstOfMonth.minusDays(firstWeekdayOfMonth)
+			log.debug "  => firstCalendarDate = ${firstCalendarDate}"
 		}
 
 		def firstOfWeek = referenceDate.withDayOfWeek(1).minusDays(1)
 		def lastOfWeek = referenceDate.withDayOfWeek(6)
 		def midnight = new LocalTime(0,0)
 		def monthInfo = [:]
+		log.debug "  firstOfWeek = ${firstOfWeek}"
+		log.debug "  lastOfWeek = ${lastOfWeek}"
 
 		monthInfo.referenceDate = referenceDate.toDateTime(midnight).toCalendar().time
 		monthInfo.dayOfWeek = dayOfWeek
@@ -472,6 +507,9 @@ class AppointmentController {
 		monthInfo.firstWeekdayOfMonth = firstWeekdayOfMonth
 		monthInfo.firstOfMonth = firstOfMonth.toDateTime(midnight).toCalendar().time
 		monthInfo.lastOfMonth = lastOfmonth.toDateTime(midnight).toCalendar().time
+		monthInfo.firstDayOfNextMonth = firstDayOfNextMonth.toDateTime(midnight).toCalendar().time
+
+		log.debug "END private def getMonthInfo(refDate)"
 
 		return monthInfo
 
