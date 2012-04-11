@@ -961,7 +961,7 @@ class IncentiveController {
 			def incentiveInstanceList = []
 			def incentiveInstance = null
 			// Get list of selected incentives
-			def selectedIncentives = params.incentivesToPrint?.split(',')
+			def selectedIncentives = params.incentivesToPrint?.replace('[','').replace(']','').split(',')
 			// Add selected incentives to the list
 			selectedIncentives.each {
 				incentiveInstance = Incentive.read(it.toLong())
