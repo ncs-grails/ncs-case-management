@@ -59,7 +59,7 @@
 				    	optionValue="displayName"
 				    	value="${result?.interviewer}" />
 	            </span>
-	            <%-- <span class="button with-select">
+	            <span class="button with-select">
 					<g:submitToRemote value="With Receipt #"
 						url="[controller:'incentive', action:'list', id:'6']"
 						update="formContainer"
@@ -68,12 +68,12 @@
 						onSuccess=""
 						onFailure="showFailure()" />
 					<g:textField name="receiptNumber" value="" />
-	             </span>	--%>	                  
-				<g:if test="${result?.filterId != 1}">
+	             </span>	                  
+				<%-- <g:if test="${result?.filterId != 1}">
 					 <span class="button with-select">
 				        <g:textField name="filter" class="searchBox" value="Search..." />
 	                 </span>
-                 </g:if>		                  
+                 </g:if>--%>		                  
     		</div>
     	</g:form>
     </div>	
@@ -123,8 +123,10 @@
             <%-- <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">--%>  
             <tr>                        
             
-                <td><g:checkBox name="${'checkBox_' + incentiveInstance?.id}" value="${true}" /></td>
-
+				<g:if test="${result?.filterId == 5}">
+	                <td><g:checkBox name="${'checkBox_' + incentiveInstance?.id}" value="${true}" /></td>
+				</g:if>
+				
                 <td><g:link action="edit" id="${incentiveInstance?.id}">${incentiveInstance?.id}</g:link></td>
 
                 <td>${incentiveInstance?.type?.name}</td>

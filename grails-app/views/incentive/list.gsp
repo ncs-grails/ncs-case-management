@@ -97,7 +97,7 @@
 							        	optionValue="displayName"
 							        	value="${interviewer}" />
 			                    </span>		                  
-								<%--<span class="button with-select">
+								<span class="button with-select">
 							    	<g:submitToRemote value="With Receipt #"
 							    		url="[controller:'incentive', action:'list', id:'6']"
 							    		update="formContainer"
@@ -105,7 +105,7 @@
 							    		onComplete="hideSearching()"
 							    		onSuccess=""
 							    		onFailure="showFailure()" />
-							        <g:textField name="receiptNumber" value="" /> --%>
+							        <g:textField name="receiptNumber" value="" />
 			                    </span>		                  
 		            		</div>
 		            	</g:form>
