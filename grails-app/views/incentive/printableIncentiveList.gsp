@@ -15,8 +15,9 @@
 			{
 		    	/* Avery 5160 labels -- CSS and HTML by MM at Boulder Information Services */
 		        /*width: 2.625in; /* plus .25 inches from padding */
-		        width: 2.875in; /* plus .25 inches from padding */
-		        height: .875in; /* plus .125 inches from padding */
+		        width: 2.875in;
+		        /* height: .875in; /* plus .25 inches from padding */
+		        height: .835in; /* plus .25 inches from padding */
 		        /*padding: .125in .125in; */
 		        padding: .125in 0;
 		        margin-right: .125in; /* the gutter */
@@ -55,6 +56,8 @@
     			<div class="label-row barcode"><img src="${createLink(controller:'barcode', action:'png', id:'INC' + incentiveInstance?.id)}" /></div>
     			<div class="label-row barcode">${incentiveInstance?.barcode}</div>    			
     		</div>
+    		<%-- INSERT PAGE BREAK AFTER EACH SET OF 30 LABELS --%>
+    		<g:if test="${i > 0}"><g:if test="${i % 29 == 0}"><div class="page-break"></div></g:if></g:if>
     	</g:each>
     </body>
 </html>
