@@ -9,7 +9,7 @@
 				/*width: 8.5in;*/
 				width: 9.0in;
 				/*margin: 0.3in .1875in;*/
-				margin: 0.3in 0;
+				/*margin: 0.3in 0;*/ /* Margins should be set in print page setup for browser */
 			}
 			.label
 			{
@@ -57,7 +57,8 @@
     			<div class="label-row barcode">${incentiveInstance?.barcode}</div>    			
     		</div>
     		<%-- INSERT PAGE BREAK AFTER EACH SET OF 30 LABELS --%>
-    		<g:if test="${i > 0}"><g:if test="${i % 29 == 0}"><div class="page-break"></div></g:if></g:if>
+    		<g:set var="breakCount" value="${i + 1}" />
+    		<g:if test="${i > 0}"><g:if test="${breakCount % 30 == 0}"><div class="page-break"></div></g:if></g:if>
     	</g:each>
     </body>
 </html>
