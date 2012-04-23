@@ -229,6 +229,15 @@
 		</fieldset>
 
 		<fieldset class="maroonBorder">
+			<legend class="m1">Incentives</legend>
+			<ul>
+			<g:each var="inc" in="${incentiveInstanceList}">
+			<li>${inc}</li>
+			</g:each>
+			</ul>
+		</fieldset>
+
+		<fieldset class="maroonBorder">
 			<legend class="m1">Items Generated</legend>
 			<g:if test="${ ! trackedItemInstanceList}">
 			  No Items found
