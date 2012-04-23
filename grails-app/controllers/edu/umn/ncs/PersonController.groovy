@@ -25,6 +25,14 @@ class PersonController {
 			def trackedItemInstanceList = TrackedItem.findAllByPerson(personInstance)
 			def appointmentInstanceList = Appointment.findAllByPerson(personInstance)
 			def subjectInstanceList = Subject.findAllByPerson(personInstance)
+
+			def incentiveInstanceList = Incentive.createCriteria().list {
+				trackedItem {
+					person {
+						idEq(personInstance.id)
+					}
+				}
+			}
 			
 			def callInstanceList = Call.createCriteria().list {
 				items {
@@ -88,6 +96,7 @@ class PersonController {
 				householdInstanceList: householdInstanceList,
 				callInstanceList: callInstanceList,
 				eventReportInstanceList: eventReportInstanceList,
+				incentiveInstanceList : incentiveInstanceList,
 				resultHistoryList: resultHistoryList ]
 		}
 		
