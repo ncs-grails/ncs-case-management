@@ -13,7 +13,7 @@
 		</div>
 		<div class="body">
 		
-		<h1>Person Details</h1>
+		<h1>Information about this Person</h1>
 		
 		<fieldset class="maroonBorder">
 			<legend class="m1">Person ID: ${personInstance.id}</legend>
