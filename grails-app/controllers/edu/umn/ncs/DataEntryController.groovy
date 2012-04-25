@@ -8,6 +8,8 @@ class DataEntryController {
 
 	static instrumentMapping = [
 		[ instrumentNickName:'eligqx', controller: 'eligibilityQuestionnaire'],
+		[ instrumentNickName:'eqrng', controller: 'eligibilityQuestionnaire'],
+		[ instrumentNickName:'eqrwg', controller: 'eligibilityQuestionnaire'],
 		[ instrumentNickName:'fathengitems', controller: 'fatherEngagement'],
 		[ instrumentNickName:'fathenhcons', controller: 'fatherEngagement'] ]
 
