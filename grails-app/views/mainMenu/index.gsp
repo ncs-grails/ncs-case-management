@@ -62,6 +62,9 @@
 								<g:link controller="eventType">event type</g:link>
 							</dd>
 
+							<dt><g:link controller="result" action="list">Result Types</g:link></dt>
+							<dd>Manage the kinds of results that can be tied to tracked items.</dd>							
+
 						</dl>				
 					</div>
 				</sec:ifAnyGranted>
