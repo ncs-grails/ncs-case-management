@@ -14,6 +14,7 @@ class BatchController {
 
     def emailService
     def springSecurityService
+	def batchService
 
     def index = { 
         redirect(action:'list',params:params)
@@ -440,83 +441,24 @@ class BatchController {
 		
 	}
 
-	// TODO: Errors out if tracked item has a child item.
-	// TODO: Errors out if tracked item is in the user queue (edu.umn.ncs.phone.UserQueue)
-	// TODO: check for any other kinds of errors that may cause the item to fail on deletion
-	//		 then report what table caused the failure
-	//
-	// TODO: shouldn't this be in TrackedItemController.deleteItem(Integer item) ?
-	private def deleteItem(Integer item) {
-		
-		def trackedItemInstance = null
-		def r = [batchId: 0,
-			message: "",
-			err: ""]
-		
-		trackedItemInstance = TrackedItem.read(item)
-		if (debug) {
-			println "********************* before if (trackedItemInstance"
-		}
-		if (trackedItemInstance) {
-			r.batchId = trackedItemInstance.batchId
-			
-			if (debug) {
-				println "trackedItemInstance.batchId: ${trackedItemInstance.batchId}"
-			}
-			
-			// Delete BatchQueue parent records
-			def BatchQueueInstanceList = BatchQueue.createCriteria().list{
-				items {
-					eq('id', trackedItemInstance.id)
-				}
-			}
-			BatchQueueInstanceList.each{batchQueueInstance
-				try {
-					batchQueueInstance.delete()
-				}catch(org.springframework.dao.DataIntegrityViolationException e){
-					r.err += "${message(code: 'default.not.deleted.message', args: [message(code: 'batchQueue.label', default: 'Batch Queue'), ${item}])}"
-				}
-			}
-			
-			// Delete Item
-			try {
-				trackedItemInstance.delete()
-				r.message += "${item}, "
-			}catch(org.springframework.dao.DataIntegrityViolationException e){
-				r.err += "${message(code: 'default.not.deleted.message', args: [message(code: 'trackedItem.label', default: 'TrackedItem'), ${item}])}"
-			}
-		}
-		return r
-	}
 
 	// TODO: shouldn't this be in TrackedItemController.delete() ?
 	@Secured(['ROLE_NCS_IT'])
 	def deleteItems = {
-		def message = ""
-		def err = ""
-		def batchId = null
-		def r = [:]
+		def itemIds = [] as Set
 		
-		message = "Deleted Items: "
-		params?.item?.id?.each { 
-			def itemId = Integer.parseInt(it)
-			
-			if (itemId) {
-				r = deleteItem(itemId)
-	
-				message += r?.message
-				err += r?.err
-				batchId = r?.batchId
+		params.item?.id?.each { 
+			def itemId
+			try {
+				itemId = Integer.parseInt(it)
+				itemIds.add(itemId)
+			} catch(NumberFormatException ex){
+				itemId = null
+				log.warn "Invalid item ID: ${it}"
 			}
 		}
 
-		if (batchId) {
-			flash.message = message + err
-			flash.errorMessage = err
-			redirect(action: "edit", id: batchId)
-		} else {
-			redirect(action: "list")
-		}
+		batchService.deleteTrackedItems(itemIds)
 	}
 		
 	// TODO: shouldn't this be in TrackedItemController.create() ?

@@ -13,11 +13,8 @@
         <div class="nav">
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></span>
-			<!-- TODO: Why is there a create link when the action fails? -->
-			<%--
-            <span class="menuButton"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span>
-			--%>
         </div>
+
         <div class="body">
             <h1>Editing Batch # ${batchInstance?.id}</h1>
             
@@ -38,7 +35,8 @@
                 <g:renderErrors bean="${batchInstance}" as="list" />
             </div>
             </g:hasErrors>
-            <g:form method="post" name="editBatch">
+		
+			<g:form method="post" name="editBatch">
                 <g:hiddenField name="id" value="${batchInstance?.id}" />
                 <g:hiddenField name="version" value="${batchInstance?.version}" />
                 <div class="dialog">
@@ -205,12 +203,22 @@
                                 </td>
                             </tr>
                         
+							<div class="buttons">
+								<span class="button">
+									<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+								</span>
+							</div>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                   <label for="items"><g:message code="batch.items.label" default="Items" /></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'items', 'errors')}">
-                                
+								<td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'items', 'errors')}">
+
+
+				</g:form>                        
+
+				<g:form method="post" name="manageItems" controller="trackedItem">
 	                                <div class="manageBatch">
 		                                <g:hiddenField name="item.id" value="0" />
 		                                <g:hiddenField name="item.id" value="0" />
@@ -273,7 +281,6 @@
 											<span style="margin-left:5px;" class="buttons">
 												<!-- TODO: a hash tag to bring the jump back to the same spot would be nice.  An AJAX call would be even better -->
 												<g:actionSubmit name="addItem" class="create" action="addItem" value="Add Item" onclick="return checkItems(${validItems?.dwellingUnit?.id}, ${validItems?.person?.id}, ${validItems?.household?.id});" /> 
-												<%--<g:actionSubmit class="create" action="addItem" value="Add Item" onclick="return confirm('Are You  Sure?');" /> --%>
 											</span>
 									</div>    									
 
@@ -284,11 +291,19 @@
                    
                 </div>
                 
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" /></span>
-                    <span class="button"><g:actionSubmit class="delete" action="delete" value="Delete Batch" /></span>
-                </div>
-            </g:form>
+				</g:form>
+
+				<g:form method="post" name="deleteBatch">
+					<g:hiddenField name="id" value="${batchInstance?.id}" />
+					<g:hiddenField name="version" value="${batchInstance?.version}" />
+
+					<div class="buttons">
+						<span class="button">
+							<g:actionSubmit class="delete" action="delete" value="Delete Batch" />
+						</span>
+					</div>
+				</g:form>
+
         </div>
     </body>
 </html>

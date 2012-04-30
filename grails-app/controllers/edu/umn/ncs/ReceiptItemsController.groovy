@@ -197,7 +197,7 @@ class ReceiptItemsController {
 		def appName = "ncs-case-management"
 		
 		def receivedResult = Result.findByName('received')
-		
+		 
 		def trackedItemInstance = TrackedItem.get(itemId)
 		
 		if (!trackedItemInstance) {
@@ -209,13 +209,17 @@ class ReceiptItemsController {
 			result.instrumentName = trackedItemInstance.batch.primaryInstrument.toString()
 			result.studyName =  trackedItemInstance.batch.primaryInstrument.study.toString()
 
-			if (trackedItemInstance.result) {
+
+
+			if (trackedItemInstance.result && trackedItemInstance?.result?.result?.name == receivedResult?.name) {
 				// item has been recepted already.  See what it was
 				result.resultDate = trackedItemInstance.result.receivedDate
 				result.resultName = trackedItemInstance.result.result.name
 
 				result.success = false
 				result.errorText = "Item already receipted ${result.resultDate}."
+
+				log.debug "NGP debug; receivedResult: ${receivedResult}    trackedItemInstance?.result:  ${trackedItemInstance?.result} "
 
 			} else {
 				

@@ -47,6 +47,8 @@ class DwellingUnitController {
 			
 			// Find IDs for ItemResults
 			def itemResultIdList = trackedItemInstanceList.collect{ it?.result?.id?.toString() }
+
+
 			// get rid of nulls in the list
 			itemResultIdList.removeAll([null])
 
@@ -57,11 +59,15 @@ class DwellingUnitController {
 					eq('className', 'edu.umn.ncs.ItemResult')
 					'in'('persistedObjectId', itemResultIdList)
 				}
+
+				log.debug "NGP debug on 2012-04-26; itemResultIdList: ${itemResultIdList.each{it}}"
+				log.debug "NGP debug on 2012-04-26; auditLogEventInstanceList:  ${auditLogEventInstanceList.each{it}}"
 			}
 			
 			auditLogEventInstanceList.each{
 				def item = [:]
 				
+
 				item.id = it.persistedObjectId.toInteger()
 				def ti = trackedItemInstanceList.find{it.result?.id == item.id}
 				item.trackedItem = TrackedItem.read(ti.id)
@@ -71,6 +77,8 @@ class DwellingUnitController {
 				def resultId = it?.oldValue?.replace('edu.umn.ncs.Result : ', '')?.toInteger()
 				item.oldResult = Result.read(resultId)
 				
+				log.debug "NGP debug 2012-04-26; itemResultId: ${item?.id}    oldResult: ${resultId}"
+
 				if (item.oldResult) {
 					resultHistoryList.add(item)
 				}
