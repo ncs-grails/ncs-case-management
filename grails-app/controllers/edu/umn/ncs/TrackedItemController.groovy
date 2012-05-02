@@ -10,6 +10,8 @@ class TrackedItemController {
 	private static LocalTime midnight = new LocalTime(0,0)
 
 	def springSecurityService
+	def batchService
+	def trackedItemService
 	
     def index = { redirect(controller:'mainMenu') }
 	
@@ -304,6 +306,118 @@ class TrackedItemController {
 			}
 		}
 		return message
+	}
+	
+	// TODO: shouldn't this be in TrackedItemController.delete() ?
+	@Secured(['ROLE_NCS_IT'])
+	def deleteItems = {
+		def itemIds = [] as Set<Integer>
+		
+		params.item?.id?.each { 
+			def itemId
+			try {
+				itemId = Integer.parseInt(it)
+				itemIds.add(itemId)
+			} catch(NumberFormatException ex){
+				itemId = null
+				log.warn "Invalid item ID: ${it}"
+			}
+		}
+
+		trackedItemService.deleteTrackedItems(itemIds)
+	}
+		
+	// TODO: shouldn't this be in TrackedItemController.create() ?
+	@Secured(['ROLE_NCS_IT'])
+	def addItem = {
+
+		def batchInstance = Batch.read(params.id)
+		def trackedItemInstance = null
+		
+		if (batchInstance) {
+			
+			if (params.version){
+				def version = params.version.toLong()
+				if (batchInstance.version > version) {
+					batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
+					render(view: "edit", model: [batchInstance: batchInstance])
+					return
+				}
+			}
+
+			
+			// Checking if this is a valid Dwelling Unit , Person or Household
+			def dwellingUnitId = params?.dwellingUnit?.id
+			def personId = params?.person?.id
+			def householdId = params?.household?.id
+			
+			def username = springSecurityService?.principal?.getUsername()
+			
+			def bcq = new BatchCreationQueue()
+			
+			if (dwellingUnitId) {
+				
+				def dwellingUnit = DwellingUnit.read(dwellingUnitId)
+				if (dwellingUnit) {
+					bcq.dwellingUnit = dwellingUnit
+					trackedItemInstance = batchInstance.items.find{it.dwellingUnitId == dwellingUnit.id}
+				}
+			} else if (personId){
+				def person = Person.read(personId)
+				if (person){
+					bcq.person = person
+					trackedItemInstance = batchInstance.items.find{it.personId == person.id}
+				}
+			} else if (householdId){
+				def household = Household.read(householdId)
+				if (household){
+					bcq.household = household
+					trackedItemInstance = batchInstance.items.find{it.householdId == household.id}
+				}
+			}
+
+            def message = ''
+			bcq.username = username
+			if (!bcq.validate()) {
+				
+				bcq.errors.each{ e->
+					e.fieldErrors.each{fe -> println "! Rejected'${fe.rejectedValue}' for field '${fe.field}'\n"}
+				}
+				message = "Valid DwellingUnit, Person or Household ID Required."
+			} else {
+				
+				if (!trackedItemInstance) {
+
+					batchInstance.properties = params
+										
+					trackedItemInstance = new TrackedItem(person: bcq.person,
+						dwellingUnit: bcq.dwellingUnit,
+						household: bcq.household)
+					
+					batchInstance.updatedBy = username
+					batchInstance.addToItems(trackedItemInstance)
+					
+					if (!batchInstance.hasErrors() && batchInstance.save(flush:true)){
+						message = "Batch ${batchInstance.id} successfully updated!"
+					} else {
+						batchInstance.errors.each{e ->
+							e.fieldErrors.each{fe -> println "! Saving Batch. Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
+						}
+					}
+					
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemsService.getValidItems(params.id), message: message])
+					return
+					
+				} else {
+					render(view: "edit", model: [ batchInstance: batchInstance, validItems: trackedItemsService.getValidItems(params.id), message: "Item already in batch. Item ID: ${trackedItemInstance?.id}"])
+					return
+				}
+			}
+			render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemsService.getValidItems(params.id)])
+		} else {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
+			redirect(action: "list")
+		}
 	}
 	
 }

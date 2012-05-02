@@ -80,4 +80,18 @@ class TrackedItemService {
 		// now return the full list of items in the chain
 		return children
 	}
+
+	private def getValidItems(batchId) {
+		def validItems = [:]
+
+		def batchInstance = Batch.read(batchId)
+
+		if (batchInstance) {
+			validItems.dwellingUnit = batchInstance.items.find { it.dwellingUnit != null}
+			validItems.person = batchInstance.items.find{it.person != null}
+			validItems.household = batchInstance.items.find{it.household != null}
+		}
+		return validItems
+	}
+
 }

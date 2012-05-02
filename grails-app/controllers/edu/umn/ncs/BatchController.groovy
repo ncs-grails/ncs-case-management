@@ -15,7 +15,8 @@ class BatchController {
     def emailService
     def springSecurityService
 	def batchService
-
+	def trackedItemService
+	
     def index = { 
         redirect(action:'list',params:params)
     }
@@ -176,9 +177,6 @@ class BatchController {
                     }
 
                 } catch (Exception ex) {
-					if (debug){
-						println "NGP debug; ${ex}"
-					}
                     flash.message = "Invalid Batch ID: ${batchId}\n"
 					flash.exception = ex
                 }
@@ -312,7 +310,7 @@ class BatchController {
 			def yearRange = (referenceDateYear..(referenceDateYear+1))
 
 			/* Check the batch items: created for dwelling Units, persons or households */
-			[batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange]
+			[batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange]
 		}
 	}
 	
@@ -338,7 +336,7 @@ class BatchController {
 				}
 			} else {
 				batchInstance.errors.rejectValue("id", "id.NotEmpty", [message(code: 'id.label', default: 'Batch')] as Object[], "Batch: ${batchInstance.id} not deleted. All tracked items must be deleted.")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 		}
@@ -376,19 +374,19 @@ class BatchController {
 
             if (calledCampusCourierDate && calledCampusCourierDate.isBefore(dateCreated) && !calledCampusCourierDate.isEqual(dateCreated)) {
                 batchInstance.errors.rejectValue("calledCampusCourierDate", "batch.calledCampusCourierDate.dateToEarly")
-                    render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+                    render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
                     return
             }
 
 			if (instrumentDate && instrumentDate.isBefore(dateCreated) && !instrumentDate.isEqual(dateCreated)) {
 				batchInstance.errors.rejectValue("instrumentDate", "batch.instrumentDate.dateToEarly")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 						
 			if (addressAndMailingDate && addressAndMailingDate.isBefore(dateCreated) && !addressAndMailingDate.isEqual(dateCreated)){
 				batchInstance.errors.rejectValue("addressAndMailingDate", "batch.addressAndMailingDate.dateToEarly")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 			
@@ -397,20 +395,20 @@ class BatchController {
 
 			if (mailDate && mailDate.isBefore(dateCreated) && !mailDate.isEqual(dateCreated)) {
 				batchInstance.errors.rejectValue("mailDate", "batch.mailDate.dateToEarly")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 
 
 			if (trackingReturnDate && trackingReturnDate.isBefore(dateCreated) && !trackingReturnDate.isEqual(dateCreated)) {
 				batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after date generated")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 
 			if (mailDate && trackingReturnDate && mailDate.isBefore(trackingReturnDate) && mailDate.isEqual(trackingReturnDate)) {
 				batchInstance.errors.rejectValue("trackingReturnDate", "batch.trackingReturnDate.dateToEarly", [message(code: 'batch.label', default: 'Batch')] as Object[], "Tracking Return Date must come after Mail Date")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 			}
 
@@ -419,7 +417,7 @@ class BatchController {
 				if (batchInstance.version > version) {
 
 					batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+					render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 					return
 				}
 			}
@@ -431,7 +429,7 @@ class BatchController {
 				redirect(action: "edit", id: batchInstance.id)
 			}
 			else {
-				render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), yearRange: yearRange])
+				render(view: "edit", model: [batchInstance: batchInstance, validItems: trackedItemService.getValidItems(params.id), yearRange: yearRange])
 			}
 			
 		} else {
@@ -439,135 +437,6 @@ class BatchController {
             redirect(action: "list")
         }
 		
-	}
-
-
-	// TODO: shouldn't this be in TrackedItemController.delete() ?
-	@Secured(['ROLE_NCS_IT'])
-	def deleteItems = {
-		def itemIds = [] as Set
-		
-		params.item?.id?.each { 
-			def itemId
-			try {
-				itemId = Integer.parseInt(it)
-				itemIds.add(itemId)
-			} catch(NumberFormatException ex){
-				itemId = null
-				log.warn "Invalid item ID: ${it}"
-			}
-		}
-
-		batchService.deleteTrackedItems(itemIds)
-	}
-		
-	// TODO: shouldn't this be in TrackedItemController.create() ?
-	@Secured(['ROLE_NCS_IT'])
-	def addItem = {
-		if (debug) {
-			println "******************  NGP debug; I am in additem"
-		}
-		def batchInstance = Batch.read(params.id)
-		def trackedItemInstance = null
-		
-		if (batchInstance) {
-			
-			if (params.version){
-				def version = params.version.toLong()
-				if (batchInstance.version > version) {
-					batchInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: 'batch.label', default: 'Batch')] as Object[], "Another user has updated this Batch while you were editing")
-					render(view: "edit", model: [batchInstance: batchInstance])
-					return
-				}
-			}
-
-			
-			// Checking if this is a valid Dwelling Unit , Person or Household
-			def dwellingUnitId = params?.dwellingUnit?.id
-			def personId = params?.person?.id
-			def householdId = params?.household?.id
-			
-			def username = springSecurityService?.principal?.getUsername()
-			
-			def bcq = new BatchCreationQueue()
-			
-			if (dwellingUnitId) {
-				
-				def dwellingUnit = DwellingUnit.read(dwellingUnitId)
-				if (dwellingUnit) {
-					bcq.dwellingUnit = dwellingUnit
-					trackedItemInstance = batchInstance.items.find{it.dwellingUnitId == dwellingUnit.id}
-				}
-			} else if (personId){
-				def person = Person.read(personId)
-				if (person){
-					bcq.person = person
-					trackedItemInstance = batchInstance.items.find{it.personId == person.id}
-				}
-			} else if (householdId){
-				def household = Household.read(householdId)
-				if (household){
-					bcq.household = household
-					trackedItemInstance = batchInstance.items.find{it.householdId == household.id}
-				}
-			}
-
-            def message = ''
-			bcq.username = username
-			if (!bcq.validate()) {
-				
-				bcq.errors.each{ e->
-					e.fieldErrors.each{fe -> println "! Rejected'${fe.rejectedValue}' for field '${fe.field}'\n"}
-				}
-				message = "Valid DwellingUnit, Person or Household ID Required."
-			} else {
-				
-				if (!trackedItemInstance) {
-
-					batchInstance.properties = params
-										
-					trackedItemInstance = new TrackedItem(person: bcq.person,
-						dwellingUnit: bcq.dwellingUnit,
-						household: bcq.household)
-					
-					batchInstance.updatedBy = username
-					batchInstance.addToItems(trackedItemInstance)
-					
-					if (!batchInstance.hasErrors() && batchInstance.save(flush:true)){
-						message = "Batch ${batchInstance.id} successfully updated!"
-					} else {
-						batchInstance.errors.each{e ->
-							e.fieldErrors.each{fe -> println "! Saving Batch. Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
-						}
-					}
-					
-					render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id), message: message])
-					return
-					
-				} else {
-					render(view: "edit", model: [ batchInstance: batchInstance, validItems: getValidItems(params.id), message: "Item already in batch. Item ID: ${trackedItemInstance?.id}"])
-					return
-				}
-			}
-			render(view: "edit", model: [batchInstance: batchInstance, validItems: getValidItems(params.id)])
-		} else {
-			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'batch.label', default: 'Batch'), params.id])}"
-			redirect(action: "list")
-		}
-	}
-	
-	// TODO: shouldn't this be in TrackedItemController?
-	private def getValidItems(batchId) {
-		def validItems = [:]
-		
-		def batchInstance = Batch.read(batchId)
-		
-		if (batchInstance) {
-			validItems.dwellingUnit = batchInstance.items.find { it.dwellingUnit != null}
-			validItems.person = batchInstance.items.find{it.person != null}
-			validItems.household = batchInstance.items.find{it.household != null}
-		}
-		return validItems
 	}
 
 	

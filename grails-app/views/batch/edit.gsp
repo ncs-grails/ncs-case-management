@@ -203,25 +203,40 @@
                                 </td>
                             </tr>
                         
-							<div class="buttons">
-								<span class="button">
-									<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								</span>
-							</div>
+                        </tbody>
+                    </table>
+                   
+                </div>
+                
+				<div class="buttons">
+					<span class="button">
+						<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+					</span>
+				</div>
 
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="items"><g:message code="batch.items.label" default="Items" /></label>
-                                </td>
+			</g:form>                        
+
+			<g:form method="post" name="manageItems" controller="trackedItem">
+
+                <g:hiddenField name="id" value="${batchInstance?.id}" />
+                <g:hiddenField name="version" value="${batchInstance?.version}" />
+
+				<g:hiddenField name="item.id" value="0" />
+				<g:hiddenField name="item.id" value="0" />
+
+                <div class="dialog mt1">
+
+					<h1>Editing Items in Batch # ${batchInstance?.id}</h1>
+
+                    <table>
+                        <tbody>
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="items"><g:message code="batch.items.label" default="Items" /></label>
+								</td>
 								<td valign="top" class="value ${hasErrors(bean: batchInstance, field: 'items', 'errors')}">
 
-
-				</g:form>                        
-
-				<g:form method="post" name="manageItems" controller="trackedItem">
-	                                <div class="manageBatch">
-		                                <g:hiddenField name="item.id" value="0" />
-		                                <g:hiddenField name="item.id" value="0" />
+								<div class="manageBatch">
 		 								<table class="scroll" id="itemsList">
 											<thead>
 												<th>Item ID</th>
