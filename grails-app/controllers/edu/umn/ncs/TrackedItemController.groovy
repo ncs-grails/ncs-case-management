@@ -10,7 +10,7 @@ class TrackedItemController {
 	private static LocalTime midnight = new LocalTime(0,0)
 
 	def springSecurityService
-	
+
     def index = { redirect(controller:'mainMenu') }
 	
 	def show = {
@@ -51,12 +51,17 @@ class TrackedItemController {
 		// I realize that some of it is tricky due to the result changing?
 		// but could it have used the "trackedItemInstance.parameters = params" trick?
 		// ... the answer may be "no", but I thought I'd ask.
-		
+	
+		// TO-DO: 2012-05-03 Noticed with ReceiptItemsService.receiptItem the ItemResult updates are logging properly in auditLog by auditLog plugin. Change "update tracked_item result" here to call receiptItemsService.receiptItem 
+
 		// TODO: Expiration date doesn't show up for addition/modification/deletion
 		def username = springSecurityService.principal.getUsername()
 		def appName = "ncs-case-management"
 
-		def message = ''
+		def messages = []
+		def errors = []
+		def auditLogMap = []
+
 		def today = new LocalDate()	
 		
 		def itemResultInstance = null
@@ -141,10 +146,10 @@ class TrackedItemController {
 						itemResultInstance.userUpdated = username
 						
 						if (!itemResultInstance.hasErrors() && itemResultInstance.save(flush: true)) {
-							message += "Result for Item ID: ${trackedItemInstance.id} updated. <br/>"
+							messages.add("Result for Item ID: ${trackedItemInstance.id} updated. <br/>")
 							trackedItemInstance.result = itemResultInstance
 						} else {
-							message += "Failed updating ItemResult for Item ID: ${trackedItemInstance} ItemResult ID: ${itemResultInstance.id}. "
+							errors.add("Failed updating ItemResult for Item ID: ${trackedItemInstance} ItemResult ID: ${itemResultInstance.id}. ")
 							itemResultInstance.errors.each{ e ->
 								e.fieldErrors.each{fe -> println "! Rejected '${fe.rejectedValues}' for field '${fe.field}'<br/>"}
 							}
@@ -209,101 +214,20 @@ class TrackedItemController {
 			
 			if (!trackedItemInstance.hasErrors() && trackedItemInstance.save(flush: true)) {
 
-/* 
- 				Skip manually logging "DELETE" events. 
-				They logged automatically. (problem: actor not saved on auto logging. But it works for ajz)
-				UPDATEs are not auto logged should be manually logged here:
- */
  
-				// Log studyYear
-				if (oldStudyYear && trackedItemInstance.studyYear && oldStudyYear != trackedItemInstance.studyYear) {
-					// Log studyYear "UPDATE" 
-					message += auditLog('edu.umn.ncs.trackedItemInstance',
-						"UPDATE",
-						trackedItemInstance.studyYear,
-						oldStudyYear,
-						trackedItemInstance.id,
-						"studyYear")
-				}
-				
-				// Log parentItem
-				if (oldParentItem && trackedItemInstance.parentItem && trackedItemInstance.parentItem && oldParentItem != trackedItemInstance.parentItem) {
-					// Log parentItem "UPDATE" 
-					// Result for 85753 of edu.umn.ncs.Result : 281 on 2011-09-10 00:00:00.0. 
-						message += auditLog('edu.umn.ncs.trackedItemInstance',
-							"UPDATE",
-							trackedItemInstance.parentItem.toString(),
-							oldParentItem.toString(),
-							trackedItemInstance.id,
-							"parentItem")
-				}
 
-				// Log result, receivedDate, user "UPDATE" events
-				if (oldResult && trackedItemInstance?.result?.id && oldResult != trackedItemInstance?.result?.result?.id) {
-					// Log result
-					message += auditLog("edu.umn.ncs.ItemResult",
-						"UPDATE",
-						"edu.umn.ncs.Result:${itemResultInstance.result.id}",
-						"edu.umn.ncs.Result:${oldResult}" + " Created: [on: ${oldItemResultDateCreated} by: ${oldItemResultUserCreated}] Updated: [on: ${oldItemResultLastUpdated} by ${oldItemResultUserUpdated} ]",
-						itemResultInstance.id,
-						"result")
-				}
-				
-				if (oldReceivedDate && trackedItemInstance?.result?.receivedDate && oldReceivedDate != trackedItemInstance?.result?.receivedDate) {
-					// Log receivedDate
-					message += auditLog('edu.umn.ncs.ItemResult',
-						"UPDATE",
-						"${itemResultInstance.receivedDate.toString()}",
-						oldReceivedDate.toString() + " Created: [on: ${oldItemResultDateCreated} by: ${oldItemResultUserCreated}] Updated: [on: ${oldItemResultLastUpdated} by ${oldItemResultUserUpdated} ]",
-						itemResultInstance.id,
-						"receivedDate")
-				}
-
-				message += "Item ${trackedItemInstance.id} updated successfully!"
-				render(view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
+				messages.add("Item ${trackedItemInstance.id} updated successfully!")
+				render(view: "edit", model: [trackedItemInstance: trackedItemInstance, messages: messages])
 				
 			} else {
-				message += "Failed updating Item ${trackedItemInstance.id}!"
-				render (view: "edit", model: [trackedItemInstance: trackedItemInstance, message: message])
+				messages.add ("Failed updating Item ${trackedItemInstance.id}!")
+				render (view: "edit", model: [trackedItemInstance: trackedItemInstance, messages: messages])
 			}
 			
 		} else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trackedItem.label', default: 'Tracked Item'), params.id])}"
             redirect(controller: "batch", action: "list")
         }
-	}
-	
-	// this should probably be in a service? (so it can be re-used )
-	private def auditLog(className, eventName, newValue, oldValue, persistedObjectId, propertyName){
-
-		def message = ""		
-		def username = springSecurityService.principal.getUsername()
-		
-		def auditLog = new AuditLogEvent(actor: username,
-			className: className,
-			dateCreated: new Date(),
-			eventName: eventName,
-			lastUpdated: new Date(),
-			newValue: newValue,
-			oldValue: oldValue,
-			persistedObjectId: persistedObjectId,
-			propertyName: propertyName)
-		
-		if (!auditLog.hasErrors() && auditLog.save(flush: true)) {
-			
-			message += "Logged ${propertyName}: ${oldValue} <br/>"
-			if (debug && propertyName == "studyYear") {
-				def studyYear = AuditLogEvent.findByPersistedObjectIdAndPropertyName(85758, "studyYear")
-				println "LOGGED STUDYYEAR: ${studyYear}"
-			}
-			
-		} else {
-			message += "Failed to log old ${propertyName}: ${oldValue} <br/>"
-			auditLog.errors.each{ e ->
-				e.fieldErrors.each{fe -> println "! Rejected '${fe.rejectedValue}' for field '${fe.field}'\n"}
-			}
-		}
-		return message
 	}
 	
 }

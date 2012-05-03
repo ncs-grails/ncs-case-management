@@ -27,10 +27,14 @@
 				<div class="message">${flash.message}</div>
 			</g:if> 
 			
-			<g:if test="${message}">
-				<div class="message">${message}</div>
+			<g:if test="${messages}">
+				<div class="message">${messages}</div>
 			</g:if> 			
 			
+			<g:if test="${errors}">
+				<div class="errors">${errors}</div>
+			</g:if> 			
+
 			<g:hasErrors bean="${trackedItemInstance}">
 				<div class="errors">
 					<g:renderErrors bean="${trackedItemInstance}" as="list" />

@@ -9,6 +9,7 @@ class ReceiptItemsController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def springSecurityService
+	def receiptItemsService
 
     def rand = new Random()
 
@@ -78,8 +79,8 @@ class ReceiptItemsController {
                 // we have an item
                 def id = barcodeValue.replace("I", "")
 
-				result = _receiptItem(id, receivedDate, result)
-			
+				result = receiptItemsService.receiptItem(id, receivedDate, result)
+
             } else if (barcodeValue[0].toUpperCase() == "B") {
                 // we have a batch id
                 result.trackingDocument = true
@@ -95,11 +96,11 @@ class ReceiptItemsController {
                             batchInstance.save(flush:true)
                             result.success = true
 
-                        result.trackedItemId = "Tracking Document for Batch # ${batchInstance.id}"
-                        result.instrumentName = batchInstance.primaryInstrument.toString()
-                        result.studyName =  batchInstance.primaryInstrument.study.toString()
-                        result.resultDate = batchInstance.trackingReturnDate
-                        result.resultName = "Received"
+							result.trackedItemId = "Tracking Document for Batch # ${batchInstance.id}"
+							result.instrumentName = batchInstance.primaryInstrument.toString()
+							result.studyName =  batchInstance.primaryInstrument.study.toString()
+							result.resultDate = batchInstance.trackingReturnDate
+							result.resultName = "Received"
 
                         } else {
                             result.errorText = "Already Receipted on ${batchInstance.trackingReturnDate}"
@@ -109,7 +110,7 @@ class ReceiptItemsController {
                     }
 
                 } catch (Exception e) {
-                    println "${e}"
+					log.debug e
                     result.errorText = "Invalid Batch id."
                 }
 
@@ -172,7 +173,7 @@ class ReceiptItemsController {
 				} else {
 				
 					if (trackedItemInstanceList.size() == 1) {
-						result = _receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
+						result = receiptItemsService.receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
 					} else {
 						renderView = 'chooseItem'
 						result.trackedItemInstanceList = trackedItemInstanceList
@@ -191,57 +192,4 @@ class ReceiptItemsController {
 
 	def cancelItem = { }
 	
-	private def _receiptItem(itemId, receivedDate, result){
-		
-		def username = springSecurityService.principal.getUsername()
-		def appName = "ncs-case-management"
-		
-		def receivedResult = Result.findByName('received')
-		
-		def trackedItemInstance = TrackedItem.get(itemId)
-		
-		if (!trackedItemInstance) {
-			result.success = false
-			result.errorText = "   Item not found."
-		} else {
-			// get received status and received date
-			result.trackedItemId = trackedItemInstance.id
-			result.instrumentName = trackedItemInstance.batch.primaryInstrument.toString()
-			result.studyName =  trackedItemInstance.batch.primaryInstrument.study.toString()
-
-			if (trackedItemInstance.result) {
-				// item has been recepted already.  See what it was
-				result.resultDate = trackedItemInstance.result.receivedDate
-				result.resultName = trackedItemInstance.result.result.name
-
-				result.success = false
-				result.errorText = "Item already receipted ${result.resultDate}."
-
-			} else {
-				
-				// tie the result back to the item
-				trackedItemInstance.result = new ItemResult(result:receivedResult,
-					userCreated: username,
-					appCreated: appName,
-					receivedDate: receivedDate)
-				
-				if ( trackedItemInstance.save(flush:true) ) {
-					result.success = true
-					result.resultDate = new LocalDate(trackedItemInstance.result.receivedDate).toString('MM-dd-yyyy')
-					result.resultName = trackedItemInstance.result.result.name
-				} else {
-
-					trackedItemInstance.errors.each{
-						println "   error: ${it}"
-					}
-					result.success = false
-					result.errorText = "unable to save result"
-				}
-			}
-		}
-		
-		
-		
-		return result
-	}
 }

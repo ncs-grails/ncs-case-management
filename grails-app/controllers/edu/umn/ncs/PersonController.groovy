@@ -6,9 +6,9 @@ import edu.umn.ncs.phone.Call
 
 @Secured(['ROLE_NCS_PROTECTED'])
 class PersonController {
+	def lookupService
 
 	@Secured(['ROLE_NCS_LOOKUP'])
-
 	def show = {
 
 		//println "PERSON CONTROLLER > SHOW"
@@ -62,31 +62,7 @@ class PersonController {
 			// get rid of nulls in the list
 			itemResultIdList.removeAll([null])
 
-			// Find Matching Audit Events for ItemResults
-			def auditLogEventInstanceList = []
-			if (itemResultIdList) {
-				auditLogEventInstanceList = AuditLogEvent.createCriteria().list{
-						eq('className', 'edu.umn.ncs.ItemResult')
-						'in'('persistedObjectId', itemResultIdList)
-				}
-			}
-			
-			auditLogEventInstanceList.each{
-				def item = [:]
-				
-				item.id = it.persistedObjectId.toInteger()
-				def ti = trackedItemInstanceList.find{it.result?.id == item.id}
-				item.trackedItem = TrackedItem.read(ti.id)
-				item.username = it.actor
-				item.dateCreated = it.dateCreated
-				
-				def resultId = it?.oldValue?.replace('edu.umn.ncs.Result : ', '')?.toInteger()
-				item.oldResult = Result.read(resultId)
-				
-				if (item.oldResult) {
-					resultHistoryList.add(item)
-				}
-			}
+			resultHistoryList = lookupService.resultHistory(resultHistoryList, itemResultIdList, trackedItemInstanceList)
 
 			[personInstance: personInstance,
 				personLinkInstance: personLinkInstance,
