@@ -84,6 +84,12 @@
                         </tr>
                     
                         <tr class="prop">
+                            <td valign="top" class="name"><g:message code="report.allowedRoles.label" default="Allowed Roles" /></td>
+                            
+	                        <td valign="top" class="value">${fieldValue(bean: reportInstance, field: "allowedRoles")}</td>                            
+                        </tr>
+
+                        <tr class="prop">
                             <td valign="top" class="name"><g:message code="report.adminsOnly.label" default="Admins Only" /></td>
                             
                             <td valign="top" class="value"><g:formatBoolean boolean="${reportInstance?.adminsOnly}" /></td>

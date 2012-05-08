@@ -133,6 +133,20 @@
                                 </td>
                             </tr>
                         
+		                  <tr class="prop">
+                                <td valign="top" class="name label-column">
+                                    <label for="allowedRoles"><g:message code="report.allowedRoles.label" default="Allowed Roles" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: reportInstance, field: 'allowedRoles', 'errors')}">
+                                    <g:select
+                                   		name="allowedRoles"
+                                   		from="${groupInstanceList}"
+                                   		optionKey="name"
+                                   		optionValue="name"
+                                   		multiple="true" />
+                                </td>
+                            </tr>
+          
                             <tr class="prop">
                                 <td valign="top" class="name label-column">
                                     <label for="adminsOnly"><g:message code="report.adminsOnly.label" default="Admins Only" /></label>

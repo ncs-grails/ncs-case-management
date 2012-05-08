@@ -15,6 +15,9 @@ class ReportController {
     def dataSource      // inject the Spring-Bean dataSource
     def birtReportService
 	def reportService
+	def directoryService
+	def groupInstanceList
+	def debug = true
 	
     def index = { 
         redirect(action: "list", params: params)
@@ -31,6 +34,12 @@ class ReportController {
 		def reportInstance = new Report()
 		reportInstance.properties = params
 		
+		// Get NCS groups
+		groupInstanceList = directoryService.getGroups()
+		if (!groupInstanceList) {
+			directoryService.loadGroups("ENHS-NCS-*")			
+			groupInstanceList = directoryService.getGroups()
+		}
 		// Populate list of empty report parameters
 		def reportParamInstance = null
 		def reportParamInstanceList = []
@@ -42,7 +51,7 @@ class ReportController {
 		// Get list of designed BIRT reports
 		def reportList = getDesignedReports().collect { it.name }
 
-		return [reportInstance: reportInstance, reportList: reportList, reportParamInstanceList: reportParamInstanceList ]
+		return [reportInstance: reportInstance, reportList: reportList, reportParamInstanceList: reportParamInstanceList, groupInstanceList: groupInstanceList ]
 	}
 	
 	@Secured(['ROLE_NCS_IT'])
@@ -71,7 +80,9 @@ class ReportController {
 				reportInstance.designedName = designedName				
 			}
 		}
-		
+		if (debug) {
+			println "roles::${params.allowedRoles}"
+		}
 		if (reportInstance.save(flush: true)) {
 			flash.message = "Report Created"
 			redirect(action: "show", id: reportInstance.id)
@@ -251,8 +262,30 @@ class ReportController {
 			
 			// Get list of designed BIRT reports
 			def reportList = getDesignedReports().collect { it.name }
-	
-			return [reportInstance: reportInstance, reportList: reportList, reportParamInstanceList: reportParamInstanceList ]
+
+			// Get NCS groups
+			groupInstanceList = directoryService.getGroups()
+			if (!groupInstanceList) {
+				directoryService.loadGroups("ENHS-NCS-*")
+				groupInstanceList = directoryService.getGroups()
+			}
+			if (debug) {
+				println "groupInstanceList::$groupInstanceList"
+			}
+			// Add the current allowed role names and descriptions to a list of maps
+			// so they may be selected on the edit page
+			def allowedRolesList = []
+			reportInstance.allowedRoles.split(',').each{ r ->
+				def allowedRolesMap =  [:]
+				allowedRolesMap.name = r
+				allowedRolesMap.description = groupInstanceList.find { it.name == r }.description
+				allowedRolesList << allowedRolesMap
+			}
+			if (debug) {
+				println "allowedRolesList::$allowedRolesList"
+			}
+			
+			return [reportInstance: reportInstance, reportList: reportList, reportParamInstanceList: reportParamInstanceList, groupInstanceList: groupInstanceList, allowedRolesList: allowedRolesList ]
 		}
 	}
 

@@ -12,7 +12,7 @@ class Report {
     String description
 	/** if the report is an SQL query, then this is the SQL code */
     String query
-	/** ??? */
+	/** Name of the BIRT .rptdesign file with the layout and data connections of a designed report */
 	String designedName
 	/** Flags whether or not to use the SQL contained in the query attribute to generate the report */
 	Boolean useQuery = false

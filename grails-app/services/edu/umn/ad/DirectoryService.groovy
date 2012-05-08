@@ -44,10 +44,46 @@ class DirectoryService {
 
 	private def _authorities = [] as Set
 	private def _members = [] as Set
-
+	private def _groups = [] as Set
+	
 	def getAuthorities = { _authorities }
 	def getMembers = { _members }
+	def getGroups = { _groups }
+	
+	def loadGroups(final String searchCriteria) {
+		/**
+		 * Search for groups using a search criteria.
+		 * Populates a result set. Default search criteria is '*'
+		 * or everything. 
+		 */
+		// internal variables
+		def maxDepth = 5
+		def currentDepth = 0
+		def fillRoles
+		def ldap
 
+		// Open Connection
+		ldap = LDAP.newInstance(ldapUri, ldapUserDn, ldapUserPw)
+
+		if (! searchCriteria || searchCriteria == '') {
+			searchCriteria = '*'
+		}
+		
+		// Find the Groups
+		def groups = ldap.search(filter:"cn=${searchCriteria}", base:ldapGroupsBaseDn, scope:SearchScope.SUB )
+		
+		// Add group names and descriptions to a map
+		groups.each{
+			def group = [:]
+			group.name = it.cn
+			group.description = it.description
+			_groups.add(group)
+			
+		}
+		_groups = _groups.sort{ it?.name }
+		
+	}
+		
 	String loadUsersByGroupname(final String groupname) {
 
 		// lookup user and data
