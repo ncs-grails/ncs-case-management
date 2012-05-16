@@ -28,6 +28,9 @@ class ReportServiceIntegrationTests extends GrailsUnitTestCase {
         super.tearDown()
     }
 
+	void testBogus() {
+		
+	}
 	/*
     void testCanViewReport() {
 
