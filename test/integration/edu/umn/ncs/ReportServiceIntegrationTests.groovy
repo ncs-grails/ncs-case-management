@@ -1,14 +1,27 @@
 package edu.umn.ncs
 
 import grails.test.*
+import edu.umn.auth.MockAuthenticationToken
+import edu.umn.auth.MockUserDetails
+import org.springframework.security.core.authority.GrantedAuthorityImpl
 
 class ReportServiceIntegrationTests extends GrailsUnitTestCase {
 	def debug = true
-	def userDetailsService
 	def reportService
+	def authenticatedToken
 	
     protected void setUp() {
         super.setUp()
+		// Create a list of string role names
+		def authoritiesString = [ 'ROLE_NCS_IT', 'ROLE_NCS_ALL' ]
+		// convert strings to Spring Security Roles
+		def authorities = authoritiesString.collect{ new GrantedAuthorityImpl(it) }
+		// Create userDetails object
+		def mockUserDetails = new MockUserDetails('ast', 'your mama', true, 
+									false, false, false, authorities, "Aaron S. Timbo", "ast@umn.edu")
+
+		// Create an authenticated token
+		authenticatedToken = new MockAuthenticationToken('ast', authorities, mockUserDetails)
     }
 
     protected void tearDown() {
@@ -16,8 +29,13 @@ class ReportServiceIntegrationTests extends GrailsUnitTestCase {
     }
 
     void testCanViewReport() {
+
+		def sss = [ principal: [ getUsername: {'ast'}  ] ]
+		
+		reportService.springSecurityService = sss
+
 		// Get a mock user
-		def user = userDetailsService.loadUserByUsername('ast', true)
+		def user = authenticatedToken
 		assert user != null
 		if (debug) {
 			println "user::$user"
