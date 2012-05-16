@@ -52,11 +52,19 @@ grails.project.dependency.resolution = {
 		compile ":pdf:0.6"
 		compile ":quartz:0.4.2"
 		compile ":springcache:1.3.1"
-		compile ":spring-security-core:1.2.7.3"
+		
+		compile ":webflow:$grailsVersion"
+
+		compile ":spring-security-core:1.2.7.9"
+		// If you're getting errors like the following, try running `grails compile` with the following version of 
+		// spring-security-ldap rather than the custom version
+		/* :: org.springframework.ldap#org.springframework.ldap;1.3.0.RELEASE: not found
+		   :: org.springframework.security#org.springframework.security.ldap;3.0.4.RELEASE: not found
+		   */
+		// compile ":spring-security-ldap:1.0.5"
 		compile ":spring-security-ldap:1.0.6"
 		compile ":spring-security-shibboleth-native-sp:1.0.3"
 		provided ":spring-security-mock:1.0.1"
-		compile ":webflow:1.3.4"
 	}
 }
 
