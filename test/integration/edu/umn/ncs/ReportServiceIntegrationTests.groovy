@@ -28,6 +28,7 @@ class ReportServiceIntegrationTests extends GrailsUnitTestCase {
         super.tearDown()
     }
 
+	/*
     void testCanViewReport() {
 
 		def sss = [ principal: [ getUsername: {'ast'}  ] ]
@@ -94,4 +95,5 @@ class ReportServiceIntegrationTests extends GrailsUnitTestCase {
 		assert reportService.canViewReport(report4) == false
 
 	}
+	*/
 }
