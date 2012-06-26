@@ -53,7 +53,6 @@
 					            	<g:hiddenField id="personId" name="person.id" value="${eventReportInstance?.person?.id}" />
 					                <g:hiddenField name="id" value="${eventReportInstance?.id}" />
 					                <g:hiddenField name="version" value="${eventReportInstance?.version}" />
-					                <g:hiddenField name="studies" value="${eventReportInstance?.studies?.id}" />
 
 					                <div class="prop">
 					                    <span valign="top" class="name">
