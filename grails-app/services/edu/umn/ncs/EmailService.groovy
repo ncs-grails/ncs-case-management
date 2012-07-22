@@ -15,8 +15,7 @@ class EmailService {
 		// println "sendProductionReport:params::${params}"
 		def referenceDate = new Date()
 		
-		def recipients = [ 'ajz@umn.edu'
-			, 'dmd@cccs.umn.edu'
+		def recipients = [ 'dmd@cccs.umn.edu'
 			, 'jaf@umn.edu'
 			, 'front_dis@cccs.umn.edu'
 			, 'sup_dis@cccs.umn.edu' ]
@@ -45,7 +44,7 @@ class EmailService {
 				}
 			} else {
 				mailService.sendMail {
-					to "ajz@umn.edu", "ngp@umn.edu"
+					to "ngp@umn.edu"
 					from "help@ncs.umn.edu"
 					subject "NCS Production Report for ${referenceDate}"
 					body "No batches generated, nothing to send!"
@@ -53,7 +52,7 @@ class EmailService {
 			}
 		} catch ( Exception ex ) {
 			mailService.sendMail {
-				to "ajz@umn.edu", "ngp@umn.edu"
+				to "ngp@umn.edu"
 				from "help@ncs.umn.edu"
 				subject "FAILED! NCS Production Report for ${referenceDate}"
 				body "Failed to send NCS Production Report.  Doh!"
@@ -64,8 +63,7 @@ class EmailService {
 	def sendNorcAlert = { params ->
 
 		// who gets the email...
-		def recipients = [ 'ajz@umn.edu'
-			, 'msg@cccs.umn.edu'
+		def recipients = ['msg@cccs.umn.edu'
 			, 'Barron-Martin@norc.org'
 			, 'Sokolowski-John@norc.uchicago.edu' ]
 
@@ -136,7 +134,7 @@ class EmailService {
 			}
 		} catch (Exception ex) {
 			mailService.sendMail {
-				to "ajz@umn.edu", "ngp@umn.edu"
+				to "ngp@umn.edu"
 				from "help@ncs.umn.edu"
 				subject "FAILED! Alert to NORC of Data Posting"
 				body "Failed to send Alert to NORC of Data Posting.  Doh!\n${ex}"

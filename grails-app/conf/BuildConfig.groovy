@@ -53,7 +53,7 @@ grails.project.dependency.resolution = {
 		compile ":quartz:0.4.2"
 		compile ":springcache:1.3.1"
 		
-		compile ":webflow:$grailsVersion"
+		compile ":webflow:1.3.8"
 
 		compile ":spring-security-core:1.2.7.9"
 		// If you're getting errors like the following, try running `grails compile` with the following version of 
