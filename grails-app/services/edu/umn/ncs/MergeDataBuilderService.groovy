@@ -23,7 +23,7 @@ class MergeDataBuilderService {
 	
     static transactional = true
 	
-	def debug = false
+	def debug = false 
 
 	/**
 	This returns the minimum base data set required to do a mailing.
@@ -94,8 +94,11 @@ class MergeDataBuilderService {
 				reason: ""
             ]
 			
+			record.creationConfigName = batchInstance?.creationConfig?.name
+
 			if (debug) { 
-				println "MergeDataBuilderService:getBaseData::record.itemId = ${record.itemId}" 
+				println "Config name:  ${record.creationConfigName}" 
+				//println "MergeDataBuilderService:getBaseData::record.itemId = ${record.itemId}" 
 			}
 
             if (item.dwellingUnit) {
