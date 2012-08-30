@@ -303,8 +303,8 @@
 		<!-- Street Addresses -->
 		<g:if test="${personInstance.streetAddresses}">
 		<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
-			<g:each var="pa" in="${personInstance.streetAddresses.sort{ it.preferredOrder} }">
-			<h2><span class="preferredOrder">#${pa.preferredOrder + 1} - </span>${pa.streetAddress.address}</h2>
+			<g:each var="pa" in="${personInstance.streetAddresses.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
+			<h2><span class="preferredOrder">#${i + 1} - </span>${pa.streetAddress.address}</h2>
 			<p> ${pa.streetAddress.cityStateZip}<br />
 			${pa.streetAddress.country?.name} </p>
 			</g:each>
@@ -314,8 +314,8 @@
 		<!-- Phone Numbers -->
 		<g:if test="${personInstance.phoneNumbers}">
 		<fieldset class="maroonBorder"><legend class="m1">Phone Numbers</legend>
-		<g:each var="pn" in="${personInstance.phoneNumbers.sort{ it.preferredOrder} }">
-			<h2><span class="preferredOrder">#${pn.preferredOrder + 1} - </span>${pn.phoneType.toString().capitalize()}</h2>
+		<g:each var="pn" in="${personInstance.phoneNumbers.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
+			<h2><span class="preferredOrder">#${i + 1} - </span>${pn.phoneType.toString().capitalize()}</h2>
 			<p>${pn.phoneNumber}</p>
 		</g:each>
 		</fieldset>
@@ -324,8 +324,8 @@
 		<!-- Email Addresses -->
 		<g:if test="${personInstance.emailAddresses}">
 		<fieldset class="maroonBorder"><legend class="m1">Email Addresses</legend>
-			<g:each var="ea" in="${personInstance.emailAddresses.sort{ it.preferredOrder} }">
-			<h2><span class="preferredOrder">#${ea.preferredOrder + 1} - </span>${ea.emailType.toString().capitalize()}</h2>
+			<g:each var="ea" in="${personInstance.emailAddresses.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
+			<h2><span class="preferredOrder">#${i + 1} - </span>${ea.emailType.toString().capitalize()}</h2>
 			<p>${ea.emailAddress.emailAddress.toLowerCase()}(<a href="mailto:${ea.emailAddress.emailAddress.toLowerCase()}">send mail</a>)</p>
 			</g:each>
 		</fieldset>
