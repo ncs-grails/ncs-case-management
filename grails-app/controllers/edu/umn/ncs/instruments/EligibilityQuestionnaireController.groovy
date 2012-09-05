@@ -14,6 +14,7 @@ class EligibilityQuestionnaireController {
 	private static debug = false
 	
 	def springSecurityService
+	def personService
 
     def index = {
         redirect(action: "list", params: params)
@@ -27,8 +28,7 @@ class EligibilityQuestionnaireController {
     def create = {
         def eligibilityQuestionnaireInstance = new EligibilityQuestionnaire()
         eligibilityQuestionnaireInstance.properties = params
-
-
+		
 		// Set the street address of the dwelling unit if we can find it.
 		if ( eligibilityQuestionnaireInstance.trackedItem ) {
 			// get the tracked item ID
@@ -62,7 +62,21 @@ class EligibilityQuestionnaireController {
 		eligibilityQuestionnaireInstance.appCreated = appCreated
 		eligibilityQuestionnaireInstance.userCreated = user.username
         if (eligibilityQuestionnaireInstance.save(flush: true)) {
-            flash.message = "${message(code: 'default.created.message', args: [message(code: 'eligibilityQuestionnaire.label', default: 'EligibilityQuestionnaire'), eligibilityQuestionnaireInstance.trackedItem.id])}"
+			// Attempt to create a new person
+			def personInstance  = personService.makePersonFromEligibiltyQuestionnaire(eligibilityQuestionnaireInstance)
+			// Link person to current tracked item
+			if (personInstance && eligibilityQuestionnaireInstance?.trackedItem) {
+				personService.linkPersonToTrackedItem(personInstance,eligibilityQuestionnaireInstance?.trackedItem)
+			}
+			// Link person to existing street address instance
+			if (personInstance && eligibilityQuestionnaireInstance?.useExistingStreetAddress) {
+				personService.linkPersonToStreetAddress(personInstance, eligibilityQuestionnaireInstance.useExistingStreetAddress, 'eligibility_questionnaire_data_entry')
+			}
+			// TODO: Try to create a new street address from entered data if standardized
+			
+			// TODO: Link new person to the manually entered street address
+			
+			flash.message = "${message(code: 'default.created.message', args: [message(code: 'eligibilityQuestionnaire.label', default: 'EligibilityQuestionnaire'), eligibilityQuestionnaireInstance.trackedItem.id])}"
             //redirect(action: "show", id: eligibilityQuestionnaireInstance.id)
 			redirect(action:'index', controller:'dataEntry')
         }

@@ -27,7 +27,7 @@ class EligibilityQuestionnaire {
 	 This field is optional, but has a maximum size of 10 characters. */
 	String suffix
 
-	/** The gender of teh person who completed the survey if available.
+	/** The gender of the person who completed the survey if available.
 	  This field is optional.
 	  */
 	Gender gender
