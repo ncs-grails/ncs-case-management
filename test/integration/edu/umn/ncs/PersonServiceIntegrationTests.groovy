@@ -26,7 +26,9 @@ class PersonServiceIntegrationTests extends GrailsUnitTestCase {
 	protected void invalidPerson() {
 		// map for an invalid person object
 		person = [
-			title: 'Mrs'
+			title: 'Mrs',
+			firstName: 'DK',
+			lastName: 'unknown'
 			]
 	}
 	
@@ -40,7 +42,15 @@ class PersonServiceIntegrationTests extends GrailsUnitTestCase {
 		assert personInstance
 		
 		if (debug) { println "Created person::$personInstance" }
-				
+		
+		// Test creating an invalid person
+		invalidPerson()
+		personInstance = personService.makePerson(person)
+		
+		assert ! personInstance
+		
+		if (debug) { println "Could not create person::$personInstance" }
+		
     }
 	
 	void testCreateStreetAddress() {

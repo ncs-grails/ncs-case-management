@@ -3,7 +3,7 @@ package edu.umn.ncs
 import grails.validation.ValidationException
 
 class PersonService {
-	def debug = true
+	def debug = false
 	
 	static appCreated = 'ncs-case-management'
 	
@@ -28,104 +28,112 @@ class PersonService {
     Person makePerson(personMap) {
 		/**
 		 * Create a new person in the HS system
-		 * from a hash map.
+		 * from a hash map. Requires the following
+		 * keys at a minimum and the lastName
+		 * key must have a value and not be unknown/DK:
+		 * title, firstName, middleName,
+		 * lastName, suffix, gender, dob, useExistingStreetAddress,
+		 * address.
 		 */
 		def personInstance = null
 
 		log.trace "Looking for Person: ${personMap.lastName}, ${personMap.firstName}"
 		
-		// first name, last name, street address object match
-		if (! personInstance && personMap.useExistingStreetAddress && personMap.firstName){
-			def personInstanceList = Person.createCriteria().list {
-				and {
-					eq("firstName", personMap.firstName)
-					eq("lastName", personMap.lastName)
-				}
-				streetAddresses {
-					streetAddress {
-						idEq(personMap.useExistingStreetAddress.id)
-					}
-				}
-			}
-			personInstanceList.each{
-				if ( ! personInstance) { personInstance = it }
-			}
-		}
-
-		// last name only, street address object match
-		if (! personInstance && personMap.useExistingStreetAddress && ! personMap.firstName){
-			def personInstanceList = Person.createCriteria().list {
-				and {
-					isNull("firstName")
-					eq("lastName", personMap.lastName)
-				}
-				streetAddresses {
-					streetAddress {
-						idEq(personMap.useExistingStreetAddress.id)
-					}
-				}
-			}
-			personInstanceList.each{
-				if ( ! personInstance) { personInstance = it }
-			}
-		}
-
-		// first name, last name, entered string address match
-		if (! personInstance && personMap.address && personMap.firstName){
-			def personInstanceList = Person.createCriteria().list {
-				and {
-					eq("firstName", personMap.firstName)
-					eq("lastName", personMap.lastName)
-				}
-				streetAddresses {
-					streetAddress {
-						ilike("address", "%${personMap.address}%")
-					}
-				}
-			}
-			personInstanceList.each{
-				if ( ! personInstance) { personInstance = it }
-			}
-		}
-
-		// last name only, entered string address match
-		if (! personInstance && personMap.address && ! personMap.firstName){
-			def personInstanceList = Person.createCriteria().list {
-				and {
-					isNull("firstName")
-					eq("lastName", personMap.lastName)
-				}
-				streetAddresses {
-					streetAddress {
-						ilike("address", "%${personMap.address}%")
-					}
-				}
-			}
-			personInstanceList.each{
-				if ( ! personInstance) { personInstance = it }
-			}
-		}
-
-		if (debug && personInstance) { "Person exists::$personInstance" }
+		if (personMap.lastName && personMap.lastName != 'DK' && personMap.lastName != 'unknown') {
 		
-		// Attempt to create a new person
-		if (! personInstance){
-			if (debug) { "Creating new person::$personInstance" }
+			// first name, last name, street address object match
+			if (! personInstance && personMap.useExistingStreetAddress && personMap.firstName){
+				def personInstanceList = Person.createCriteria().list {
+					and {
+						eq("firstName", personMap.firstName)
+						eq("lastName", personMap.lastName)
+					}
+					streetAddresses {
+						streetAddress {
+							idEq(personMap.useExistingStreetAddress.id)
+						}
+					}
+				}
+				personInstanceList.each{
+					if ( ! personInstance) { personInstance = it }
+				}
+			}
+	
+			// last name only, street address object match
+			if (! personInstance && personMap.useExistingStreetAddress && ! personMap.firstName){
+				def personInstanceList = Person.createCriteria().list {
+					and {
+						isNull("firstName")
+						eq("lastName", personMap.lastName)
+					}
+					streetAddresses {
+						streetAddress {
+							idEq(personMap.useExistingStreetAddress.id)
+						}
+					}
+				}
+				personInstanceList.each{
+					if ( ! personInstance) { personInstance = it }
+				}
+			}
+	
+			// first name, last name, entered string address match
+			if (! personInstance && personMap.address && personMap.firstName){
+				def personInstanceList = Person.createCriteria().list {
+					and {
+						eq("firstName", personMap.firstName)
+						eq("lastName", personMap.lastName)
+					}
+					streetAddresses {
+						streetAddress {
+							ilike("address", "%${personMap.address}%")
+						}
+					}
+				}
+				personInstanceList.each{
+					if ( ! personInstance) { personInstance = it }
+				}
+			}
+	
+			// last name only, entered string address match
+			if (! personInstance && personMap.address && ! personMap.firstName){
+				def personInstanceList = Person.createCriteria().list {
+					and {
+						isNull("firstName")
+						eq("lastName", personMap.lastName)
+					}
+					streetAddresses {
+						streetAddress {
+							ilike("address", "%${personMap.address}%")
+						}
+					}
+				}
+				personInstanceList.each{
+					if ( ! personInstance) { personInstance = it }
+				}
+			}
+	
+			if (debug && personInstance) { "Person exists::$personInstance" }
 			
-			personInstance = new Person(title: personMap.title,
-				firstName: personMap.firstName,
-				middleName: personMap.middleName,
-				lastName: personMap.lastName,
-				suffix: personMap.suffix,
-				gender: personMap.gender,
-				birthDate: personMap.dob,
-				appCreated: appCreated,
-				isRecruitable: true)
-			
-			if (! personInstance.save(flush:true)) {
-				log.warn "Unable to save person::$personInstance"
-				personInstance.errors.each{ println "${it}" }
-				throw new ValidationException("Person could not be saved due to validation errors", personInstance.errors) 
+			// Attempt to create a new person
+			if (! personInstance){
+				if (debug) { "Creating new person::$personInstance" }
+				
+				personInstance = new Person(title: personMap.title,
+					firstName: personMap.firstName,
+					middleName: personMap.middleName,
+					lastName: personMap.lastName,
+					suffix: personMap.suffix,
+					gender: personMap.gender,
+					birthDate: personMap.dob,
+					appCreated: appCreated,
+					isRecruitable: true)
+				
+				if (! personInstance.save(flush:true)) {
+					log.warn "Unable to save person::$personInstance"
+					personInstance.errors.each{ println "${it}" }
+					throw new ValidationException("Person could not be saved due to validation errors", personInstance.errors) 
+				}
 			}
 		}
 		
