@@ -3,7 +3,7 @@ package edu.umn.ncs
 import grails.validation.ValidationException
 
 class PersonService {
-	def debug = false
+	def debug = true
 	
 	static appCreated = 'ncs-case-management'
 	
@@ -173,4 +173,71 @@ class PersonService {
 		}
 	}
 
+	def multipleContactRecords(String type) {
+		/**
+		 * Return list of people with multiple contact records
+		 * filtered by type.
+		 * Parameters: type [address|phone|email]
+		 */
+		def results = []
+		switch (type) {
+			case "address":
+				results = Person.list().findAll{ it.streetAddresses?.size() > 1 }
+				break
+			case "phone":
+				results = Person.list().findAll{ it.phoneNumbers?.size() > 1 }
+				break
+			case "email":
+				results = Person.list().findAll{ it.emailAddresses?.size() > 1 }
+				break
+			default:
+				results = null
+		}
+		if (results) {
+			results = results.sort{ it.id }
+		}
+		return results
+	}
+
+	def contactInfoRecord(String type, Long id) {
+		def result = null
+		switch (type) {
+			case "address":
+				result = PersonAddress.get(id)
+				break
+			case "phone":
+				result = PersonPhone.get(id)
+				break
+			case "email":
+				result = PersonEmail.get(id)
+				break
+			default:
+				result = null
+		}
+		return result
+	}
+	
+	Boolean updateContactInfoRecord(contactInfoInstance, Boolean active, String endDate) {
+		if (active != contactInfoInstance.active) {
+			if (debug) {
+				println "Active status does not match params::$active and contact record::$contactInfoInstance.active"
+			}
+			// Update end date for contact info
+			if (contactInfoInstance.active) {
+				// Make contact info inactive by adding end date
+				try {
+					contactInfoInstance.endDate = new Date(endDate)
+				} catch (e) {
+					return false
+				}
+			} else {
+				// Make contact info active by removing end date
+				contactInfoInstance.endDate = null				
+			}
+			if (! contactInfoInstance.save(flush:true)) {
+				return false	
+			}
+		}
+		return true
+	}
 }

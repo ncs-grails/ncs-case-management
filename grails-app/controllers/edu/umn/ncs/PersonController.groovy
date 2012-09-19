@@ -1,13 +1,18 @@
 package edu.umn.ncs
 // Let's us use security annotations
 import grails.plugins.springsecurity.Secured
+
+import org.apache.jasper.compiler.Node.ParamsAction;
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import edu.umn.ncs.phone.Call
 
 @Secured(['ROLE_NCS_PROTECTED'])
 class PersonController {
+	def debug = true
+	
 	def lookupService
-
+	def personService
+	
 	@Secured(['ROLE_NCS_LOOKUP'])
 	def show = {
 
@@ -77,5 +82,56 @@ class PersonController {
 		}
 		
 	}
+	
+	def cleanupContactInfo = {
+		[type: [[id: 'address',value: 'addresses'], [id: 'phone',value: 'phone numbers'], [id: 'email', value: 'email addresses']] ]
+	}
+	
+	def findContactInfo = {
+		if (debug) {
+			println "Getting people with multiple $params.type records"
+		}
+		def results = personService.multipleContactRecords(params.type)
+		if (debug) {
+			println "Found ${results?.size()} people with multiple $params.type records"
+		}
+		render( template: "contactInfoList", model: [ results: results, type: params.type ] )
+	}
+	
+	def updateContactInfo = {
+		if (debug) {
+			println "Updating data::$params"
+		}
+		def personInstance = null
+		def contactInfoInstance = null 
+		def activeKey = ""
+		def endDateKey = ""
+		def contactInfoInstanceIds = []
+		def success = false
+		def errors = false
+		params.findAll{ it.key =~ /id/ }.each{ contactInfoInstanceIds << it.value.toLong() }
+		if (debug) {
+			println "Processing person $params.type ids::$contactInfoInstanceIds"
+		}
+		
+		// Process each contact record
+		contactInfoInstanceIds.each {
+			contactInfoInstance = personService.contactInfoRecord(params.type, it)
+			if (contactInfoInstance) {
+				if (debug) {
+					println "Updating person $params.type::$contactInfoInstance"
+				}				
+				// TODO: Compare active status of contact record
+				activeKey = "active_$it"
+				endDateKey = "endDate_$it"
+				success = personService.updateContactInfoRecord(contactInfoInstance, params[activeKey] ? true : false, params[endDateKey])
+				personInstance = contactInfoInstance.person
+				if (! success) {
+					errors = true
+				}
+			}	
+		}
 
+		render( template: "contactInfoForm", model: [ personInstance: personInstance, type: params.type ] )
+	}
 }
