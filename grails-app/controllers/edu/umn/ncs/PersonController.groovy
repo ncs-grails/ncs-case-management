@@ -131,7 +131,13 @@ class PersonController {
 				}
 			}	
 		}
-
+		if (! errors) {
+			flash.message = "person.update.message"
+			flash.args = [ personInstance ]
+			flash.default = "Contact info updated"
+		}
+		// TODO: Display info to user if update fails due to errors
+		
 		render( template: "contactInfoForm", model: [ personInstance: personInstance, type: params.type ] )
 	}
 }

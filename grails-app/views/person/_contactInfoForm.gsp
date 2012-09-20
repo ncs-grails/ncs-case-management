@@ -1,6 +1,9 @@
 <g:javascript src="contact-info.js" />
 
 <div id="${'contactInfoBox' + personInstance.id}" class="contactInfoBox">
+	<g:if test="${flash.message}">
+		<div id="updateMessage" class="message"><g:message code="${flash.message}" args="${flash.args}" default="${flash.default}"/></div>
+	</g:if>
 	<g:form name="${'contactInfoForm_' + personInstance.id}" >
 		<g:hiddenField name="type" value="${type}" />
 		<div><strong>${personInstance}</strong></div>

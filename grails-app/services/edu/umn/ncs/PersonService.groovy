@@ -179,6 +179,7 @@ class PersonService {
 		 * filtered by type.
 		 * Parameters: type [address|phone|email]
 		 */
+		// TODO: Filter results with a time parameter (e.g. new contact info added in last x days)
 		def results = []
 		switch (type) {
 			case "address":
@@ -236,6 +237,15 @@ class PersonService {
 			}
 			if (! contactInfoInstance.save(flush:true)) {
 				return false	
+			}
+		} else {
+			// Compare end dates
+			if (! active && endDate) {
+				try {
+					contactInfoInstance.endDate = new Date(endDate)
+				} catch (e) {
+					return false
+				}
 			}
 		}
 		return true

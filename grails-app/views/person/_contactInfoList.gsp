@@ -2,8 +2,10 @@
 
 <g:if test="${results}">
 	<g:hiddenField name="type" value="${type}" />
-	<div class="message"></div>
+	
+	<div id="infoMessage" class="message"></div>
 	<div class="errors"></div>
+	
 	<strong>Found ${results.size()} people with multiple ${type} records</strong>
 	<g:each in="${results}" var="personInstance" status="i">
 		<g:render template="contactInfoForm" model="${['personInstance':personInstance, 'type':type]}" />

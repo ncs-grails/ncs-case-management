@@ -12,7 +12,7 @@ var debug = true;
 
 jQuery(document).ready(function() {
 	if (debug) {
-		jQuery(".message").html("jQuery loaded!");
+		jQuery("#infoMessage").html("jQuery loaded!");
 	}
 	
 	// Enable date picker for dynamic controls
@@ -21,15 +21,17 @@ jQuery(document).ready(function() {
 	// Handle change of active status event
 	jQuery("input[id*=active]").change(function() {
 		if (debug) {
-			jQuery(".message").html("Toggle active for " + jQuery(this).attr('name'));
+			jQuery("#infoMessage").html("Toggle active for " + jQuery(this).attr('name'));
 		}
 		var id = getId(jQuery(this).attr('name'));
 		if (debug) {
-			jQuery(".message").html("ID set to " + id);
+			jQuery("#infoMessage").html("ID set to " + id);
 		}
 		var datePickerElementId = '#datepicker_' + id;
 		if (jQuery(this).is(':checked')) {
 			jQuery(datePickerElementId).hide();
+			// Clear the date field
+			jQuery(datePickerElementId).val('');
 		} else {
 			jQuery(datePickerElementId).show();
 			jQuery(datePickerElementId).focus();			
@@ -44,6 +46,13 @@ jQuery(document).ready(function() {
 		var id = getId(jQuery(this).attr('name'));
 		var datePickerElementId = '#datepicker_' + id;
 		jQuery(datePickerElementId).hide();
+	});
+	
+	// Hide all update messages when save button is clicked
+	jQuery(":button").click(function() {
+		jQuery("#updateMessage").each(function() {
+			jQuery(this).hide();			
+		});
 	});
 	
 });
@@ -61,5 +70,9 @@ function getId(name) {
 }
 
 function updateMessage() {
-	jQuery(".message").html("Contact info updated successfully!");	
+	if (debug) {
+		jQuery("#infoMessage").html("Contact info updated successfully!");			
+	}
 }
+
+// TODO: Validate info on save, make sure an end date has been specified if active is not checked
