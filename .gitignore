@@ -2,3 +2,4 @@ web-app/WEB-INF/tld/
 target
 *.swp
 *.log
+*.war

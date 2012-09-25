@@ -91,10 +91,10 @@ class MergeDataBuilderService {
                 resultDate: item?.result?.receivedDate,
 				instructions: "",
 				comments: "",
-				reason: ""
+				reason: "",
+				creationConfigName: batchInstance?.creationConfig?.name
             ]
 			
-			record.creationConfigName = batchInstance?.creationConfig?.name
 
 			if (debug) { 
 				println "Config name:  ${record.creationConfigName}" 
@@ -112,7 +112,7 @@ class MergeDataBuilderService {
                 record.fullName = item.person?.fullName
                 record.title = item.person?.title
                 record.firstName = item.person?.firstName
-                record.lastName = item.person?.lastName
+                record.lastName = item.person?.lastName?.replaceAll("\\?", '')
                 record.gender = item.person?.gender?.name
 				if (record.lastName == null) {
 					record.salutation ="To whom it may concern"

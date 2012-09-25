@@ -753,6 +753,7 @@ class DocumentGenerationService {
 		
         // the output recordset (list of maps)
         def outputData = mergeDataBuilderService.getBaseData(batchInstance)
+
 		if (debug) {
 			def newSplitTime = new GregorianCalendar().time.time
 			println "getBaseData"
