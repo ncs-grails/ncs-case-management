@@ -134,14 +134,17 @@ class MergeDataBuilderService {
 					record.salutation ="Dear Mr. ${name}"
 				} else if (record.title == null && item.person?.gender?.id == 2) {
 					record.salutation ="Dear Ms. ${name}"
-				} else if (record.title == null) {
-					record.salutation ="To whom it may concern"
-				} else if (record.title.size() < 4) {
-					record.salutation ="Dear ${record.title}. ${name}"
+				} else if (record.title != null) {
+					if (record.title.size() < 4) {
+						record.salutation ="Dear ${record.title}. ${name}"
+					} else {
+						record.salutation ="Dear ${record.title} ${name}"
+					}
+
 				} else {
-					record.salutation ="Dear ${record.title} ${name}"
+					record.salutation = "Dear ${record.firstName} ${record.lastName}"
 				}
-            }
+			}
 
 			// look up any comments that may exist
 			item.comments.each{ c ->
