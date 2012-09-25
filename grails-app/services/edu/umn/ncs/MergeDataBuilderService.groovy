@@ -107,25 +107,39 @@ class MergeDataBuilderService {
             if (item.household) {
                 record.householdId = item.household.id
             }
+
+
             if (item.person) {
+
                 record.personId = item.person.id
                 record.fullName = item.person?.fullName
                 record.title = item.person?.title
                 record.firstName = item.person?.firstName
                 record.lastName = item.person?.lastName?.replaceAll("\\?", '')
                 record.gender = item.person?.gender?.name
-				if (record.lastName == null) {
+
+				def name = record.lastName ? record.lastName : record.firstName
+
+				if (debug){
+					println "personId: ${item?.person?.id}"
+					println "name: ${name}"
+					println "title: ${record?.title}"
+					println "gender: ${item.person?.gender?.id}"
+
+				}
+
+				if (name == null) {
 					record.salutation ="To whom it may concern"
 				} else if (record.title == null && item.person?.gender?.id == 1) {
-					record.salutation ="Dear Mr. ${record.lastName}"
+					record.salutation ="Dear Mr. ${name}"
 				} else if (record.title == null && item.person?.gender?.id == 2) {
-					record.salutation ="Dear Ms. ${record.lastName}"
+					record.salutation ="Dear Ms. ${name}"
 				} else if (record.title == null) {
 					record.salutation ="To whom it may concern"
 				} else if (record.title.size() < 4) {
-					record.salutation ="Dear ${record.title}. ${record.lastName}"
+					record.salutation ="Dear ${record.title}. ${name}"
 				} else {
-					record.salutation ="Dear ${record.title} ${record.lastName}"
+					record.salutation ="Dear ${record.title} ${name}"
 				}
             }
 
