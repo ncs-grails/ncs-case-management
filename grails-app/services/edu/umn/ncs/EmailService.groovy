@@ -15,10 +15,7 @@ class EmailService {
 		// println "sendProductionReport:params::${params}"
 		def referenceDate = new Date()
 		
-		def recipients = [ 'dmd@cccs.umn.edu'
-			, 'jaf@umn.edu'
-			, 'front_dis@cccs.umn.edu'
-			, 'sup_dis@cccs.umn.edu' ]
+		def recipients = ['NCS_UMN_Production_Report@lists.ncs.umn.edu']
 
 		def dateRange = getFullDayRange(params?.referenceDate)
 
@@ -63,9 +60,7 @@ class EmailService {
 	def sendNorcAlert = { params ->
 
 		// who gets the email...
-		def recipients = ['msg@cccs.umn.edu'
-			, 'Barron-Martin@norc.org'
-			, 'Sokolowski-John@norc.uchicago.edu' ]
+		def recipients = ['msg@cccs.umn.edu']
 
 		//recipients = [ 'ajz@cccs.umn.edu' ]
 
