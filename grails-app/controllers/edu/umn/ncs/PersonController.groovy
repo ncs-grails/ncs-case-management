@@ -82,12 +82,24 @@ class PersonController {
 		}
 		
 	}
-	
-	def cleanupContactInfo = {
+
+    @Secured(['ROLE_NCS_IT'])
+    def cleanupContactInfo = {
 		[type: [[id: 'address',value: 'addresses'], [id: 'phone',value: 'phone numbers'], [id: 'email', value: 'email addresses']] ]
 	}
-	
-	def findContactInfo = {
+
+    @Secured(['ROLE_NCS_IT'])
+    def personContactInfo = {
+        def personInstance = Person.read(params.id)
+        if (personInstance) {
+            render( template: "contactInfoForm", model: [ personInstance: personInstance, type: params.type ] )
+        } else {
+            render "Oops, person not found with id::${params.id}!"
+        }
+    }
+
+    @Secured(['ROLE_NCS_IT'])
+    def findContactInfo = {
 		if (debug) {
 			println "Getting people with multiple $params.type records"
 		}
@@ -97,14 +109,14 @@ class PersonController {
 		}
 		render( template: "contactInfoList", model: [ results: results, type: params.type ] )
 	}
-	
-	def updateContactInfo = {
+
+    @Secured(['ROLE_NCS_IT'])
+    def updateContactInfo = {
 		if (debug) {
 			println "Updating data::$params"
 		}
 		def personInstance = null
 		def contactInfoInstance = null 
-		def activeKey = ""
 		def endDateKey = ""
 		def contactInfoInstanceIds = []
 		def success = false
@@ -122,9 +134,8 @@ class PersonController {
 					println "Updating person $params.type::$contactInfoInstance"
 				}				
 				// TODO: Compare active status of contact record
-				activeKey = "active_$it"
 				endDateKey = "endDate_$it"
-				success = personService.updateContactInfoRecord(contactInfoInstance, params[activeKey] ? true : false, params[endDateKey])
+				success = personService.updateContactInfoRecord(contactInfoInstance, params[endDateKey])
 				personInstance = contactInfoInstance.person
 				if (! success) {
 					errors = true
@@ -140,4 +151,16 @@ class PersonController {
 		
 		render( template: "contactInfoForm", model: [ personInstance: personInstance, type: params.type ] )
 	}
+
+    @Secured(['ROLE_NCS_IT'])
+    def cancelContactUpdate = {
+        def personInstance = Person.read(params.id)
+        if (personInstance) {
+            render( template: "contactInfo", model: [ personInstance: personInstance, type: params.type ] )
+        } else {
+            render "Oops, person not found with id::${params.id}! "
+        }
+
+    }
+
 }

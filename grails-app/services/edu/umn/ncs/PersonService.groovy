@@ -200,7 +200,32 @@ class PersonService {
 		return results
 	}
 
-	def contactInfoRecord(String type, Long id) {
+    def personContactRecords(String type, Person personInstance) {
+        /**
+         * Return person contact records for a specific person
+         * filtered by type.
+         * @param type [address|phone|email]
+         * @param personInstance
+         * @return results (list of person contact records)
+         */
+        def results = []
+        switch (type) {
+            case "address":
+                results = personInstance.streetAddresses?.sort{ a,b -> b.dateCreated <=> a.dateCreated }
+                break
+            case "phone":
+                results = personInstance.phoneNumbers?.sort{ a,b -> b.dateCreated <=> a.dateCreated }
+                break
+            case "email":
+                results = personInstance.emailAddresses?.sort{ a,b -> b.dateCreated <=> a.dateCreated }
+                break
+            default:
+                results = null
+        }
+        return results
+    }
+
+    def contactInfoRecord(String type, Long id) {
 		def result = null
 		switch (type) {
 			case "address":
@@ -218,36 +243,23 @@ class PersonService {
 		return result
 	}
 	
-	Boolean updateContactInfoRecord(contactInfoInstance, Boolean active, String endDate) {
-		if (active != contactInfoInstance.active) {
-			if (debug) {
-				println "Active status does not match params::$active and contact record::$contactInfoInstance.active"
-			}
-			// Update end date for contact info
-			if (contactInfoInstance.active) {
-				// Make contact info inactive by adding end date
-				try {
-					contactInfoInstance.endDate = new Date(endDate)
-				} catch (e) {
-					return false
-				}
-			} else {
-				// Make contact info active by removing end date
-				contactInfoInstance.endDate = null				
-			}
-			if (! contactInfoInstance.save(flush:true)) {
-				return false	
-			}
-		} else {
-			// Compare end dates
-			if (! active && endDate) {
-				try {
-					contactInfoInstance.endDate = new Date(endDate)
-				} catch (e) {
-					return false
-				}
-			}
-		}
+	Boolean updateContactInfoRecord(contactInfoInstance, String endDate) {
+        // Make contact info active/inactive based on presence of an end date
+        if (debug) {
+            println "Active status is $contactInfoInstance.active but an end date has been entered. Updating..."
+        }
+        if (endDate) {
+            try {
+                if (debug) {
+                    println "    setting end date to::$endDate"
+                }
+                contactInfoInstance.endDate = new Date(endDate)
+            } catch (e) {
+                return false
+            }
+        } else {
+            contactInfoInstance.endDate = null
+        }
 		return true
 	}
 }

@@ -17,6 +17,8 @@ jQuery(document).ready(function() {
 	
 	// Enable date picker for dynamic controls
 	jQuery("input[id*=datepicker]").datepicker();
+
+    jQuery("#ui-datepicker-div").wrap('<div style="position:absolute;left:-10em;top:0.5em"></div>');
 	
 	// Handle change of active status event
 	jQuery("input[id*=active]").change(function() {
@@ -47,14 +49,7 @@ jQuery(document).ready(function() {
 		var datePickerElementId = '#datepicker_' + id;
 		jQuery(datePickerElementId).hide();
 	});
-	
-	// Hide all update messages when save button is clicked
-	jQuery(":button").click(function() {
-		jQuery("#updateMessage").each(function() {
-			jQuery(this).hide();			
-		});
-	});
-	
+
 });
 
 function getId(name) {
@@ -75,4 +70,12 @@ function updateMessage() {
 	}
 }
 
-// TODO: Validate info on save, make sure an end date has been specified if active is not checked
+function hideElementById(id) {
+    jQuery("#" + id).hide();
+    return true;
+}
+
+function showElementById(id) {
+    jQuery("#" + id).show();
+    return true;
+}

@@ -5,7 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="layout" content="ncs" />
 		<title>Lookup - National Children's Study</title>
-	</head>
+        <g:javascript src="contact-info.js" />
+    </head>
 	<body>
 		<div class="nav">
 			<span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a></span>
@@ -303,12 +304,22 @@
 		<!-- Street Addresses -->
 		<g:if test="${personInstance.streetAddresses}">
 		<fieldset class="maroonBorder"><legend class="m1">Addresses</legend>
-			<g:each var="pa" in="${personInstance.streetAddresses.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
-			<h2><span class="preferredOrder">#${i + 1} - </span>${pa.streetAddress.address}</h2>
-			<p> ${pa.streetAddress.cityStateZip}<br />
-			${pa.streetAddress.country?.name} </p>
-			</g:each>
-		</fieldset>
+            <div id="contactInfoBox">
+                <g:each var="pa" in="${personInstance.streetAddresses.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
+                    <h2><span class="preferredOrder">#${i + 1} - </span>${pa.streetAddress.address}</h2>
+                    <p> ${pa.streetAddress.cityStateZip}<br />
+                        ${pa.streetAddress.country?.name} </p>
+                </g:each>
+            </div>
+            <sec:ifAnyGranted roles="ROLE_NCS_IT">
+                <g:form>
+                    <g:hiddenField name="id" value="${personInstance.id}" />
+                    <g:hiddenField name="type" value="address" />
+                    <%--<span id="editAddressButton" class="buttons"><g:submitToRemote action="personContactInfo" class="edit" update="contactInfoBox" value="Edit" onclick="return hideElement('editAddressButton');" /></span>--%>
+                    <span id="addressButton" class="buttons"><g:submitToRemote url="[ controller: 'person', action: 'personContactInfo' ]" class="edit" update="contactInfoBox" value="Edit" onComplete="return hideElementById('addressButton');" /></span>
+                </g:form>
+            </sec:ifAnyGranted>
+        </fieldset>
 		</g:if>
 
 		<!-- Phone Numbers -->

@@ -1,4 +1,4 @@
-html * {
+        html * {
 	margin: 0;
 	/*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
 }
@@ -291,4 +291,9 @@ th.desc a {
 	background: transparent url(../images/skin/database_save.png) 5px 50%
 		no-repeat;
 	padding-left: 28px;
+}
+
+.buttons input.cancel {
+    background: transparent url(../images/cancel.png) 5px 50% no-repeat;
+    padding-left: 28px;
 }
