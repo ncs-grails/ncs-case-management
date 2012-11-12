@@ -45,15 +45,18 @@
 				</g:if>
 				<g:if test="${type == 'phone'}">
                     <g:each in="${personInstance.phoneNumbers.sort { preferredOrder } }" var="contactInfoInstance" status="count" >
-						<tr>
+						<tr class="${ count.mod(2) == 0 ? 'odd': 'even' }">
 							<td>
-								<g:checkBox name="${'active_' + contactInfoInstance.id}" checked="${contactInfoInstance.active}" />
+								<g:hiddenField name="${'id_' +  contactInfoInstance.id}" value="${contactInfoInstance.id}" />
+                                <g:hiddenField name="${'active_' + contactInfoInstance.id}" value="${contactInfoInstance.active}" />
+                                <g:formatBoolean boolean="${contactInfoInstance.active}" false="No" true="Yes" />
 							</td>
 							<td>${contactInfoInstance.phoneType}</td>
 							<td><g:if test="${contactInfoInstance.preferredOrder == 0}">*</g:if></td>
 							<td>
 								<div>${contactInfoInstance.phoneNumber}</div>
 							</td>
+                            <td><g:formatDate date="${contactInfoInstance.dateCreated}" format="MM/dd/yyyy" /></td>
 							<td>
 								<input size="12" id="${'datepicker_' + contactInfoInstance.id}" name="${'endDate_' + contactInfoInstance.id}" type="text" value="<g:formatDate date='${contactInfoInstance.endDate}' format='MM/dd/yyyy' />" />
 							</td>

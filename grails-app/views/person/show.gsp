@@ -325,10 +325,22 @@
 		<!-- Phone Numbers -->
 		<g:if test="${personInstance.phoneNumbers}">
 		<fieldset class="maroonBorder"><legend class="m1">Phone Numbers</legend>
-		<g:each var="pn" in="${personInstance.phoneNumbers.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
-			<h2><span class="preferredOrder">#${i + 1} - </span>${pn.phoneType.toString().capitalize()}</h2>
-			<p>${pn.phoneNumber}</p>
-		</g:each>
+			<div id="contactInfoPhoneBox">
+			<g:each var="pn" in="${personInstance.phoneNumbers.findAll{ it.active }?.sort{ it.preferredOrder} }" status="i">
+				<h2><span class="preferredOrder">#${i + 1} - </span>${pn.phoneType.toString().capitalize()}</h2>
+				<p>${pn.phoneNumber}</p>
+			</g:each>
+		</div>
+
+		<sec:ifAnyGranted roles="ROLE_NCS_IT">
+			<g:form>
+				<g:hiddenField name="id" value="${personInstance.id}" />
+				<g:hiddenField name="type" value="phone" />
+				<span id="phoneButton" class="buttons">
+					<g:submitToRemote url="[ controller: 'person', action: 'personContactInfo' ]" class="edit" update="contactInfoPhoneBox" value="Edit" onComplete="return hideElementById('phoneButton');" />
+				</span>
+			</g:form>
+		</sec:ifAnyGranted>
 		</fieldset>
 		</g:if>
 
