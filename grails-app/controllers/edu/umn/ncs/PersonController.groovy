@@ -16,10 +16,15 @@ class PersonController {
 	@Secured(['ROLE_NCS_LOOKUP'])
 	def show = {
 
-		//println "PERSON CONTROLLER > SHOW"
+		if (debug) {
+			println "PERSON CONTROLLER > SHOW"
+			println "=> params = $params"
+		}
 
 		def personInstance = Person.read(params.id)
-		//println "=> personInstance = ${personInstance}"
+		if (debug) {
+			println "=> personInstance = ${personInstance}"
+		}
 
 		if (!personInstance) {
 			response.sendError(404)
@@ -113,8 +118,10 @@ class PersonController {
     @Secured(['ROLE_NCS_IT'])
     def updateContactInfo = {
 		if (debug) {
-			println "Updating data::$params"
+			println "PERSON CONTROLLER > UPDATE-CONTACT-INFO"
+			println "=> params = $params"
 		}
+
 		def personInstance = null
 		def contactInfoInstance = null 
 		def endDateKey = ""
@@ -123,7 +130,7 @@ class PersonController {
 		def errors = false
 		params.findAll{ it.key =~ /id/ }.each{ contactInfoInstanceIds << it.value.toLong() }
 		if (debug) {
-			println "Processing person $params.type ids::$contactInfoInstanceIds"
+			println "=> Processing person $params.type ids::$contactInfoInstanceIds"
 		}
 		
 		// Process each contact record
@@ -131,7 +138,7 @@ class PersonController {
 			contactInfoInstance = personService.contactInfoRecord(params.type, it)
 			if (contactInfoInstance) {
 				if (debug) {
-					println "Updating person $params.type::$contactInfoInstance"
+					println "=> Updating person $params.type::$contactInfoInstance"
 				}				
 				// TODO: Compare active status of contact record
 				endDateKey = "endDate_$it"
@@ -148,17 +155,24 @@ class PersonController {
 			flash.default = "Contact info updated"
 		}
 		// TODO: Display info to user if update fails due to errors
+		if (debug) { println "=> params.type = $params.type" }
 		
 		render( template: "contactInfoForm", model: [ personInstance: personInstance, type: params.type ] )
 	}
 
     @Secured(['ROLE_NCS_IT'])
     def cancelContactUpdate = {
+	if (debug) {
+		println "PERSON CONTROLLER > CANCEL-CONTACT-UPDATE"
+		println "=> params = $params"
+	}
         def personInstance = Person.read(params.id)
+	if (debug) { println "=> personInstance: $personInstance" }
         if (personInstance) {
-            render( template: "contactInfo", model: [ personInstance: personInstance, type: params.type ] )
+		if (debug) { println "=> params.type = $params.type" }
+		render( template: "contactInfo", model: [ personInstance: personInstance, type: params.type ] )
         } else {
-            render "Oops, person not found with id::${params.id}! "
+		render "Oops, person not found with id::${params.id}! "
         }
 
     }
