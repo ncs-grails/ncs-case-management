@@ -10,45 +10,67 @@ class ReceiptItemsController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def springSecurityService
 	def receiptItemsService
-
-    def rand = new Random()
+    
+	def rand = new Random()
+	def debug = true
 
     def index = {
+		
+		if (debug) { 
+			log.debug "RECEIPT-ITEMS CONTROLLER > INDEX --------------------------------"
+			log.debug "==> params: ${params}" 
+	   	}
         redirect(action: "receipt", params: params)
     }
 
     def receipt = {
-		def receiptDate = params.receiptDate
 
+		if (debug) { 
+			log.debug "RECEIPT-ITEMS CONTROLLER > RECEIPT ------------------------------"
+			log.debug "==> params: ${params}" 
+	   	}
+
+		def receiptDate = params.receiptDate
+		if (debug && receiptDate) { log.debug "==> receiptDate (based on params.receiptDate): ${receiptDate}" }
 		if ( ! receiptDate ) {
 			receiptDate = new Date()
+			if (debug) { log.debug "==> receiptDate (new date b/c params.receiptDate is null): ${receiptDate}" }
 		}
+
 		[ receiptDate: receiptDate ]
+
 	}
 
     def receiptItem = {
 		
+		if (debug) { 
+			log.debug "RECEIPT-ITEMS CONTROLLER > RECEIPT-ITEM --------------------------"
+			log.debug "==> params: ${params}" 
+	   	}
+
 		def renderView = "itemResult"
+		if (debug) { log.debug "==> renderView set to: ${renderView}" }
 
 		//${record.norcProjectId}-${record.norcSuId}-${record.norcDocId}
 		def norcMailingPattern = ~/[0-9]{4}-[0-9]{8,10}-[0-9]{2,3}/		
+		if (debug) { log.debug "==> norcMailingPattern: ${norcMailingPattern}" }
 
-        // Delay Code, used to test out of sequence responses
         /*
-        def sleepTime = rand.nextInt(3000)
+        // Delay Code, used to test out sequence responses       
+		def sleepTime = rand.nextInt(3000)
         print "Waiting...${sleepTime}"
         sleep(sleepTime)
         println "...Done."
-         */
+        */
 
 		def receivedDate = params.receiptDateInstance
 		if ( ! receivedDate ) {
 			receivedDate = new Date()
+			if (debug) { log.debug "==> receivedDate (new date because params.receiptDateInstanc is null): ${receivedDate}" }
 		} else {
-            // Mon Jan 31 13:38:42 CST 2011
             receivedDate = Date.parse('EEE MMM d HH:mm:ss z yyyy', receivedDate)
+			if (debug) { log.debug "==> receivedDate (based on params.receiptDateInstance): ${receivedDate}" }
         }
-		//println "receiptItems:receivedDate::${receivedDate}"
 
         // prep all the things we'll need to send back
         def result = [
@@ -66,46 +88,79 @@ class ReceiptItemsController {
         // if a div ID was passed, let's save it to the result set
         if (params?.divId) {
             result.divId = params.divId
+			if (debug) { log.debug "==> result.divId (based on params?divId): ${result.divId}" }
         }
 
         if (params?.id){
+
             def barcodeValue = params?.id
 
-            //println "barcodeValue: ${barcodeValue}"
+            if (debug) { log.debug "==> barcodeValue (based on params?.id): ${barcodeValue" }
             //println "barcodeValue[1]: ${barcodeValue[0]}"
 
-			// Check if it has I infront. If yes remove the "I" and proceed
+			
+			// Examine barcode and then process
+			// Barcode has prefix 'I' for item -- remove prefix
             if (barcodeValue[0].toUpperCase() == "I") {
-                // we have an item
+
                 def id = barcodeValue.replace("I", "")
-
 				result = receiptItemsService.receiptItem(id, receivedDate, result)
+				if (debug) { 
+					log.debug "==> barcode is Tracking Item Id" 
+					log.debug "==> result: ${result}"		
+				}
+			
 
+			// Barcode has prefix 'B' for batch
             } else if (barcodeValue[0].toUpperCase() == "B") {
-                // we have a batch id
+
+				if (debug) { log.debug "==> barcode is Batch Id"i }
+
                 result.trackingDocument = true
 
                 try {
-                    def batchId = Integer.parseInt(barcodeValue.replace("B", ""))
 
+                    def batchId = Integer.parseInt(barcodeValue.replace("B", ""))
                     def batchInstance = Batch.get(batchId)
+					if (debug) { log.debug "==> batchId: ${batchId}" }
+
                     if (batchInstance) {
+
+						if (debug) { log.debug "==> batchInstance (based on batchId): ${batchInstance}" }
+
                         if (!batchInstance.trackingReturnDate) {
 
-                            batchInstance.trackingReturnDate = receivedDate
+							if (debug) { log.debug "==> batch not receipted yet (b/c trackingReturnDate is null)" }
+                            
+							batchInstance.trackingReturnDate = receivedDate
                             batchInstance.save(flush:true)
                             result.success = true
 
-							result.trackedItemId = "Tracking Document for Batch # ${batchInstance.id}"
 							result.instrumentName = batchInstance.primaryInstrument.toString()
 							result.studyName =  batchInstance.primaryInstrument.study.toString()
 							result.resultDate = batchInstance.trackingReturnDate
+						
+							// TODO: determine tracked item result based on instrument-type
 							result.resultName = "Received"
 
+							if (debug) { 
+								log.debug "==> batchInstance.trackingReturnDate (based on receiveDate): ${batchInstance.trackingReturnDate}" 
+								log.debug "==> result.instrumentName (based in primaryInstrument): ${result.instrumentName}" 
+								log.debug "==> result.studyName (based in primaryInstrument.study): ${result.studyName}" 
+								log.debug "==> result.resultDate (based ontrackingReturnDate): ${result.resultDate}" 
+								log.debug "==> result.resultName: ${result.resultName}" 
+							}
+							
                         } else {
+
+							if (debug) { log.debug "==> batch already receipted on (based on batchInstance.trackingReturnDate): ${batchInstance.trackingReturnDate}" }
                             result.errorText = "Already Receipted on ${batchInstance.trackingReturnDate}"
+
                         }
+
                     } else {
+
+						if (debug) { log.debug "==> cannot create batchInstance b/c batchId ${batchId} does not exist" }
                         result.errorText = "Batch does not exist!"
                     }
 
@@ -114,15 +169,22 @@ class ReceiptItemsController {
                     result.errorText = "Invalid Batch id."
                 }
 
+			// Barcode is a NORC barcode
             } else if (	norcMailingPattern.matcher(barcodeValue).matches() ) {
 			
-				// Looks like someone scanned in a NORC barcode...
-				// Hmm....
-				def barcodeParts = barcodeValue.split('-')
+				// Looks like someone scanned in a NORC barcode...Hmm....
+				if (debug) { log.debug "==> barcode is a NORC Id" }
 				
+				def barcodeParts = barcodeValue.split('-')
 				def norcProjectId = barcodeParts[0]
 				def norcSuId = barcodeParts[1]
 				def norcDocId = barcodeParts[2]
+				if (debug) { 
+					log.debug "==> barcodeParts: ${barcodeParts}" 
+					log.debug "==> norcProjectId: ${norcProjectId}" 
+					log.debug "==> norcSuId: ${norcSuId}" 
+					log.debug "==> norcDocId: ${norcDocId}" 
+				}
 				
 				// Rerouting 119 to 122
 				// Reason: 3500 EQs went out with norcDocId: 119 instead of 122 (JS late update)
@@ -135,13 +197,20 @@ class ReceiptItemsController {
 				def dwellingUnitInstance = DwellingUnitLink.findByNorcSuId(norcSuId)?.dwellingUnit
 				def personInstance = PersonLink.findByNorcSuId(norcSuId)?.person
 				def instrumentInstanceList = InstrumentLink.findAllByNorcDocId(norcDocId)?.collect{ it.instrument }
+				if (debug) { 
+					log.debug "==> studyInstance: ${studyInstance}" 
+					log.debug "==> dwellingUnitInstance: ${dwellingUnitInstance}" 
+					log.debug "==> personInstance: ${personInstance}" 
+					log.debug "==> instrumentInstanceList: ${instrumentInstanceList}" 
+				}
 				
 				def trackedItemInstanceList = []
 				
-				// If everything went as expected...
+				// Get Tracking Item
 				if (studyInstance && dwellingUnitInstance && instrumentInstanceList) {
 					
 					// get a list of tracked items for this dwelling unit and instrument combo
+					if (debug) { log.debug "==> get Tracked Item, if (studyInstance && dwellingUnitInstance && instrumentInstanceList)" }
 					trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
 						and{
 							eq('dwellingUnit', dwellingUnitInstance)
@@ -152,8 +221,11 @@ class ReceiptItemsController {
 							}
 						}
 					}
+
 				} else if (studyInstance && personInstance && instrumentInstanceList) {
-					// get a list of tracked items for this dwelling unit and instrument combo
+					
+					// get a list of tracked items for this person and instrument combo
+					if (debug) { log.debug "==> get Tracked Item, if (studyInstance && personInstance && instrumentInstanceList)" }
 					trackedItemInstanceList = TrackedItem.createCriteria().listDistinct{
 						and{
 							eq('person', personInstance)
@@ -168,20 +240,40 @@ class ReceiptItemsController {
 				}
 				
 				if ( ! trackedItemInstanceList ) {
-					// No can do.
+
+					if (debug) { log.debug "==> no tracked item found" }
 					result.errorText = "No items matched that NORC Mailing ID!"
+
 				} else {
 				
 					if (trackedItemInstanceList.size() == 1) {
+
 						result = receiptItemsService.receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
+						if (debug) { 
+							log.debug "==> one tracked item found" 
+							log.debug "==> result: ${result}" 
+						}
+					
 					} else {
+
 						renderView = 'chooseItem'
 						result.trackedItemInstanceList = trackedItemInstanceList
+						if (debug) { 
+							log.debug "==> multiple tracked items found" 
+							log.debug "==> result.trackedItemInstanceList: ${result.trackedItemInstanceList}" 
+							log.debug "==> renderView set to: ${renderView}"
+						}
+					
 					}
+				
 				}
+			
+			// invalid barcode
 			} else {
-                // invalid barcode!
+
+				if (debug) { log.debug "==> invalid barcode entry" }
                 result.errorText = "invalid barcode"
+
             }
         }
 
