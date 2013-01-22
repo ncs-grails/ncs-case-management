@@ -1,12 +1,6 @@
 	<g:if test="${success}">
-		success, received 
-		${studyName}
-		${instrumentName}
-		, ID: 
-		${trackedItemId}
-		, Receipt Date:
-		${resultDate}
+		Successful Receipt of ${studyName} ${instrumentName}: Tracked Item Id ${trackedItemId}, Receipt Date of ${resultDate}, Result of '${resultName}'
 	</g:if>
 	<g:else>
-		failed to receipt item: ${errorText}
+		Failed Receipt of ${studyName} ${instrumentName}: Tracked Item Id ${trackedItemId}, Error due to '${errorText}'
 	</g:else>

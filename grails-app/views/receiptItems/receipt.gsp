@@ -16,9 +16,7 @@
 
 	<div class="nav">
 		<span class="menuButton">
-			<a class="home" href="${createLink(uri: '/')}">
-				<g:message code="default.home.label" />
-			</a>
+			<a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label" /></a>
 		</span>
 	</div>
 
@@ -26,18 +24,12 @@
 	
 		<h1>Receipt Items</h1>
 
-		<g:if test="${flash.message}">
-			<div class="message">
-				${flash.message}
-			</div>
-		</g:if>
+		<g:if test="${flash.message}"><div class="message">${flash.message}</div></g:if>
 	
 		<g:form action="receipt">
 			<div class="prop">
 				<span class="name">
-					<label for="receiptDate">
-						Receipt	Date: <g:formatDate format="yyyy-MM-dd" date="${receiptDate}" />
-					</label>
+					<label for="receiptDate">Receipt Date: <g:formatDate format="yyyy-MM-dd" date="${receiptDate}" /></label>
 				</span>
 				<span class="value">
 					<g:datePicker name="receiptDate" value="${receiptDate}" precision="minute" />
@@ -52,9 +44,7 @@
 
 		<div class="prop">
 			<span class="name">
-				<label for="item">
-					<g:message code="receiptItems.item.label" default="Item to receipt" />
-				</label>
+				<label for="item"><g:message code="receiptItems.item.label" default="Item to receipt" /></label>
 			</span>
 			<span class="value">
 				<input type="text" size="15" id="barcode" name="barcode" value="" /> 
