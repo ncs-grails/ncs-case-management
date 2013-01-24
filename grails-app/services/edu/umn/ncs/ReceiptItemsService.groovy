@@ -93,7 +93,7 @@ class ReceiptItemsService {
 					result.success = false
 					result.resultName = trackedItemInstance.result.result.name
 					result.resultDate = trackedItemInstance.result.receivedDate
-					result.errorText = "Tracked Item already receipted on ${result.resultDate} with result of ${result.resultName}"
+					result.errorText = "Already receipted on ${result.resultDate} with result of '${result.resultName}'"
 					if (debug) { 
 						log.debug "result.success: ${result.success}"
 						log.debug "result.resultName (pulled from trackedItemInstance.result.result.name): ${result.resultName}"

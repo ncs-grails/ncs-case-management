@@ -253,7 +253,7 @@ class ReceiptItemsController {
 				
 					if (trackedItemInstanceList.size() == 1) {
 
-						//result = receiptItemsService.receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
+						result = receiptItemsService.receiptItem(trackedItemInstanceList[0]?.id, receivedDate, result)
 						if (debug) { 
 							log.debug "=> one tracked item found" 
 							log.debug "=> result: ${result}" 
@@ -273,7 +273,7 @@ class ReceiptItemsController {
 				
 				}
 
-			// invalid barcode emtry
+			// invalid barcode entry
 			} else {
 
 				if (debug) { log.debug "=> invalid barcode entry" }

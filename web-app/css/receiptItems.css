@@ -2,3 +2,8 @@
     max-height: 20em;
     overflow: auto;
 }
+
+.fontBoldRed {
+	color: red;
+	/* font-weight: bold; */
+}
