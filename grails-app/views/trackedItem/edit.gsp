@@ -93,7 +93,7 @@
 			             <label for="receiptDate">Receipt Date</label>
 			           </span>
 			           <span class="value ${hasErrors(bean: trackedItemInstance, field: 'result', 'errors')}">
-			               <g:datePicker name="receiptDate" value="${trackedItemInstance?.result?.receivedDate}" precision="day" years="[2011,2012]" default="none" noSelection="['': '']"/>
+			               <g:datePicker name="receiptDate" value="${trackedItemInstance?.result?.receivedDate}" precision="day" years="[2011,2012,2013]" default="none" noSelection="['': '']"/>
 			           </span>	       
 			       
 			           <span class="name">
